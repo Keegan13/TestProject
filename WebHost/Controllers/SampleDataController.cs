@@ -2,28 +2,45 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Host.Models;
+using Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
+using Host.Extensions;
 
 namespace Host.Controllers
 {
-    [Route("api/[controller]")]
+    public class someclass
+
+    {
+        public string name { get; set; }
+        public string password { get; set; }
+    }
+    [Route("developers")]
     public class SampleDataController : Controller
     {
+        private readonly ProjectManagerService _projectManager;
+        public SampleDataController(ProjectManagerService projectManager)
+        {
+            this._projectManager = projectManager;
+        }
         private static string[] Summaries = new[]
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
-        [HttpGet("[action]")]
-        public IEnumerable<WeatherForecast> WeatherForecasts()
+        [Route("create")]
+        public IActionResult AddDeveloper([FromBody] EditDeveloperViewModel developer)
         {
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            if (!ModelState.IsValid) return BadRequest();
+
+            var newDev = developer.GetInstance();
+            if (_projectManager.DeveloperExists(newDev))
             {
-                DateFormatted = DateTime.Now.AddDays(index).ToString("d"),
-                TemperatureC = rng.Next(-20, 55),
-                Summary = Summaries[rng.Next(Summaries.Length)]
-            });
+                //addmodel error
+            }
+            _projectManager.Add(newDev);
+            _projectManager.SaveChanges();
+            return Ok();
         }
 
         public class WeatherForecast

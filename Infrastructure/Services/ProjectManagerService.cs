@@ -86,17 +86,18 @@ namespace Infrastructure.Services
             if (String.IsNullOrEmpty(name)) throw new ArgumentOutOfRangeException();
             return _context.Set<Project>().Any(x => x.Name == name);
         }
-        private bool DeveloperExists(Developer developer)
+        public bool DeveloperExists(Developer developer)
         {
-            if (DeveloperExists(developer.Id)) return true;
-            return DeveloperExists(developer.Nickname);
+            if (developer.Id > 0) return DeveloperExists(developer.Id);
+            if (!string.IsNullOrEmpty(developer.Nickname)) return DeveloperExists(developer.Nickname);
+            throw new Exception();
         }
-        private bool DeveloperExists(int id)
+        public bool DeveloperExists(int id)
         {
             if (id <= 0) throw new Exception();
             return _context.Set<Developer>().Any(x => x.Id == id);
         }
-        private bool DeveloperExists(string nickname)
+        public bool DeveloperExists(string nickname)
         {
             if (string.IsNullOrEmpty(nickname)) throw new ArgumentOutOfRangeException();
             return _context.Set<Developer>().Any(x => x.Nickname == nickname);
