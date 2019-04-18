@@ -8,6 +8,7 @@ namespace Host.Models
 {
     public class EditDeveloperViewModel
     {
+        public string Url { get; set; }
         [Required]
         public string FullName { get; set; }
         [Required]

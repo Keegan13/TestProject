@@ -36,7 +36,7 @@ namespace Host
                 configuration.RootPath = "ClientApp/dist";
             });
 
-            Mapper.Initialize(config=>config.AddProfile<AutoMapperProfile>());
+            Mapper.Initialize(config => config.AddProfile<AutoMapperProfile>());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -53,15 +53,24 @@ namespace Host
                 app.UseHsts();
             }
 
-            //app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
 
             app.UseMvc(routes =>
             {
+                //routes.MapRoute(
+                //    name: "default",
+                //    template: "{Controller?}/{Action?}",
+                //    defaults: new { controller = "Home", Action = "Index" });
                 routes.MapRoute(
-                    name: "default",
-                    template: "{controller}/{action=Index}/{id?}");
+                    name: "main",
+                    template: "{Controller}/{name}",
+                    defaults: new { action="Single" });
+                routes.MapRoute(
+                    name: "manage",
+                    template: "{controller}s/{action}"
+                   );
             });
 
             app.UseSpa(spa =>

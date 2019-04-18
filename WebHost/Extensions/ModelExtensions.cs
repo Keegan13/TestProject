@@ -1,9 +1,5 @@
 ﻿using Host.Models;
 using Infrastructure.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 
 namespace Host.Extensions
@@ -14,9 +10,22 @@ namespace Host.Extensions
         {
             return Mapper.Map<Developer>(model);
         }
-        public static EditDeveloperViewModel GetVM(this Developer developer)
+        public static EditDeveloperViewModel GetVM(this Developer developer, string url)
         {
-            return Mapper.Map<EditDeveloperViewModel>(developer);
+            var result = Mapper.Map<EditDeveloperViewModel>(developer);
+            result.Url = url;
+            return result;
+        }
+
+        public static Project GetInstance(this EditProjectViewModel model)
+        {
+            return Mapper.Map<Project>(model);
+        }
+        public static EditProjectViewModel GetVM(this Project project, string url)
+        {
+            var result = Mapper.Map<EditProjectViewModel>(project);
+            result.Url = url;
+            return result;
         }
     }
 }
