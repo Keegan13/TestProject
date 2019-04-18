@@ -8,7 +8,7 @@
     {
         public ApplicationContext CreateDbContext(string[] args)
         {
-            return new ApplicationContext((new DbContextOptionsBuilder()).UseSqlServer(@"Server=.\SQLExpress;AttachDbFilename=./ProjectDb.mdf;Database=ProjectManagmentSystem;Trusted_Connection = true;").Options);
+            return new ApplicationContext((new DbContextOptionsBuilder()).UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=TestProjectDB;Trusted_Connection=True;").Options);
         }
     }
 }
