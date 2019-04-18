@@ -4,17 +4,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.28307.168
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3637930F-C3BC-44F9-B87B-786675E3A7C2}"
-	ProjectSection(SolutionItems) = preProject
-		Infrastructure\requirements.md = Infrastructure\requirements.md
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{C641A61F-45FA-4A53-9220-6EAFC9675112}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{8C349885-3DC6-4EED-A60F-9B9BD6F3C218}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "web", "web", "{2D3ECD63-CB85-4D3E-9404-4664868FA7CE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Host", "Host\Host.csproj", "{F4FBE43E-73C5-4B37-802D-46B8EA39F603}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{469B92F3-FEA4-4049-87BA-D27B862CA20C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{76359595-F2A6-4540-8DEB-B4B8701095FF}"
+	ProjectSection(SolutionItems) = preProject
+		requirements.md = requirements.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
