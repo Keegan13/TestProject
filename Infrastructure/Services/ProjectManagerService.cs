@@ -29,9 +29,9 @@ namespace Infrastructure.Services
         {
             return _context.Set<Developer>().Find(id);
         }
-        public Developer GetDeveloper(string nickname)
+        public Task<Developer> GetDeveloper(string nickname)
         {
-            return _context.Set<Developer>().Where(x => x.Nickname == nickname).FirstOrDefault();
+            return _context.Set<Developer>().Where(x => x.Nickname == nickname).FirstOrDefaultAsync();
         }
         public IEnumerable<Project> GetActiveProjects(int skip = 0, int take = 0)
         {
@@ -40,20 +40,55 @@ namespace Infrastructure.Services
             if (take > 0) query = query.Take(take);
             return query.OrderBy(x => x.EndDate).ToArray();
         }
-        public IEnumerable<Developer> GetDevelopers(int skip = 0, int take = 0)
+        public async Task<IEnumerable<Developer>> GetDevelopers(string sortColumn = null, string keywords = null, bool isAsc = true, int skip = 0, int take = 0)
         {
             var query = _context.Set<Developer>().AsQueryable();
+            if (!string.IsNullOrEmpty(keywords))
+            {
+                query = query.Where(x => x.FullName.Contains(keywords));
+            }
+            if (string.IsNullOrEmpty(sortColumn)) sortColumn = "fullName";
+            if (isAsc) query = query.OrderBy(sortColumn);
+            else query = query.OrderByDescending(sortColumn);
             if (skip > 0) query = query.Skip(skip);
             if (take > 0) query = query.Take(take);
-            return query.OrderBy(x => x.Nickname).ToArray();
+            return await query.ToArrayAsync();
         }
-        public IEnumerable<Project> GetProjects(int skip = 0, int take = 0)
+
+        public async Task<IEnumerable<Project>> GetProjects(string sortColumn = null, string keywords = null, bool isAsc = true, int skip = 0, int take = 0)
         {
             var query = _context.Set<Project>().AsQueryable();
+            if (!string.IsNullOrEmpty(keywords))
+            {
+                //pre
+                query = query.Where(x => x.Name.Contains(keywords));
+            }
+            if (string.IsNullOrEmpty(sortColumn)) sortColumn = "Name";
+            if (isAsc) query = query.OrderBy(sortColumn);
+            else query = query.OrderByDescending(sortColumn);
             if (skip > 0) query = query.Skip(skip);
             if (take > 0) query = query.Take(take);
-            return query.OrderByDescending(x => x.EndDate).ToArray();
+            return await query.ToArrayAsync();
         }
+        public int CountProjects(string keywords = null)
+        {
+            var query = _context.Set<Project>().AsQueryable();
+            if (!string.IsNullOrEmpty(keywords))
+            {
+                query = query.Where(x => x.Name.Contains(keywords));
+            }
+            return query.Count();
+        }
+        public int CountDevelopers(string keywords = null)
+        {
+            var query = _context.Set<Developer>().AsQueryable();
+            if (!string.IsNullOrEmpty(keywords))
+            {
+                query = query.Where(x => x.FullName.Contains(keywords) | x.Nickname.Contains(keywords));
+            }
+            return query.Count();
+        }
+
         public void Update<T>(T entity) where T : class => _context.Set<T>().Update(entity);
         public void AssignDeveloper(int projectId, int developerId)
         {
@@ -71,20 +106,21 @@ namespace Infrastructure.Services
         {
 
         }
-        public bool ProjectExists(Project project)
+        public async Task<bool> ProjectExists(Project project)
         {
-            if (ProjectExists(project.Id)) return true;
-            return ProjectExists(project.Name);
+            if (project.Id > 0) return await ProjectExists(project.Id);
+            if (!string.IsNullOrEmpty(project.Name)) return await ProjectExists(project.Name);
+            throw new Exception();
         }
-        public bool ProjectExists(int id)
+        public Task<bool> ProjectExists(int id)
         {
             if (id <= 0) throw new Exception();
-            return _context.Set<Project>().Any(x => x.Id == id);
+            return _context.Set<Project>().AnyAsync(x => x.Id == id);
         }
-        public bool ProjectExists(string name)
+        public Task<bool> ProjectExists(string name)
         {
             if (String.IsNullOrEmpty(name)) throw new ArgumentOutOfRangeException();
-            return _context.Set<Project>().Any(x => x.Name == name);
+            return _context.Set<Project>().AnyAsync(x => x.Name == name);
         }
         public bool DeveloperExists(Developer developer)
         {

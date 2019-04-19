@@ -2,6 +2,7 @@ import { AbstractControl } from '@angular/forms';
 
 export class Developer {
 
+  public url:string;
   public fullName: string;
   public nickname: string;
   public skills: string[];

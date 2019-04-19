@@ -13,25 +13,36 @@ namespace Host.Controllers
 {
     public class DeveloperController : BaseConroller
     {
-        public DeveloperController(ProjectManagerService projectManager, IConfiguration configuration) : base(projectManager, configuration)
+        public DeveloperController(ProjectManagerService projectManager) : base(projectManager)
         {
 
         }
 
-        public IActionResult Single(string name)
+        public async Task<IActionResult> Single(string name)
         {
-            if (_mng.GetDeveloper(Decode(name)) is Developer developer)
+            if (await _mng.GetDeveloper(Decode(name)) is Developer developer)
             {
                 return new JsonResult(developer.GetVM(name));
             }
             return NotFound();
         }
-        public IActionResult Get(FilterModel filter)
+        public async Task<IActionResult> Get(FilterModel filter)
         {
-            return Ok();
+            var count = _mng.CountDevelopers(filter.Keywords);
+            var result = await _mng.GetDevelopers(
+                filter.SortColumn,
+                filter.Keywords,
+                filter.SortOrder == OrderDirection.Ascending,
+                filter.Skip.Value,
+                filter.Take.Value);
+            return new JsonResult(new CollectionResult<EditDeveloperViewModel>()
+            {
+                Values = result.Select(x => x.GetVM(Encode(x.Nickname))).ToArray(),
+                TotalCount = count
+            });
         }
 
-        public IActionResult Create([FromBody] EditDeveloperViewModel model)
+        public async Task<IActionResult> Create([FromBody] EditDeveloperViewModel model)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.GetErrorObject());
 
@@ -44,9 +55,9 @@ namespace Host.Controllers
             }
 
             _mng.Add(developer);
-            _mng.SaveChanges();
+            await _mng.SaveChanges();
 
-            return Ok();
+            return new JsonResult(developer.GetVM(Encode(developer.Nickname)));
         }
         public IActionResult Update()
         {

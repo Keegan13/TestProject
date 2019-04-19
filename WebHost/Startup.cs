@@ -8,6 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Infrastructure.Extensions;
 using AutoMapper;
 using Host.Extensions;
+using Microsoft.AspNetCore.Http;
+using System.IO;
 
 namespace Host
 {
@@ -42,6 +44,15 @@ namespace Host
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.Use(_next =>
+            {
+                return async (context) =>
+                {
+
+                    await _next.Invoke(context);
+                };
+
+            });
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -65,11 +76,11 @@ namespace Host
                 //    defaults: new { controller = "Home", Action = "Index" });
                 routes.MapRoute(
                     name: "main",
-                    template: "{Controller}/{name}",
-                    defaults: new { action="Single" });
+                    template: "api/{Controller}/{name}",
+                    defaults: new { action = "Single" });
                 routes.MapRoute(
                     name: "manage",
-                    template: "{controller}s/{action}"
+                    template: "api/{controller}s/{action}"
                    );
             });
 
@@ -84,6 +95,12 @@ namespace Host
                 {
                     spa.UseAngularCliServer(npmScript: "start");
                 }
+            });
+
+            app.Run(async (context) =>
+            {
+                context.Response.ContentType = "text/html";
+                await context.Response.SendFileAsync(Path.Combine(env.WebRootPath, "index.html"));
             });
         }
     }

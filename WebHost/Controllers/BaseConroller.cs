@@ -8,11 +8,9 @@ namespace Host.Controllers
     public class BaseConroller : Controller
     {
         protected readonly ProjectManagerService _mng;
-        protected readonly IConfiguration config;
-        public BaseConroller(ProjectManagerService projectManager, IConfiguration configuration)
+        public BaseConroller(ProjectManagerService projectManager)
         {
             _mng = projectManager;
-            config = configuration;
         }
         public static string Encode(string input)
         {
