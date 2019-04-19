@@ -11,9 +11,37 @@ namespace Infrastructure.Services
     public class ProjectManagerService
     {
         private readonly DbContext _context;
+        private Dictionary<string, ISortScheme<Developer>> _devSorts;
+        private Dictionary<string, ISortScheme<Project>> _projSorts;
+
+        public virtual void AddSortScheme<TEntity>(string key, ISortScheme<TEntity> scheme)
+        {
+            if (typeof(Developer) == typeof(TEntity))
+            {
+                if (!_devSorts.ContainsKey(key))
+                    _devSorts.Add(key, (ISortScheme<Developer>)scheme);
+            }
+            if (typeof(Project) == typeof(TEntity))
+            {
+
+                if (!_projSorts.ContainsKey(key))
+                    _projSorts.Add(key, (ISortScheme<Project>)scheme);
+            }
+        }
+        public virtual IEnumerable<string> GetSortSchemes<TEntity>()
+        {
+            if (typeof(Project) == typeof(TEntity))
+                return _projSorts.Keys;
+            if (typeof(Developer) == typeof(TEntity))
+                return _devSorts.Keys;
+            return Enumerable.Empty<string>();
+        }
+
         public ProjectManagerService(ApplicationContext context)
         {
             this._context = context;
+            this._devSorts = new Dictionary<string, ISortScheme<Developer>>();
+            this._projSorts = new Dictionary<string, ISortScheme<Project>>();
         }
         public void Add<T>(T entity) where T : class => _context.Set<T>().Add(entity);
         public Project GetProject(int id)
@@ -40,16 +68,30 @@ namespace Infrastructure.Services
             if (take > 0) query = query.Take(take);
             return query.OrderBy(x => x.EndDate).ToArray();
         }
-        public async Task<IEnumerable<Developer>> GetDevelopers(string sortColumn = null, string keywords = null, bool isAsc = true, int skip = 0, int take = 0)
+        public async Task<IEnumerable<TEntity>> Get<TEntity>(string sort = null, string keywords = null, bool isAsc = true, int skip = 0, int take = 0) where TEntity:class
+        {
+            var query = _context.Set<TEntity>().AsQueryable();
+            if (!string.IsNullOrEmpty(keywords))
+            {
+                query = query.Where(x => x.FullName.Contains(keywords));
+            }
+            if (string.IsNullOrEmpty(sort)) sort = "fullName";
+            if (isAsc) query = query.OrderBy(sort);
+            else query = query.OrderByDescending(sort);
+            if (skip > 0) query = query.Skip(skip);
+            if (take > 0) query = query.Take(take);
+            return await query.ToArrayAsync();
+        }
+        public async Task<IEnumerable<Developer>> GetDevelopers(string sort = null, string keywords = null, bool isAsc = true, int skip = 0, int take = 0)
         {
             var query = _context.Set<Developer>().AsQueryable();
             if (!string.IsNullOrEmpty(keywords))
             {
                 query = query.Where(x => x.FullName.Contains(keywords));
             }
-            if (string.IsNullOrEmpty(sortColumn)) sortColumn = "fullName";
-            if (isAsc) query = query.OrderBy(sortColumn);
-            else query = query.OrderByDescending(sortColumn);
+            if (string.IsNullOrEmpty(sort)) sort = "fullName";
+            if (isAsc) query = query.OrderBy(sort);
+            else query = query.OrderByDescending(sort);
             if (skip > 0) query = query.Skip(skip);
             if (take > 0) query = query.Take(take);
             return await query.ToArrayAsync();
