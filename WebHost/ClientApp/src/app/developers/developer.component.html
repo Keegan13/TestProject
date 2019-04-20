@@ -1,0 +1,6 @@
+<div class="developer-profile">
+  <h2>{{developer?.fullName}} ({{developer?.nickname}})</h2>
+  <button type="button" class="btn btn-primary" (click)="edit()">Edit</button>
+<div>
+  <app-list-projects [isModal]="false" [developer]="router.snapshot.params['id']"></app-list-projects>
+</div>

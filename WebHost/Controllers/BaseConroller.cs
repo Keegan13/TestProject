@@ -1,5 +1,4 @@
-﻿using AutoMapper.Configuration;
-using Infrastructure.Services;
+﻿using Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Web;
 
@@ -14,11 +13,15 @@ namespace Host.Controllers
         }
         public static string Encode(string input)
         {
-            return HttpUtility.UrlEncode(input).Replace('+', '-');
+            if (!string.IsNullOrEmpty(input))
+                return HttpUtility.UrlEncode(input).Replace('+', '-');
+            return null;
         }
         public static string Decode(string encoded)
         {
-            return HttpUtility.UrlDecode(encoded.Replace('-', '+'));
+            if (!string.IsNullOrEmpty(encoded))
+                return HttpUtility.UrlDecode(encoded.Replace('-', '+'));
+            return null;
         }
     }
 }

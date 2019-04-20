@@ -1,3 +1,40 @@
-<p>
-  list-projects works!
-</p>
+<div *ngIf="totalPages>1&&!isModal">
+  <nav>
+    <ul class="pagination justify-content-end">
+      <li class="page-item">
+        <a class="page-link" (click)="previousPage()">Previous</a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" (click)="nextPage()">Next</a>
+      </li>
+    </ul>
+  </nav>
+</div>
+<div *ngIf="!isModal">
+  <table class="table table-sm">
+    <thead>
+      <tr>
+        <th>Project name</th>
+        <th>Start</th>
+        <th>Finish</th>
+        <th *ngIf="developer"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let element of projects">
+        <td><a class="" [routerLink]='["/project",element.url]'>{{element.name}}</a></td>
+        <td>{{element.startDate}}</td>
+        <td>{{element.endDate}}</td>
+        <td *ngIf="developer">
+          <button class="btn btn-primary" *ngIf="developer!=element.developer">Add</button>
+          <button class="btn-danger btn" *ngIf="developer==element.developer">Remove</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div *ngIf="isModal">
+  <div class="" *ngFor="let element of projects">
+    <a [routerLink]='["/project",element.url]'>{{element.name}}</a>
+  </div>
+</div>

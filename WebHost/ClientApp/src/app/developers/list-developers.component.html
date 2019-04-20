@@ -1,4 +1,5 @@
-<nav aria-label="Page navigation example">
+<div *ngIf="totalPages>1&&!isModal">
+<nav >
   <ul class="pagination justify-content-end">
     <li class="page-item">
       <a class="page-link" (click)="previousPage()">Previous</a>
@@ -8,7 +9,16 @@
     </li>
   </ul>
 </nav>
+</div>
 
+
+<div *ngIf="isModal">
+  <div class="" *ngFor="let element of developers">
+    <a [routerLink]='["/developer",element.url]'>{{element.nickname}}</a>
+  </div>
+</div>
+
+<div *ngIf="!isModal">
 <table class="table table-sm">
   <thead>
     <tr>
@@ -21,14 +31,17 @@
   <tbody>
     <tr *ngFor="let element of developers">
       <td>{{element.fullName}}</td>
-      <td><a class="dropdown-item" [routerLink]='["/developer",element.url]'>Create{{element.nickname}}</a></td>
+      <td><a [routerLink]='["/developer",element.url]'>{{element.nickname}}</a></td>
       <td>{{element.skills|json}}</td>
-
-
       <td *ngIf="project">
-        <button class="btn btn-primary" *ngIf="project!=element.project">Add</button>
-        <button class="btn-danger btn" *ngIf="project==element.project">Remove</button>
+        <button class="btn btn-primary" *ngIf="project!=element.project">assign</button>
+        <button class="btn-danger btn" *ngIf="project==element.project">unassign</button>
       </td>
     </tr>
   </tbody>
 </table>
+</div>
+
+
+
+

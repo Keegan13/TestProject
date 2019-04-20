@@ -14,5 +14,6 @@ namespace Host.Models
         [Required]
         public DateTime? EndDate { get; set; }
         public ProjectStatus? Status { get; set; }
+        public string Developer { get; internal set; }
     }
 }

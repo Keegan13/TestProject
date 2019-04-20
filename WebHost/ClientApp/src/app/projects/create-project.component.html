@@ -1,8 +1,9 @@
 <form [formGroup]="createForm" class="form-horizontal" (ngSubmit)="onSubmit()">
-  <h3 class="">Add new Project</h3>
+  <h3 class="">Project</h3>
   <span class="has-error" *ngIf="createForm.errors?.serverError">
     {{createForm.errors.serverError}}
   </span>
+
   <div class="form-group" [ngClass]="{'has-error': name.invalid&&(name.touched||name.dirty)}">
     <label for="name" class="control-label col-sm-2">Project name</label>
     <div class="col-sm-8">
@@ -18,73 +19,48 @@
     </div>
   </div>
 
-  <div class="form-group">
-    <label for="description" class="control-label col-sm-2">Project description</label>
+
+  <div class="form-group" [ngClass]="{'has-error':description.invalid &&(description.touched||description.dirty)}">
+    <label for="description" class="control-label col-sm-2">Description</label>
     <div class="col-sm-8">
       <textarea id="description" class="form-control" formControlName="description"></textarea>
-
+      <span *ngIf="description.invalid &&(description.touched||description.dirty)">
+        <span *ngIf="description.errors?.serverError">
+          {{description.errors.serverError}}
+        </span>
+      </span>
     </div>
   </div>
 
-  <div class="form-group">
+
+  <div class="form-group" [ngClass]="{'has-error': startDate.errors&&(startDate.touched||startDate.dirty)}">
     <label for="startDate" class="control-label col-sm-2">Project start Date</label>
     <div class="col-sm-8">
       <input type="text" bsDatepicker id="startDate" formControlName="startDate" type="text" class="form-control">
+      <span *ngIf="startDate.invalid&&(startDate.touched||startDate.dirty)">
+        <span *ngIf="startDate.errors.required">
+          Start date is required
+        </span>
+        <span *ngIf="startDate.errors?.serverError">
+          {{startDate.errors.serverError}}
+        </span>
+      </span>
     </div>
   </div>
-  <div class="form-group">
+
+  <div class="form-group" [ngClass]="{'has-error': endDate.errors&&(endDate.touched||endDate.dirty)}">
     <label for="endDate" class="control-label col-sm-2">Project end date</label>
     <div class="col-sm-8">
       <input type="text" bsDatepicker id="endDate" formControlName="endDate" type="text" class="form-control">
+      <span *ngIf="endDate.invalid&&(endDate.touched||endDate.dirty)">
+        <span *ngIf="endDate.errors.required">
+          Start date is required
+        </span>
+        <span *ngIf="endDate.errors?.serverError">
+          {{endDate.errors.serverError}}
+        </span>
+      </span>
     </div>
   </div>
   <button class="btn btn-primary" type="submit">Save</button>
 </form>
-
-<table border="1">
-  <tr>
-    <th style="padding:10px">FormGroup</th>
-    <th style="padding:10px">name</th>
-    <th style="padding:10px">description</th>
-    <th style="padding:10px">startDate</th>
-    <th style="padding:10px">endDate</th>
-  </tr>
-  <tr>
-    <td style="padding:10px">
-      touched: {{createForm.touched}}
-      <br /> dirty:{{createForm.dirty}}
-      <br /> valid: {{createForm.valid}}
-      <br /> Form Values: {{createForm.value|json}}
-      <br /> Errors: {{createForm.errors|json}}
-    </td>
-    <td style="padding:10px">
-      touched: {{name.touched}}
-      <br /> dirty:{{name.dirty}}
-      <br /> valid: {{name.valid}}
-      <br /> Form Values: {{name.value|json}}
-      <br /> errors:{{name.errors|json}}
-    </td>
-    <td style="padding:10px">
-      touched: {{description.valid}}
-      <br /> dirty:{{description.dirty}}
-      <br /> valid: {{description.valid}}
-      <br /> Form Values: {{description.value|json}}
-      <br /> {{description.errors|json}}
-    </td>
-    <td style="padding:10px">
-      touched: {{startDate.valid}}
-      <br /> dirty:{{startDate.dirty}}
-      <br /> valid: {{startDate.valid}}
-      <br /> Form Values: {{startDate.value|json}}
-      <br /> {{startDate.errors|json}}
-    </td>
-    <td style="padding:10px">
-      touched: {{endDate.valid}}
-      <br /> dirty:{{endDate.dirty}}
-      <br /> valid: {{endDate.valid}}
-      <br /> Form Values: {{endDate.value|json}}
-      <br /> {{endDate.errors|json}}
-    </td>
-  </tr>
-
-</table>

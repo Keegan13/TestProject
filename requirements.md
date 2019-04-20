@@ -20,24 +20,24 @@
 
  #### Implementation queue & Application Facase
 
-| Use case|Status| App facade func
-|-| - |-|
-| Create Project | unstrated | AddProject(...)| pre |
-| Create Developer| unstrated | AddDeveloper(...)| pre |
-| View Project| unstrated | GetProject(...)| pre |
-| View Developer| unstrated | GetDeveloper(...)| pre |
-| View Active Projects| unstrated | GetActiveProjects(...)| unstrated |
-| View all developers| unstrated | GetDevelopers(...)| unstrated |
-| View all project| unstrated | GetProjects(...)| unstrated |
-| Edit Project| unstrated | UpdateProject(...)| unstrated |
-| Edit Developer| unstrated | UpdateDeveloper(...)| unstrated |
-| View Completed projects| unstrated | GetProjects(...)| unstrated |
-| View upcomming projects| unstrated | GetProjects(...)| unstrated |
-| Delete projects/developers| unstrated | RemoveProject/RemoveDeveloper| unstrated |
-| Assign Developers to projects| unstrated | Assign(proj,dev) // try | unstrated |
-| Unassign devlopers from projects| unstrated | Unassign(proj,dev) //try | unstrated |
-| View assigned developers for current project| unstrated | GetDevelopers(...)| unstrated |
-| Search developer| unstrated | FindDeveloper(...)| unstrated |
-| Search project| unstrated | FindProject(...)| unstrated |
+| Use case|Status| Manager |Status|Component|Status
+|-| - |-| - |-|-|
+| Create Project | unstrated | Add\<T>(T x)| done | create-project-| pre |
+| Create Developer| unstrated | Add\<T>(T x)| done | create-developer- | pre |
+| View Project| unstrated | Get\<T>(...)| pre | project- | pre (rename)|
+| View Developer| unstrated | Get\<T>(...)| pre | developer- | unstarted |
+| View Active Projects| unstrated | GetActiveProjects(...)| unstarted | active-projects  | unstarted |
+| View all developers| unstrated | Get\<T>(...)| pre |all-developers,list-developers| unstarted |
+| View all project| unstrated | Get\<T>(...)| pre | all-projects,list-developers | unstarted |
+| Edit Project| unstrated | Update\<T>(T x)| done | edit-project | unstarted |
+| Edit Developer| unstrated | Update\<T>(T x)| done | edit-developer | unstarted |
+| View Completed projects| unstrated | GetProjects(...)| unstrated | all-projects | unstarted |
+| View upcomming projects| unstrated | GetProjects(...)| unstrated | all-projects | unstarted |
+| Delete projects/developers| unstrated | Remove\<T>(T x)| unstrated | edit-developer | unstarted |
+| Assign Developers to projects| unstrated | Assign(proj,dev) // try | unstrated | ? | unstarted |
+| Unassign devlopers from projects| unstrated | Unassign(proj,dev) //try | unstrated | ? | unstarted |
+| View assigned developers for current project| unstrated | GetDevelopers(...)| unstrated | view-develoeprs | unstarted |
+| Search developer| unstrated | Get\<T>(...keys)| pre | search-component | unstarted |
+| Search project| unstrated | Get\<T>(...keys)| pre| search-component | unstarted |
 
 

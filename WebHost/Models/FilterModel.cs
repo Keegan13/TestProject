@@ -9,5 +9,6 @@
         public string Keywords { get; set; }
         public string SetName { get; set; }
         public string Context { get; set; }
+        public string SetContext { get; set; }
     }
 }

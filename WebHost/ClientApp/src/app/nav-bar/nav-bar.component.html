@@ -21,7 +21,9 @@
               <div class="dropdown-divider"></div>
               <a class="dropdown-item" [routerLink]='["/projects/upcomming"]'>Upcomming</a>
               <a class="dropdown-item" [routerLink]='["/projects/active"]'>Active</a>
-              <a class="dropdown-item" [routerLink]='["/projects/completed"]'>Completed</a>          
+              <a class="dropdown-item" [routerLink]='["/projects/completed"]'>Completed</a>   
+              <a class="dropdown-item" [routerLink]='["/projects/all"]'>All</a>   
+                     
             </div>
           </li>
 
@@ -38,6 +40,14 @@
                 <a class="dropdown-item" [routerLink]='["/projects/completed"]'>Currently Free</a>          
               </div>
             </li>
+
+
+            <li class="form-inline my-2 my-lg-0">
+              <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+              <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+            </li>
+            
+
         </ul>
       </div>
     </div>

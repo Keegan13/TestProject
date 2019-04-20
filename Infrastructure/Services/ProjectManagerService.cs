@@ -24,18 +24,42 @@ namespace Infrastructure.Services
         //{
         //    return _context.Set<Project>().Find(id);
         //}
-        public Project GetProject(string name)
+        public Task<Project> GetProject(string name)
         {
-            //?
-            return _context.Set<Project>().Where(x => x.Name == name).FirstOrDefault();
+            return _context.Set<Project>().SingleOrDefaultAsync(x => x.Name == name);
         }
+
+        public async Task<IEnumerable<Project>> GetAssignedProjects(string devNickname)
+        {
+            if (await GetDeveloper(devNickname) is Developer dev)
+            {
+                int devId = dev.Id;
+                IEnumerable<int> projIds = this._context.Set<ProjectDeveloper>().Where(x => x.DeveloperId == devId).Select(x => x.ProjectId).ToArray();
+                return await _context.Set<Project>().Where(x => projIds.Contains(x.Id)).ToArrayAsync();
+            }
+            return Enumerable.Empty<Project>();
+        }
+
+        public async Task<IEnumerable<Developer>> GetAssignedDevelopers(string projName)
+        {
+            if (await GetProject(projName) is Project proj)
+            {
+                int projId = proj.Id;
+                IEnumerable<int> devIds = this._context.Set<ProjectDeveloper>().Where(x => x.ProjectId == projId).Select(x => x.DeveloperId).ToArray();
+                return await _context.Set<Developer>().Where(x => devIds.Contains(x.Id)).ToArrayAsync();
+            }
+            return Enumerable.Empty<Developer>();
+        }
+
+
+
         //public Developer GetDeveloper(int id)
         //{
         //    return _context.Set<Developer>().Find(id);
         //}
         public Task<Developer> GetDeveloper(string nickname)
         {
-            return _context.Set<Developer>().Where(x => x.Nickname == nickname).FirstOrDefaultAsync();
+            return _context.Set<Developer>().SingleOrDefaultAsync(x => x.Nickname == nickname);
         }
         public IEnumerable<Project> GetActiveProjects(int skip = 0, int take = 0)
         {
@@ -69,6 +93,12 @@ namespace Infrastructure.Services
             }
             return query.Count();
         }
+
+        public void Delete<T>(T entity) where T : class
+        {
+            _context.Set<T>().Remove(entity);
+        }
+
         public int CountDevelopers(string keywords = null)
         {
             var query = _context.Set<Developer>().AsQueryable();
@@ -105,10 +135,10 @@ namespace Infrastructure.Services
             if (String.IsNullOrEmpty(name)) throw new ArgumentOutOfRangeException();
             return _context.Set<Project>().AnyAsync(x => x.Name == name);
         }
-        public bool DeveloperExists(Developer developer)
+        public async Task<bool> DeveloperExists(Developer developer)
         {
             if (developer.Id > 0) return DeveloperExists(developer.Id);
-            if (!string.IsNullOrEmpty(developer.Nickname)) return DeveloperExists(developer.Nickname);
+            if (!string.IsNullOrEmpty(developer.Nickname)) return await DeveloperExists(developer.Nickname);
             throw new Exception();
         }
         public bool DeveloperExists(int id)
@@ -116,27 +146,27 @@ namespace Infrastructure.Services
             if (id <= 0) throw new Exception();
             return _context.Set<Developer>().Any(x => x.Id == id);
         }
-        public bool DeveloperExists(string nickname)
+        public Task<bool> DeveloperExists(string nickname)
         {
             if (string.IsNullOrEmpty(nickname)) throw new ArgumentOutOfRangeException();
-            return _context.Set<Developer>().Any(x => x.Nickname == nickname);
+            return _context.Set<Developer>().AnyAsync(x => x.Nickname == nickname);
         }
-        public bool IsAssigned(int projectId, int developerId)
+        public Task<bool> IsAssigned(int projectId, int developerId)
         {
             if (projectId <= 0 || developerId <= 0) throw new ArgumentOutOfRangeException();
-            return _context.Set<ProjectDeveloper>().Any(x => x.ProjectId == projectId && x.DeveloperId == developerId);
+            return _context.Set<ProjectDeveloper>().AnyAsync(x => x.ProjectId == projectId && x.DeveloperId == developerId);
         }
-        public bool IsAssigned(string projectName, string developerNickname)
+        public Task<bool> IsAssigned(string projectName, string developerNickname)
         {
             if (String.IsNullOrEmpty(projectName) || String.IsNullOrEmpty(developerNickname)) throw new ArgumentOutOfRangeException();
-            return _context.Set<ProjectDeveloper>().Any(x => x.Developer.Nickname == developerNickname && x.Project.Name == projectName);
+            return _context.Set<ProjectDeveloper>().AnyAsync(x => x.Developer.Nickname == developerNickname && x.Project.Name == projectName);
         }
-        public bool IsAssigned(Project project, Developer developer)
+        public async Task<bool> IsAssigned(Project project, Developer developer)
         {
             if (project.Id > 0 && developer.Id > 0)
-                return IsAssigned(project.Id, developer.Id);
+                return await IsAssigned(project.Id, developer.Id);
             if (!String.IsNullOrEmpty(project.Name) || !String.IsNullOrEmpty(developer.Nickname))
-                return IsAssigned(project.Name, developer.Nickname);
+                return await IsAssigned(project.Name, developer.Nickname);
             return false;
         }
         public Task<int> SaveChanges() => _context.SaveChangesAsync();

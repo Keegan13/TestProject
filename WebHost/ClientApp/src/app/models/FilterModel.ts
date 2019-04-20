@@ -6,4 +6,6 @@ export class FilterModel
     public take:number;
     public keywords:string;
     public context:string;
+    public setName:string;
+    public setContext:string;
 }

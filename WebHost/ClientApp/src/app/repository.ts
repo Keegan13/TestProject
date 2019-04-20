@@ -20,4 +20,6 @@ export abstract class Repository<T> {
 
     abstract get(filter: FilterModel): Observable<CollectionResult<T>>
 
+    abstract update(entity:T):Observable<T>
+    abstract delete(entity:T):any
 }

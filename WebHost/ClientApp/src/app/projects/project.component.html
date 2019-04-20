@@ -1,7 +1,11 @@
-<h2>{{project.name}}</h2>
+<h2>{{project?.name}}</h2>
 <p>
-  {{project.description}}
+  {{project?.description}}
 </p>
-<h2>{{project.startDate}}</h2>
-<h2>{{project.endDate</h2>
-<app-list-developers [project]="[rotuer.snapshot.params['id']]" [perPage]="5"></app-list-developers>
+<h2>{{project?.startDate}}</h2>
+<h2>{{project?.endDate}}</h2>
+
+<button type="button" class="btn btn-primary" (click)="edit()">Edit</button>
+
+
+<app-list-developers [project]="[router.snapshot.params['id']]" [perPage]="5"></app-list-developers>

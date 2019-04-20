@@ -80,7 +80,7 @@ namespace Host
                     defaults: new { action = "Single" });
                 routes.MapRoute(
                     name: "manage",
-                    template: "api/{controller}s/{action}"
+                    template: "api/{controller}s/{action}/{name?}"
                    );
             });
 

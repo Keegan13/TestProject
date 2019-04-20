@@ -1,13 +1,9 @@
-import { Component, OnInit, Inject } from '@angular/core';
-import { FormControl, FormGroup, FormBuilder, Validators, ValidationErrors } from '@angular/forms';
-import { DeveloperRepoService } from './../developer-repo.service';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Developer } from './../models/Developer';
+import { Component, OnInit, Inject, Input } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ProjectRepoService } from '../project-repo.service';
-import { FilterModel } from './../models/FilterModel';
 import { Project } from '../models/Project';
-import { errorHandler } from '@angular/platform-browser/src/browser';
 import { Router } from '@angular/router';
+import { BsModalRef } from 'ngx-bootstrap/modal';
 
 @Component({
   selector: 'app-create-project',
@@ -16,27 +12,60 @@ import { Router } from '@angular/router';
 })
 export class CreateProjectComponent implements OnInit {
   public createForm: FormGroup;
-  private submitResult: Project;
-  constructor(private fb: FormBuilder, private repo: ProjectRepoService,private router:Router) { }
-
+  @Input() isEdit: boolean;
+  @Input() project: Project;
+  get name() { return this.createForm.get("name"); }
+  get description() { return this.createForm.get("description"); }
+  get startDate() { return this.createForm.get('startDate'); }
+  get endDate() { return this.createForm.get('endDate'); }
+  get status() { return this.createForm.get('status'); }
+  constructor(public bsModalRef: BsModalRef, private fb: FormBuilder, private repo: ProjectRepoService, private router: Router) { }
   ngOnInit() {
+    if (this.project) this.isEdit = true;
+    if (!this.isEdit) this.isEdit = false;
+    if (this.isEdit && this.project) this.initEdit(); else this.initCreate();
+  }
+  private initEdit() {
+    this.createForm = this.fb.group({
+      name: [this.project.name, Validators.required],
+      description: [this.project.description],
+      startDate: [this.project.startDate, Validators.required],
+      endDate: [this.project.endDate, Validators.required],
+      status:[this.project.status]
+    });
+  }
+  private initCreate() {
     this.createForm = this.fb.group({
       name: ['', Validators.required],
       description: ['no description'],
-      startDate: ['01/01/2019'],
-      endDate: ['01/01/2019']
+      startDate: ['01/01/2019', Validators.required],
+      endDate: ['01/01/2019', Validators.required],
+      status:[]
     });
+  }
+  public onSubmit() {
+    if (this.createForm.valid) {
+      var action = this.isEdit ? this.repo.update.bind(this.repo) : this.repo.create.bind(this.repo);
+      var proj = new Project(this.createForm);
+      proj.url = this.isEdit && this.project ? this.project.url : null
+      action(proj).subscribe(((x) => {
+        this.project = x;
+        if (this.project != null) {
+          this.bsModalRef.hide();
+          this.router.navigate(['/project/' + this.project.url]);
+        }
+      }).bind(this), this.onSumbitError.bind(this), this.onSubmitSuccess.bind(this));
+    }
   }
 
   public onSumbitError(error: any): void {
-    switch(error.status)
-    {
-      case 404: 
-      this.createForm.setErrors({"serverError":"Service can't be reached"});
-      break;
-      default: 
-      this.createForm.setErrors({"serverError":"Whoops something went wrong"});
-      break;
+    switch (error.status) {
+      case 404:
+        this.createForm.setErrors({ "serverError": "Service can't be reached" });
+        break;
+      default:
+        this.createForm.setErrors({ "serverError": "Whoops something went wrong" });
+        break;
     }
     var errors = error.error.errors;
     if (errors)
@@ -47,24 +76,7 @@ export class CreateProjectComponent implements OnInit {
     this.createForm.get(field).setErrors({ 'serverError': messages.join("<br/>") });
   }
 
-   onSubmitSuccess() {
-    //redirect to view
-     console.log("Form submited, recieved response : '{0}', now should redirect to project view", JSON.stringify(this.submitResult));
+  onSubmitSuccess() {
+    console.log("submited succesfully");
   }
-
-  
-
-
-  public onSubmit() {
-    if (this.createForm.valid) {
-      this.repo.create(new Project(this.createForm)).subscribe(((x) => { this.router.navigate(['/project',x.url])}).bind(this), this.onSumbitError.bind(this), this.onSubmitSuccess.bind(this));
-      console.log("submitting form ");
-    }
-    else
-      console.log("cannot submit form invalid");
-  }
-  get name() { return this.createForm.get("name"); }
-  get description() { return this.createForm.get("description"); }
-  get startDate() { return this.createForm.get('startDate'); }
-  get endDate() { return this.createForm.get('endDate'); }
 }

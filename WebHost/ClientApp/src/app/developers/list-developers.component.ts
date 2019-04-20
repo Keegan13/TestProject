@@ -14,8 +14,10 @@ import { updateLocale } from 'ngx-bootstrap/chronos/public_api';
 export class ListDevelopersComponent implements OnInit {
 
   @Input() perPage: number;
+  @Input() isModal:boolean;
   @Input() project:string;
-  developers: Developer[];
+  @Input() data: CollectionResult<Developer>;
+  developers:Developer[];
   currentPage: number;
   totalPages: number;
 
@@ -24,8 +26,18 @@ export class ListDevelopersComponent implements OnInit {
         }
 
   ngOnInit() {
+    
     if(this.perPage===undefined)this.perPage=10;
-    this.loadPage(1);
+    if(this.data!==undefined)
+    {
+      this.currentPage=1;
+      this.parseResult(this.data);
+    }
+    else
+    {
+      this.loadPage(1);
+    }
+    
   }
   private parseResult(result: CollectionResult<Developer>): void {
     if (result) {
@@ -44,15 +56,13 @@ export class ListDevelopersComponent implements OnInit {
     this.repo.get(filter).subscribe(this.parseResult.bind(this));
   }
   public nextPage(): void {
-    if (this.totalPages > this.currentPage) {
-      
+    if (this.totalPages > this.currentPage) {   
       this.loadPage(this.currentPage+1);
     }
   }
 
   public previousPage(): void {
     if (this.currentPage > 1) {
-      
       this.loadPage(this.currentPage-1);
     }
   }

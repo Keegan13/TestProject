@@ -40,31 +40,44 @@ namespace Host.Controllers
 
             return new JsonResult(new CollectionResult<EditDeveloperViewModel>()
             {
-                Values = result.Select(x => x.GetVM(Encode(x.Nickname), proj!=null&&_mng.IsAssigned(proj, x) ? Encode(proj.Name) : null)).ToArray(),
+                Values = result.Select(x => x.GetVM(Encode(x.Nickname), proj != null && _mng.IsAssigned(proj, x) ? Encode(proj.Name) : null)).ToArray(),
                 TotalCount = count
             });
         }
 
-    public async Task<IActionResult> Create([FromBody] EditDeveloperViewModel model)
-    {
-        if (!ModelState.IsValid) return BadRequest(ModelState.GetErrorObject());
-
-        var developer = model.GetInstance();
-
-        if (_mng.DeveloperExists(developer))
+        public async Task<IActionResult> Create([FromBody] EditDeveloperViewModel model)
         {
-            ModelState.AddModelError(nameof(developer.Nickname), String.Format("Developer with nickname {0} already exists", developer.Nickname));
-            return BadRequest(ModelState.GetErrorObject());
+            if (!ModelState.IsValid) return BadRequest(ModelState.GetErrorObject());
+
+            var developer = model.GetInstance();
+
+            if (await _mng.DeveloperExists(developer))
+            {
+                ModelState.AddModelError(nameof(developer.Nickname), String.Format("Developer with nickname {0} already exists", developer.Nickname));
+                return BadRequest(ModelState.GetErrorObject());
+            }
+
+            _mng.Add(developer);
+            await _mng.SaveChanges();
+
+            return new JsonResult(developer.GetVM(Encode(developer.Nickname), null));
         }
-
-        _mng.Add(developer);
-        await _mng.SaveChanges();
-
-        return new JsonResult(developer.GetVM(Encode(developer.Nickname),null));
+        public async Task<IActionResult> Update([FromRoute] string name, [FromBody] EditDeveloperViewModel model)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState.GetErrorObject());
+            if (await _mng.GetDeveloper(Decode(name)) is Developer original)
+            {
+                if (original.Nickname!=model.Nickname&&await _mng.DeveloperExists(model.Nickname))
+                {
+                    ModelState.AddModelError(nameof(original.Nickname), String.Format("Developer with nickname {0} already exists", model.Nickname));
+                    return BadRequest(ModelState.GetErrorObject());
+                }
+                model.Update(original);
+                _mng.Update(original);
+                await _mng.SaveChanges();
+                return new JsonResult(original.GetVM(Encode(original.Nickname),null));
+            }
+            return NotFound();
+        }
     }
-    public IActionResult Update()
-    {
-        return Ok();
-    }
-}
 }

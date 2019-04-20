@@ -12,6 +12,8 @@ export class Developer {
     this.fullName = form.get('fullName').value;
     this.nickname = form.get('nickname').value;
     this.skills = Developer.parseSkills(form.get('skills').value);
+    this.url="";
+    this.project="";
   }
   private static parseSkills(skills: string): string[] {
     var output: string[] = [];

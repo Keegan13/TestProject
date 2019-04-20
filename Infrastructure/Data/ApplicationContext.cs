@@ -12,7 +12,7 @@ namespace Infrastructure.Data
 
         public ApplicationContext(DbContextOptions options) : base(options)
         {
-           // Database.EnsureCreated();
+          //Database.EnsureCreated();
         }
 
         protected override void OnModelCreating(ModelBuilder mb)
@@ -26,7 +26,6 @@ namespace Infrastructure.Data
         {
             proj.ToTable("projects");
             proj.HasKey(x => x.Id);
-            proj.HasAlternateKey(x => x.Name);
             proj.Property(x => x.Id).HasColumnName("project_id");
             proj.Property(x => x.Name).HasColumnName("project_name").IsRequired().HasMaxLength(150);
             proj.Property(x => x.Description).HasColumnName("project_description").HasMaxLength(450);
@@ -37,7 +36,6 @@ namespace Infrastructure.Data
         {
             dev.ToTable("developers");
             dev.HasKey(x => x.Id);
-            dev.HasAlternateKey(x => x.Nickname);
             dev.Property(x => x.Id).HasColumnName("developer_id");
             dev.Property(x => x.FullName).HasColumnName("developer_fullname").IsRequired().HasMaxLength(150);
             dev.Property(x => x.Nickname).HasColumnName("developer_nickname").HasMaxLength(100);

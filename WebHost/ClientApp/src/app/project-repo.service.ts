@@ -13,6 +13,12 @@ import { CollectionResult } from './collection-result';
   providedIn: 'root'
 })
 export class ProjectRepoService extends Repository<Project>{
+  update(entity: Project): Observable<Project> {
+    return this.http.post<Project>('/projects/update/'+entity.url,entity,this.getOptions);
+  }
+  delete(entity: Project): Observable<Project> {
+    return this.http.post<Project>('/projects/delete/'+entity.url,entity,this.getOptions);
+  }
   getOptions = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json'
@@ -37,7 +43,7 @@ export class ProjectRepoService extends Repository<Project>{
   }
 
   get(filter: FilterModel): Observable<CollectionResult<Project>> {
-    return this.http.get<CollectionResult<Project>>("api/projects/get" + this.getQueryStringFromObject(filter));
+    return this.http.get<CollectionResult<Project>>("api/projects/get?" + this.getQueryStringFromObject(filter));
   }
   public assign() {
 

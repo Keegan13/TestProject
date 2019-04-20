@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import {BsDatepickerModule} from "ngx-bootstrap/datepicker";
+import { BsDatepickerModule } from "ngx-bootstrap/datepicker";
 import { ReactiveFormsModule} from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -13,11 +13,16 @@ import { ListProjectsComponent } from './projects/list-projects.component';
 import { CreateProjectComponent } from './projects/create-project.component';
 import {HttpClientModule} from '@angular/common/http';
 import { APP_BASE_HREF } from '@angular/common';
-import { ViewDeveloperComponent } from './developers/view-developer.component';
+import { DeveloperComponent } from './developers/developer.component';
 import { ListDevelopersComponent } from './developers/list-developers.component';
 import { AllDevelopersComponent } from './developers/all-developers.component';
 import { AssignComponent } from './assign/assign.component';
 import { ProjectComponent } from './projects/project.component';
+import { SearchComponentComponent } from './search-component/search-component.component';
+import { AllProjectsComponent } from './projects/all-projects.component';
+import { ModalModule } from 'ngx-bootstrap/modal';
+import { EditDeveloperComponent } from './edit-developer/edit-developer.component';
+
 
 @NgModule({
   declarations: [
@@ -28,18 +33,22 @@ import { ProjectComponent } from './projects/project.component';
     UpcommingProjectsComponent,
     ListProjectsComponent,
     CreateProjectComponent,
-    ViewDeveloperComponent,
+    DeveloperComponent,
     ListDevelopersComponent,
     AllDevelopersComponent,
     AssignComponent,
-    ProjectComponent
+    ProjectComponent,
+    SearchComponentComponent,
+    AllProjectsComponent,
+    EditDeveloperComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     ReactiveFormsModule,
     HttpClientModule,
-    BsDatepickerModule.forRoot()
+    BsDatepickerModule.forRoot(),
+    ModalModule.forRoot()
   ],
   providers: [{provide: APP_BASE_HREF,useValue:'/'}],
   bootstrap: [AppComponent]
