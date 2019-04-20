@@ -10,7 +10,7 @@ namespace Host.Extensions
         {
             return Mapper.Map<Developer>(model);
         }
-        public static EditDeveloperViewModel GetVM(this Developer developer, string url)
+        public static EditDeveloperViewModel GetVM(this Developer developer, string url,string projectUrl)
         {
             var result = Mapper.Map<EditDeveloperViewModel>(developer);
             result.Url = url;

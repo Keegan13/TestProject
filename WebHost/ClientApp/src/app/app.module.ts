@@ -16,6 +16,8 @@ import { APP_BASE_HREF } from '@angular/common';
 import { ViewDeveloperComponent } from './developers/view-developer.component';
 import { ListDevelopersComponent } from './developers/list-developers.component';
 import { AllDevelopersComponent } from './developers/all-developers.component';
+import { AssignComponent } from './assign/assign.component';
+import { ProjectComponent } from './projects/project.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +30,9 @@ import { AllDevelopersComponent } from './developers/all-developers.component';
     CreateProjectComponent,
     ViewDeveloperComponent,
     ListDevelopersComponent,
-    AllDevelopersComponent
+    AllDevelopersComponent,
+    AssignComponent,
+    ProjectComponent
   ],
   imports: [
     BrowserModule,

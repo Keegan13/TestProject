@@ -49,8 +49,7 @@ namespace Host.Controllers
 
         public IActionResult Single(string name)
         {
-            name = Decode(name);
-            if (_mng.GetProject(name) is Project project)
+            if (_mng.GetProject(Decode(name)) is Project project)
             {
                 return new JsonResult(project);
             }
@@ -60,7 +59,7 @@ namespace Host.Controllers
         public async Task<IActionResult> Get(FilterModel filter)
         {
             var count = _mng.CountProjects(filter.Keywords);
-            var result = await _mng.GetProjects(
+            var result = await _mng.Get<Project>(
                 filter.SortColumn,
                 filter.Keywords,
                 filter.SortOrder == OrderDirection.Ascending,
@@ -86,7 +85,7 @@ namespace Host.Controllers
             {
                 if (!_mng.IsAssigned(project, developer))
                 {
-                    _mng.AssignDeveloper(project, developer);
+                    _mng.Assign(project, developer);
                     await _mng.SaveChanges();
                     return Ok();
                 }
@@ -102,7 +101,7 @@ namespace Host.Controllers
             {
                 if (_mng.IsAssigned(project, developer))
                 {
-                    _mng.DismissDeveloper(project, developer);
+                    _mng.Unassign(project, developer);
                     await _mng.SaveChanges();
                     return Ok();
                 }

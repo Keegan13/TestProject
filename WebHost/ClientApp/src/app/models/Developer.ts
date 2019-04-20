@@ -6,6 +6,7 @@ export class Developer {
   public fullName: string;
   public nickname: string;
   public skills: string[];
+  public project:string;
   constructor(form: AbstractControl) {
 
     this.fullName = form.get('fullName').value;

@@ -10,8 +10,6 @@ using AutoMapper;
 using Host.Extensions;
 using Microsoft.AspNetCore.Http;
 using System.IO;
-using Infrastructure.Services;
-using Infrastructure.Data;
 
 namespace Host
 {
@@ -31,13 +29,6 @@ namespace Host
 
             services.AddCustomDbContext();
 
-
-            services.AddScoped(factory =>
-            {
-                var service = new ProjectManagerService(factory.GetRequiredService<ApplicationContext>());
-                service.AddSortScheme("progress", new OrderByProgressScheme());
-                return service;
-            });
             services.AddProjectManager();
 
 
@@ -104,6 +95,12 @@ namespace Host
                 {
                     spa.UseAngularCliServer(npmScript: "start");
                 }
+            });
+
+            app.Run(async (context) =>
+            {
+                context.Response.ContentType = "text/html";
+                await context.Response.SendFileAsync(Path.Combine(env.WebRootPath, "index.html"));
             });
         }
     }

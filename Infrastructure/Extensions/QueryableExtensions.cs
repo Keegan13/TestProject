@@ -16,9 +16,7 @@ namespace System.Linq
                     properties.Add(prop);
                 }
             }
-
             Expression whereExpression = null;
-
             foreach (var prop in properties)
             {
                 // The below represents the following lamda:
@@ -47,7 +45,6 @@ namespace System.Linq
                                                        new Type[] { source.ElementType },
                                                        source.Expression,
                                                        Expression.Lambda<Func<TEntity, bool>>(whereExpression));
-
             return source.Provider.CreateQuery<TEntity>(methodCallExpression);
         }
 

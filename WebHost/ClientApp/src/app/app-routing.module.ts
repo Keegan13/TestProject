@@ -6,6 +6,7 @@ import { CreateProjectComponent } from './projects/create-project.component';
 import { ViewDeveloperComponent } from './developers/view-developer.component';
 import { ListDevelopersComponent } from './developers/list-developers.component';
 import { AllDevelopersComponent } from './developers/all-developers.component';
+import { ProjectComponent } from './projects/project.component';
 
 const routes: Routes = [
   {path:'developers/create',component: CreateDeveloperComponent},
@@ -13,7 +14,8 @@ const routes: Routes = [
   {path:'',component: HomeComponent},
   {path:'projects/create',component: CreateProjectComponent},
   {path:'developers',component: ListDevelopersComponent},
-  {path:'developers/all',component: AllDevelopersComponent}
+  {path:'developers/all',component: AllDevelopersComponent},
+  {path:'project/:id',component:ProjectComponent}
 ];
 
 @NgModule({

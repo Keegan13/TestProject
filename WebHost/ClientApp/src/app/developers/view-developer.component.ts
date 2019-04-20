@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { Developer } from "./../models/Developer";
 import {ActivatedRoute} from '@angular/router';
 import { DeveloperRepoService } from '../developer-repo.service';
@@ -12,7 +12,9 @@ export class ViewDeveloperComponent implements OnInit {
   public Developer: Developer;
   constructor(private rotuer:ActivatedRoute,private repo:DeveloperRepoService) {
   }
-
+  
+  @Input()
+  inProjectContext:boolean;
 
 
   ngOnInit() {

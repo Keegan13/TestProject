@@ -5,5 +5,5 @@ export class FilterModel
     public skip:number;
     public take:number;
     public keywords:string;
-    public setName:string;
+    public context:string;
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { DeveloperRepoService } from '../developer-repo.service';
 import { ActivatedRoute } from '@angular/router';
 import { Developer } from '../models/Developer';
@@ -12,17 +12,19 @@ import { updateLocale } from 'ngx-bootstrap/chronos/public_api';
   styleUrls: ['./list-developers.component.css']
 })
 export class ListDevelopersComponent implements OnInit {
-  private perPage: number = 10;
+
+  @Input() perPage: number;
+  @Input() project:string;
   developers: Developer[];
   currentPage: number;
   totalPages: number;
 
 
   constructor(private repo: DeveloperRepoService, private router: ActivatedRoute) {
-
-  }
+        }
 
   ngOnInit() {
+    if(this.perPage===undefined)this.perPage=10;
     this.loadPage(1);
   }
   private parseResult(result: CollectionResult<Developer>): void {
@@ -38,6 +40,7 @@ export class ListDevelopersComponent implements OnInit {
     filter.skip = this.perPage*(page-1);
     filter.take = this.perPage;
     filter.sortColumn = "fullName";
+    filter.context=this.project;
     this.repo.get(filter).subscribe(this.parseResult.bind(this));
   }
   public nextPage(): void {

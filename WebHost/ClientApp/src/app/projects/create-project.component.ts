@@ -7,6 +7,7 @@ import { ProjectRepoService } from '../project-repo.service';
 import { FilterModel } from './../models/FilterModel';
 import { Project } from '../models/Project';
 import { errorHandler } from '@angular/platform-browser/src/browser';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-create-project',
@@ -16,7 +17,7 @@ import { errorHandler } from '@angular/platform-browser/src/browser';
 export class CreateProjectComponent implements OnInit {
   public createForm: FormGroup;
   private submitResult: Project;
-  constructor(private fb: FormBuilder, private repo: ProjectRepoService) { }
+  constructor(private fb: FormBuilder, private repo: ProjectRepoService,private router:Router) { }
 
   ngOnInit() {
     this.createForm = this.fb.group({
@@ -56,7 +57,7 @@ export class CreateProjectComponent implements OnInit {
 
   public onSubmit() {
     if (this.createForm.valid) {
-      this.repo.create(new Project(this.createForm)).subscribe((x) => { this.submitResult = x; }, this.onSumbitError.bind(this), this.onSubmitSuccess.bind(this));
+      this.repo.create(new Project(this.createForm)).subscribe(((x) => { this.router.navigate(['/project',x.url])}).bind(this), this.onSumbitError.bind(this), this.onSubmitSuccess.bind(this));
       console.log("submitting form ");
     }
     else

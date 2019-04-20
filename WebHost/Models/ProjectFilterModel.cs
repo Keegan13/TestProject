@@ -8,5 +8,6 @@
         public int? Take { get; set; }
         public string Keywords { get; set; }
         public string SetName { get; set; }
+        public string Context { get; set; }
     }
 }
