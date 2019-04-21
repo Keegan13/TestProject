@@ -33,10 +33,7 @@
       <td>{{element.fullName}}</td>
       <td><a [routerLink]='["/developer",element.url]'>{{element.nickname}}</a></td>
       <td>{{element.skills|json}}</td>
-      <td *ngIf="project">
-        <button class="btn btn-primary" *ngIf="project!=element.project">assign</button>
-        <button class="btn-danger btn" *ngIf="project==element.project">unassign</button>
-      </td>
+      <app-assign-button [developer]="element.url" [context]="project" [isAssigned]="element.project==project"></app-assign-button>
     </tr>
   </tbody>
 </table>

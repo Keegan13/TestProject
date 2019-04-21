@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Developer } from '../models/Developer';
 import { FilterModel } from '../models/FilterModel';
 import { CollectionResult } from '../collection-result';
-import { updateLocale } from 'ngx-bootstrap/chronos/public_api';
+import { AssignService } from '../assign.service';
 
 @Component({
   selector: 'app-list-developers',
@@ -14,30 +14,28 @@ import { updateLocale } from 'ngx-bootstrap/chronos/public_api';
 export class ListDevelopersComponent implements OnInit {
 
   @Input() perPage: number;
-  @Input() isModal:boolean;
-  @Input() project:string;
+  @Input() isModal: boolean;
+  @Input() project: string;//this is context
   @Input() data: CollectionResult<Developer>;
-  developers:Developer[];
+  developers: Developer[];
   currentPage: number;
   totalPages: number;
 
 
   constructor(private repo: DeveloperRepoService, private router: ActivatedRoute) {
-        }
+  }
 
   ngOnInit() {
-    
-    if(this.perPage===undefined)this.perPage=10;
-    if(this.data!==undefined)
-    {
-      this.currentPage=1;
+
+    if (this.perPage === undefined) this.perPage = 10;
+    if (this.data !== undefined) {
+      this.currentPage = 1;
       this.parseResult(this.data);
     }
-    else
-    {
+    else {
       this.loadPage(1);
     }
-    
+
   }
   private parseResult(result: CollectionResult<Developer>): void {
     if (result) {
@@ -49,21 +47,21 @@ export class ListDevelopersComponent implements OnInit {
   private loadPage(page: number) {
     this.currentPage = page;
     var filter = new FilterModel();
-    filter.skip = this.perPage*(page-1);
+    filter.skip = this.perPage * (page - 1);
     filter.take = this.perPage;
     filter.sortColumn = "fullName";
-    filter.context=this.project;
+    filter.context = this.project;
     this.repo.get(filter).subscribe(this.parseResult.bind(this));
   }
+
   public nextPage(): void {
-    if (this.totalPages > this.currentPage) {   
-      this.loadPage(this.currentPage+1);
+    if (this.totalPages > this.currentPage) {
+      this.loadPage(this.currentPage + 1);
     }
   }
-
   public previousPage(): void {
     if (this.currentPage > 1) {
-      this.loadPage(this.currentPage-1);
+      this.loadPage(this.currentPage - 1);
     }
   }
 

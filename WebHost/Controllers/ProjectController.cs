@@ -72,18 +72,18 @@ namespace Host.Controllers
         {
             int count = 0;
             IEnumerable<Project> result = null;
-            if (!string.IsNullOrEmpty(filter.SetName) && Sets.ContainsKey(filter.SetName.ToLower()))
+            if (!string.IsNullOrEmpty(filter.Set) && Sets.ContainsKey(filter.Set.ToLower()))
             {
-                result = await Sets[filter.SetName.ToLower()](filter);
+                result = await Sets[filter.Set.ToLower()](filter);
                 count = result.Count();
             }
             else
             {
                 count = _mng.CountProjects(filter.Keywords);
                 result = await _mng.Get<Project>(
-                            filter.SortColumn,
+                            filter.Sort,
                             filter.Keywords,
-                            filter.SortOrder == OrderDirection.Ascending,
+                            filter.Sort== OrderDirection.Ascending,
                             filter.Skip.Value,
                             filter.Take.Value);
             }

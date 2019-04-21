@@ -22,6 +22,7 @@ import { SearchComponentComponent } from './search-component/search-component.co
 import { AllProjectsComponent } from './projects/all-projects.component';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { EditDeveloperComponent } from './edit-developer/edit-developer.component';
+import { AssignButtonComponent } from './assign-button/assign-button.component';
 
 
 @NgModule({
@@ -40,7 +41,8 @@ import { EditDeveloperComponent } from './edit-developer/edit-developer.componen
     ProjectComponent,
     SearchComponentComponent,
     AllProjectsComponent,
-    EditDeveloperComponent
+    EditDeveloperComponent,
+    AssignButtonComponent
   ],
   imports: [
     BrowserModule,

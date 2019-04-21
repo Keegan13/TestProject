@@ -24,6 +24,9 @@ namespace Infrastructure.Services
         //{
         //    return _context.Set<Project>().Find(id);
         //}
+
+        public int LastQueryTotalCount = 0;
+
         public Task<Project> GetProject(string name)
         {
             return _context.Set<Project>().SingleOrDefaultAsync(x => x.Name == name);
@@ -79,6 +82,7 @@ namespace Infrastructure.Services
             {
                 query = isAsc ? query.OrderBy(sortColumn) : query.OrderByDescending(sortColumn);
             }
+            this.LastQueryTotalCount = await query.CountAsync();
             if (skip > 0) query = query.Skip(skip);
             if (take > 0) query = query.Take(take);
             return await query.ToArrayAsync();
@@ -161,6 +165,20 @@ namespace Infrastructure.Services
             if (String.IsNullOrEmpty(projectName) || String.IsNullOrEmpty(developerNickname)) throw new ArgumentOutOfRangeException();
             return _context.Set<ProjectDeveloper>().AnyAsync(x => x.Developer.Nickname == developerNickname && x.Project.Name == projectName);
         }
+        public async Task<bool[]> IsAssigned(Project project, IEnumerable<Developer> developers)
+        {
+            int projId = project.Id;
+            int[] devsId = developers.Select(x => x.);
+            var ids = _context.Set<ProjectDeveloper>().Where(x => x.ProjectId == projId).Select(x => x.DeveloperId).ToArrayAsync();
+            var result = new bool[developers.Count()];
+            for (int i = 0; i < length; i++)
+            {
+
+            }
+
+            return null;
+        }
+
         public async Task<bool> IsAssigned(Project project, Developer developer)
         {
             if (project.Id > 0 && developer.Id > 0)

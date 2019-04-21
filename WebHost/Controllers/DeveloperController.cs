@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper.Configuration;
 using Infrastructure.Entities;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -13,11 +12,58 @@ namespace Host.Controllers
 {
     public class DeveloperController : BaseConroller
     {
+        private Dictionary<string, Func<FilterModel, Task<IEnumerable<Developer>>>> Sets;
+        private int lastCount = 0;
+
         public DeveloperController(ProjectManagerService projectManager) : base(projectManager)
         {
-
+            this.Sets = new Dictionary<string, Func<FilterModel, Task<IEnumerable<Developer>>>>();
+            Sets.Add("associated", GetByProject);
+            Sets.Add("all", GetAll);
         }
 
+        private Task<IEnumerable<Developer>> GetByProject(FilterModel filter)
+        {
+            return _mng.GetAssignedDevelopers(Decode(filter.Context));
+        }
+        private Task<IEnumerable<Developer>> GetAll(FilterModel filter)
+        {
+            return _mng.Get<Developer>(filter.Sort, filter.Keywords, filter.Order == OrderDirection.Ascending, filter.Skip.Value, filter.Take.Value);
+        }
+
+        private async Task<bool> ValidateOrDefault(FilterModel filter)
+        {
+            //if non existing Set provided use 'all'
+            if (string.IsNullOrEmpty(filter.Set) || !Sets.ContainsKey(filter.Set.ToLower())) filter.Set = "all";
+            //if order not provided use ascending
+            if (!filter.Order.HasValue) filter.Order = OrderDirection.Ascending;
+            //if no sort Column  given use fullName
+            if (string.IsNullOrEmpty(filter.Sort)) filter.Sort = "fullname";
+            //if retriving associated data (devs of project) and context not given or project does't exist
+            if (filter.Set.ToLower() == "associated")
+                if (string.IsNullOrEmpty(filter.Context))
+                {
+                    ModelState.AddModelError(nameof(filter.Context), "Project url not provided in \"Context\" field");
+                }
+                else if (!await _mng.ProjectExists(Decode(filter.Context)))
+                {
+                    ModelState.AddModelError(nameof(filter.Context), string.Format("Project with name {0} was not found", Decode(filter.Context)));
+                }
+            return ModelState.IsValid;
+        }
+        public async Task<IActionResult> Get(FilterModel filter)
+        {
+            if (await ValidateOrDefault(filter)) return BadRequest(ModelState);
+
+            var developers = await Sets[filter.Set].Invoke(filter);
+            var count = _mng.LastQueryTotalCount;
+            string projName = filter.Set.ToLower() == "associated" ? filter.Context : "";
+            return new JsonResult(new CollectionResult<EditDeveloperViewModel>()
+            {
+                Values = developers.Select(x => x.GetVM(Encode(x.Nickname), projName)).ToArray(),
+                TotalCount = count
+            });
+        }
         public async Task<IActionResult> Single(string name)
         {
             if (await _mng.GetDeveloper(Decode(name)) is Developer developer)
@@ -26,25 +72,6 @@ namespace Host.Controllers
             }
             return NotFound();
         }
-        public async Task<IActionResult> Get(FilterModel filter)
-        {
-            var count = _mng.CountDevelopers(filter.Keywords);
-            var proj = string.IsNullOrEmpty(filter.Context) ? null : _mng.GetProject(Decode(filter.Context));
-
-            var result = await _mng.Get<Developer>(
-                filter.SortColumn,
-                filter.Keywords,
-                filter.SortOrder == OrderDirection.Ascending,
-                filter.Skip.Value,
-                filter.Take.Value);
-
-            return new JsonResult(new CollectionResult<EditDeveloperViewModel>()
-            {
-                Values = result.Select(x => x.GetVM(Encode(x.Nickname), proj != null && _mng.IsAssigned(proj, x) ? Encode(proj.Name) : null)).ToArray(),
-                TotalCount = count
-            });
-        }
-
         public async Task<IActionResult> Create([FromBody] EditDeveloperViewModel model)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.GetErrorObject());
@@ -67,7 +94,7 @@ namespace Host.Controllers
             if (!ModelState.IsValid) return BadRequest(ModelState.GetErrorObject());
             if (await _mng.GetDeveloper(Decode(name)) is Developer original)
             {
-                if (original.Nickname!=model.Nickname&&await _mng.DeveloperExists(model.Nickname))
+                if (original.Nickname != model.Nickname && await _mng.DeveloperExists(model.Nickname))
                 {
                     ModelState.AddModelError(nameof(original.Nickname), String.Format("Developer with nickname {0} already exists", model.Nickname));
                     return BadRequest(ModelState.GetErrorObject());
@@ -75,7 +102,7 @@ namespace Host.Controllers
                 model.Update(original);
                 _mng.Update(original);
                 await _mng.SaveChanges();
-                return new JsonResult(original.GetVM(Encode(original.Nickname),null));
+                return new JsonResult(original.GetVM(Encode(original.Nickname), null));
             }
             return NotFound();
         }
