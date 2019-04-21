@@ -10,16 +10,22 @@ using Host.Models;
 
 namespace Host.Controllers
 {
-    public class DeveloperController : BaseConroller
+    public class DeveloperController : BaseConroller<Developer>
     {
-        private Dictionary<string, Func<FilterModel, Task<IEnumerable<Developer>>>> Sets;
-        private int lastCount = 0;
+        protected override void InitializeSets(Dictionary<string, Func<FilterModel, Task<IEnumerable<Developer>>>> sets)
+        {
+            sets.Add("associated", GetByProject);
+            sets.Add("all", GetAll);
+        }
 
+
+        protected override Task<IEnumerable<Developer>> DefaultSet(FilterModel filter)
+        {
+            return this.GetAll(filter);
+        }
         public DeveloperController(ProjectManagerService projectManager) : base(projectManager)
         {
-            this.Sets = new Dictionary<string, Func<FilterModel, Task<IEnumerable<Developer>>>>();
-            Sets.Add("associated", GetByProject);
-            Sets.Add("all", GetAll);
+
         }
 
         private Task<IEnumerable<Developer>> GetByProject(FilterModel filter)
@@ -33,8 +39,6 @@ namespace Host.Controllers
 
         private async Task<bool> ValidateOrDefault(FilterModel filter)
         {
-            //if non existing Set provided use 'all'
-            if (string.IsNullOrEmpty(filter.Set) || !Sets.ContainsKey(filter.Set.ToLower())) filter.Set = "all";
             //if order not provided use ascending
             if (!filter.Order.HasValue) filter.Order = OrderDirection.Ascending;
             //if no sort Column  given use fullName
@@ -55,7 +59,7 @@ namespace Host.Controllers
         {
             if (await ValidateOrDefault(filter)) return BadRequest(ModelState);
 
-            var developers = await Sets[filter.Set].Invoke(filter);
+            var developers = await Set(filter);
             var count = _mng.LastQueryTotalCount;
             string projName = filter.Set.ToLower() == "associated" ? filter.Context : "";
             return new JsonResult(new CollectionResult<EditDeveloperViewModel>()
@@ -106,5 +110,7 @@ namespace Host.Controllers
             }
             return NotFound();
         }
+
+
     }
 }

@@ -12,19 +12,66 @@ using System.Collections.Generic;
 
 namespace Host.Controllers
 {
-    public class ProjectController : BaseConroller
+    public class ProjectController : BaseConroller<Project>
     {
-        private Dictionary<string, Func<FilterModel, Task<IEnumerable<Project>>>> Sets;
-        public ProjectController(ProjectManagerService projectManager) : base(projectManager)
+        protected override void InitializeSets(Dictionary<string, Func<FilterModel, Task<IEnumerable<Project>>>> sets)
         {
-            this.Sets = new Dictionary<string, Func<FilterModel, Task<IEnumerable<Project>>>>();
-            Sets.Add("assignedto", GetAssigneProjects);
+            sets.Add("associated", GetAssociated);
+            sets.Add("all", GetAll);
+            sets.Add("active", GetActive);
+            sets.Add("upcomming", GetUpcomming);
+            sets.Add("completed", GetCompleted);
         }
 
-        protected Task<IEnumerable<Project>> GetAssigneProjects(FilterModel filter)
+        protected override Task<IEnumerable<Project>> DefaultSet(FilterModel filter)
         {
-            return _mng.GetAssignedProjects(Decode(filter.SetContext));
+            return this.GetAll(filter);
         }
+
+        public ProjectController(ProjectManagerService projectManager) : base(projectManager)
+        {
+
+        }
+
+        protected Task<IEnumerable<Project>> GetAll(FilterModel filter)
+        {
+            return _mng.Get<Project>(
+                sortColumn: filter.Sort,
+                isAsc: filter.Order.Value == OrderDirection.Ascending,
+                skip: filter.Skip.Value,
+                take: filter.Take.Value);
+        }
+        protected Task<IEnumerable<Project>> GetActive(FilterModel filter)
+        {
+            return _mng.GetActiveProjects(
+    sortColumn: filter.Sort,
+    isAsc: filter.Order.Value == OrderDirection.Ascending,
+    skip: filter.Skip.Value,
+    take: filter.Take.Value);
+        }
+        protected Task<IEnumerable<Project>> GetAssociated(FilterModel filter)
+        {
+            return _mng.GetAssignedProjects(Decode(filter.Context));
+        }
+
+        protected Task<IEnumerable<Project>> GetUpcomming(FilterModel filter)
+        {
+            return _mng.GetUpcommingProjects(
+    sortColumn: filter.Sort,
+    isAsc: filter.Order.Value == OrderDirection.Ascending,
+    skip: filter.Skip.Value,
+    take: filter.Take.Value);
+        }
+        protected Task<IEnumerable<Project>> GetCompleted(FilterModel filter)
+        {
+            return _mng.GetCompletedProjects(
+    sortColumn: filter.Sort,
+    isAsc: filter.Order.Value == OrderDirection.Ascending,
+    skip: filter.Skip.Value,
+    take: filter.Take.Value);
+        }
+
+
 
         public async Task<IActionResult> Create([FromBody] EditProjectViewModel model)
         {
@@ -67,29 +114,36 @@ namespace Host.Controllers
             }
             return NotFound();
         }
+        private async Task<bool> ValidateOrDefault(FilterModel filter)
+        {
+            if (!filter.Order.HasValue) filter.Order = OrderDirection.Ascending;
+            //if no sort Column  given use fullName
+            if (string.IsNullOrEmpty(filter.Sort)) filter.Sort = "name";
+            //if retriving associated data (devs of project) and context not given or project does't exist
+            if (filter.Set.ToLower() == "associated")
+                if (string.IsNullOrEmpty(filter.Context))
+                {
+                    ModelState.AddModelError(nameof(filter.Context), "Developer url not provided in \"Context\" field");
+                }
+                else if (!await _mng.DeveloperExists(Decode(filter.Context)))
+                {
+                    ModelState.AddModelError(nameof(filter.Context), string.Format("Developer with nickname {0} was not found", Decode(filter.Context)));
+                }
+            return ModelState.IsValid;
+        }
+
 
         public async Task<IActionResult> Get(FilterModel filter)
         {
-            int count = 0;
-            IEnumerable<Project> result = null;
-            if (!string.IsNullOrEmpty(filter.Set) && Sets.ContainsKey(filter.Set.ToLower()))
-            {
-                result = await Sets[filter.Set.ToLower()](filter);
-                count = result.Count();
-            }
-            else
-            {
-                count = _mng.CountProjects(filter.Keywords);
-                result = await _mng.Get<Project>(
-                            filter.Sort,
-                            filter.Keywords,
-                            filter.Sort== OrderDirection.Ascending,
-                            filter.Skip.Value,
-                            filter.Take.Value);
-            }
+            if (!await ValidateOrDefault(filter)) return BadRequest(filter);
+
+            var projects = await Set(filter);
+
+            var count = _mng.LastQueryTotalCount;
+
             return new JsonResult(new CollectionResult<EditProjectViewModel>()
             {
-                Values = result.Select(x => x.GetVM(Encode(x.Name))).ToArray(),
+                Values = projects.Select(x => x.GetVM(Encode(x.Name))).ToArray(),
                 TotalCount = count
             });
         }
@@ -133,5 +187,7 @@ namespace Host.Controllers
             }
             return ModelState.IsValid;
         }
+
+
     }
 }

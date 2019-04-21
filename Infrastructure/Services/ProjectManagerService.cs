@@ -55,6 +55,31 @@ namespace Infrastructure.Services
         }
 
 
+        private async Task<IEnumerable<Project>> GetProjectByStatus(ProjectStatus status, string sortColumn = null, bool isAsc = true, int skip = 0, int take = 0)
+        {
+            var query = _context.Set<Project>().Where(x => x.Status == status);
+            if (!string.IsNullOrEmpty(sortColumn))
+            {
+                query = isAsc ? query.OrderBy(sortColumn) : query.OrderByDescending(sortColumn);
+            }
+            if (skip > 0) query = query.Skip(skip);
+            if (take > 0) query = query.Take(take);
+            return await query.ToArrayAsync();
+        }
+
+        public Task<IEnumerable<Project>> GetCompletedProjects(string sortColumn = null, bool isAsc = true, int skip = 0, int take = 0)
+        {
+            return GetProjectByStatus(ProjectStatus.Completed, sortColumn, isAsc, skip, take);
+        }
+
+        public Task<IEnumerable<Project>> GetUpcommingProjects(string sortColumn = null, bool isAsc = true, int skip = 0, int take = 0)
+        {
+            return GetProjectByStatus(ProjectStatus.UnStarted, sortColumn, isAsc, skip, take);
+        }
+        public Task<IEnumerable<Project>> GetActiveProjects(string sortColumn = null, bool isAsc = true, int skip = 0, int take = 0)
+        {
+            return GetProjectByStatus(ProjectStatus.InProgress, sortColumn, isAsc, skip, take);
+        }
 
         //public Developer GetDeveloper(int id)
         //{
@@ -167,14 +192,11 @@ namespace Infrastructure.Services
         }
         public async Task<bool[]> IsAssigned(Project project, IEnumerable<Developer> developers)
         {
-            int projId = project.Id;
-            int[] devsId = developers.Select(x => x.);
-            var ids = _context.Set<ProjectDeveloper>().Where(x => x.ProjectId == projId).Select(x => x.DeveloperId).ToArrayAsync();
-            var result = new bool[developers.Count()];
-            for (int i = 0; i < length; i++)
-            {
+            //int projId = project.Id;
+            //int[] devsId = developers.Select(x => x.Id);
+            //var ids = _context.Set<ProjectDeveloper>().Where(x => x.ProjectId == projId).Select(x => x.DeveloperId).ToArrayAsync();
+            //var result = new bool[developers.Count()];
 
-            }
 
             return null;
         }
