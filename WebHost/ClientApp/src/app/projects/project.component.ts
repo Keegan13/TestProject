@@ -14,12 +14,23 @@ import { CreateProjectComponent } from './create-project.component';
 export class ProjectComponent implements OnInit {
   project: Project;
   bsModalRef: BsModalRef;
+
+  get start() {return this.formatDate(this.project.startDate);}
+  get end() {return this.formatDate(this.project.startDate);}
+
+  formatDate(strDate: any) {
+    let date = new Date(strDate);
+    let dd=date.getDate();
+    let mm=date.getMonth();
+    let yyyy=date.getFullYear();   
+    return  (dd<10?'0'+dd:dd) + '/' + (mm<10?'0'+mm:mm) + '/' + yyyy;
+  }
   constructor(private modalService: BsModalService, private router: ActivatedRoute, private repo: ProjectRepoService) {
   }
 
-  get id() { 
+  get id() {
     return this.router.snapshot.params['id'];
-   }
+  }
   ngOnInit() {
     this.repo.single(this.id).subscribe((x => {
       this.project = x;

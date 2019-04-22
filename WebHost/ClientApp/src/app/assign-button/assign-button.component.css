@@ -1,10 +1,9 @@
 button.assign
 {
-    background-color: rgba(53, 136, 168, 0.342);
 }
 button.unassign
 {
-    background-color: rgba(165, 42, 42, 0.178);
+    
 }
 button.disabled
 {

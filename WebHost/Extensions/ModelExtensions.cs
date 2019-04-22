@@ -20,6 +20,7 @@ namespace Host.Extensions
         public static void Update(this EditProjectViewModel model, Project toUpdate)
         {
             toUpdate.Name = model.Name;
+            toUpdate.Description = model.Description;
             toUpdate.StartDate = model.StartDate.HasValue ? model.StartDate.Value : toUpdate.StartDate;
             toUpdate.EndDate = model.EndDate.HasValue ? model.EndDate.Value : toUpdate.EndDate;
             toUpdate.Status = model.Status.HasValue ? model.Status.Value : toUpdate.Status;

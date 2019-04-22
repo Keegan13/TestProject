@@ -19,13 +19,16 @@ export class OcticonDirective implements OnInit {
     el.innerHTML = octicons[this.octicon].toSVG();
 
     const icon: Node = el.firstChild;
-    if (this.color) {
-      this.renderer.setStyle(icon, 'color', this.color)
-    }
-    if (this.width) {
-      this.renderer.setStyle(icon, 'width', this.width);
-      this.renderer.setStyle(icon, 'height', '100%');
-    }
+    if (!this.color) this.color = "#007bff"
+
+    this.renderer.setStyle(icon, 'color', this.color)
+
+    if (!this.width) this.width = 26;
+
+    this.renderer.setStyle(icon, 'width', this.width);
+    this.renderer.setStyle(icon, 'height', '100%');
+
+
   }
 
 }

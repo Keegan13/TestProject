@@ -1,26 +1,40 @@
 <div class="">
   <div>
-
-    <div class="group">
-      <div class="d-inline-block p-2">
+    <div class="row">
+      <div class="d-inline-block">
         <h2>{{project?.name}}</h2>
-        <p>
+      </div>
+
+        <button class="btn-edit btn " octicon="gear" (click)="edit()"></button>
+
+    </div>
+    <div class="row">
+      <div class="col-sm-4 col">
+        <label>Start date</label>
+        <p>{{start}}</p>
+        <label>End date</label>
+        <p>{{end}}</p>
+      </div>
+      <div class="col-sm-8 col">
+        <h4>Description</h4>
+        <p class="description col-sm-8">
           {{project?.description}}
         </p>
-        <h2>Start date: {{project?.startDate}}</h2>
-        <h2>End date: {{project?.endDate}}</h2>
       </div>
-      <button type="button" class="btn btn-primary float-right" (click)="edit()">Edit</button>
+
     </div>
-    <div>
+    <div class="row">
       <h5>Assign</h5>
       <div class="">
         <app-search set="nonassociated" type="developer" [context]="id"></app-search>
       </div>
     </div>
-    <div>
-      <app-list-developers class="col-sm-6" [project]="id" [perPage]="5" set="associated" [isModal]="false">
-      </app-list-developers>
+    <div class="row">
+      <div class="col-sm-12">
+        <h2 class="text-center info">Currently assigned developer</h2>
+        <app-list-developers class="col-sm-6" [project]="id" [perPage]="5" set="associated" [isModal]="false">
+        </app-list-developers>
+      </div>
     </div>
   </div>
 </div>

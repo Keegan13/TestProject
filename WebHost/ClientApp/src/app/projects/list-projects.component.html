@@ -11,8 +11,7 @@
       </ul>
     </nav>
   </div>
-
-
+  
   <div *ngIf="isModal">
     <div class="list-group" *ngFor="let element of projects" class="link-active">
       <a class="list-group-item list-group-item-action" [routerLink]='["/project",element.url]'>{{element.name}}</a>
