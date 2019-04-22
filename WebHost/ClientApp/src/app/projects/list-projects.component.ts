@@ -13,29 +13,30 @@ import { FilterModel } from '../models/FilterModel';
 export class ListProjectsComponent implements OnInit {
 
   @Input() perPage: number;
-  @Input() isModal:boolean;
-  @Input() data:CollectionResult<Project>;
+  @Input() isModal: boolean;
+  @Input() data: CollectionResult<Project>;
   @Input() developer: string;
-  projects:Project[];
+  @Input() set: string;
+  projects: Project[];
   currentPage: number;
   totalPages: number;
 
   constructor(private repo: ProjectRepoService, private router: ActivatedRoute) {
-        }
+  }
 
   ngOnInit() {
-    if(!this.isModal)this.isModal=false;
-    if(this.perPage===undefined)this.perPage=10;
-    if(this.data!==undefined)
-    {
-      this.currentPage=1;
+    if (!this.isModal) this.isModal = false;
+    if (this.perPage === undefined) this.perPage = 10;
+    if (typeof this.data !== 'undefined') {
+      this.currentPage = 1;
       this.parseResult(this.data);
+    } else if (typeof this.projects !== 'undefined') {
+      this.currentPage = 1;
     }
-    else
-    {
+    else {
       this.loadPage(1);
     }
-    
+
   }
   private parseResult(result: CollectionResult<Project>): void {
     if (result) {
@@ -47,21 +48,22 @@ export class ListProjectsComponent implements OnInit {
   private loadPage(page: number) {
     this.currentPage = page;
     var filter = new FilterModel();
-    filter.skip = this.perPage*(page-1);
+    filter.skip = this.perPage * (page - 1);
     filter.take = this.perPage;
-    filter.sortColumn = "name";
-    filter.context=this.developer;
+    filter.sort = "name";
+    filter.context = this.developer;
+    filter.set = this.set;
     this.repo.get(filter).subscribe(this.parseResult.bind(this));
   }
   public nextPage(): void {
-    if (this.totalPages > this.currentPage) {   
-      this.loadPage(this.currentPage+1);
+    if (this.totalPages > this.currentPage) {
+      this.loadPage(this.currentPage + 1);
     }
   }
 
   public previousPage(): void {
     if (this.currentPage > 1) {
-      this.loadPage(this.currentPage-1);
+      this.loadPage(this.currentPage - 1);
     }
   }
 

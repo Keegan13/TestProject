@@ -1,25 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
-import { CreateDeveloperComponent } from './create-developer.component';
-
 @Component({
   selector: 'app-all-developers',
+  // template:"<div style=\"width:500px\"><app-edit-developer-button></app-edit-developer-button><app-list-developers  [perPage]=\"1\"></app-list-developers></div>",
   templateUrl: './all-developers.component.html',
   styleUrls: ['./all-developers.component.css']
 })
 export class AllDevelopersComponent implements OnInit {
-  bsModalRef:BsModalRef;
-  constructor(public modalService:BsModalService) { }
-
-  ngOnInit() {
+  constructor() {
   }
-  create()
-  {
-    var initialState = {
-      isEdit: false
-    };
-    this.bsModalRef=this.modalService.show(CreateDeveloperComponent, { initialState });
-    
+  ngOnInit() {
   }
 
 }

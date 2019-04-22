@@ -24,6 +24,7 @@
     "core-js": "^2.5.4",
     "jquery": "^3.4.0",
     "ngx-bootstrap": "^4.0.1",
+    "octicons": "^8.5.0",
     "rxjs": "~6.3.3",
     "tslib": "^1.9.0",
     "typings": "^2.1.1",

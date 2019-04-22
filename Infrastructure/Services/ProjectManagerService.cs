@@ -32,84 +32,103 @@ namespace Infrastructure.Services
             return _context.Set<Project>().SingleOrDefaultAsync(x => x.Name == name);
         }
 
-        public async Task<IEnumerable<Project>> GetAssignedProjects(string devNickname)
+        public async Task<IEnumerable<Project>> GetAssignedProjects(string devNickname, OrderModel model = null)
         {
             if (await GetDeveloper(devNickname) is Developer dev)
             {
                 int devId = dev.Id;
                 IEnumerable<int> projIds = this._context.Set<ProjectDeveloper>().Where(x => x.DeveloperId == devId).Select(x => x.ProjectId).ToArray();
-                return await _context.Set<Project>().Where(x => projIds.Contains(x.Id)).ToArrayAsync();
+
+                var query = _context.Set<Project>().Where(x => projIds.Contains(x.Id));
+                this.LastQueryTotalCount = await query.CountAsync();
+                query = query.ApplyOrderModel(model);
+                return await query.ToArrayAsync();
             }
             return Enumerable.Empty<Project>();
         }
 
-        public async Task<IEnumerable<Developer>> GetAssignedDevelopers(string projName)
+        public async Task<IEnumerable<Developer>> GetAssignedDevelopers(string projName, OrderModel model = null)
         {
             if (await GetProject(projName) is Project proj)
             {
                 int projId = proj.Id;
                 IEnumerable<int> devIds = this._context.Set<ProjectDeveloper>().Where(x => x.ProjectId == projId).Select(x => x.DeveloperId).ToArray();
-                return await _context.Set<Developer>().Where(x => devIds.Contains(x.Id)).ToArrayAsync();
+                var query = _context.Set<Developer>().Where(x => devIds.Contains(x.Id));
+                this.LastQueryTotalCount = await query.CountAsync();
+                query = query.ApplyOrderModel(model);
+                return await query.ToArrayAsync();
             }
             return Enumerable.Empty<Developer>();
         }
-
-
-        private async Task<IEnumerable<Project>> GetProjectByStatus(ProjectStatus status, string sortColumn = null, bool isAsc = true, int skip = 0, int take = 0)
+        public async Task<IEnumerable<Developer>> GetNotAssignedDevelopers(string projName, string keywords = null, OrderModel model = null)
+        {
+            if (await GetProject(projName) is Project proj)
+            {
+                int projId = proj.Id;
+                IEnumerable<int> devIds = this._context.Set<ProjectDeveloper>().Where(x => x.ProjectId == projId).Select(x => x.DeveloperId).ToArray();
+                var query = _context.Set<Developer>().Where(x => !devIds.Contains(x.Id));
+                this.LastQueryTotalCount = await query.CountAsync();
+                query = query.ApplyOrderModel(model);
+                return await query.ToArrayAsync();
+            }
+            return Enumerable.Empty<Developer>();
+        }
+        //OK
+        public async Task<IEnumerable<Project>> GetByStatus(ProjectStatus status, OrderModel model = null)
         {
             var query = _context.Set<Project>().Where(x => x.Status == status);
-            if (!string.IsNullOrEmpty(sortColumn))
+            this.LastQueryTotalCount = await query.CountAsync();
+            if (model == null)
             {
-                query = isAsc ? query.OrderBy(sortColumn) : query.OrderByDescending(sortColumn);
+                switch (status)
+                {
+                    default:
+                    case ProjectStatus.Completed:
+                        model = new OrderModel
+                        {
+                            SortColumn = nameof(Project.EndDate),
+                            isAscendingOrder = false
+                        };
+                        break;
+                    case ProjectStatus.InProgress:
+                        model = new OrderModel
+                        {
+                            SortColumn = nameof(Project.EndDate),
+                            isAscendingOrder = true
+                        };
+                        break;
+                    case ProjectStatus.UnStarted:
+                        model = new OrderModel
+                        {
+                            SortColumn = nameof(Project.StartDate),
+                            isAscendingOrder = true
+                        };
+                        break;
+
+                }
             }
-            if (skip > 0) query = query.Skip(skip);
-            if (take > 0) query = query.Take(take);
-            return await query.ToArrayAsync();
-        }
-
-        public Task<IEnumerable<Project>> GetCompletedProjects(string sortColumn = null, bool isAsc = true, int skip = 0, int take = 0)
-        {
-            return GetProjectByStatus(ProjectStatus.Completed, sortColumn, isAsc, skip, take);
-        }
-
-        public Task<IEnumerable<Project>> GetUpcommingProjects(string sortColumn = null, bool isAsc = true, int skip = 0, int take = 0)
-        {
-            return GetProjectByStatus(ProjectStatus.UnStarted, sortColumn, isAsc, skip, take);
-        }
-        public Task<IEnumerable<Project>> GetActiveProjects(string sortColumn = null, bool isAsc = true, int skip = 0, int take = 0)
-        {
-            return GetProjectByStatus(ProjectStatus.InProgress, sortColumn, isAsc, skip, take);
+            return await query.ApplyOrderModel(model).ToArrayAsync();
         }
 
         //public Developer GetDeveloper(int id)
         //{
         //    return _context.Set<Developer>().Find(id);
         //}
+        //OK
         public Task<Developer> GetDeveloper(string nickname)
         {
             return _context.Set<Developer>().SingleOrDefaultAsync(x => x.Nickname == nickname);
         }
-        public IEnumerable<Project> GetActiveProjects(int skip = 0, int take = 0)
-        {
-            var query = _context.Set<Project>().Where(x => x.Status == ProjectStatus.InProgress);
-            if (skip > 0) query = query.Skip(skip);
-            if (take > 0) query = query.Take(take);
-            return query.OrderBy(x => x.EndDate).ToArray();
-        }
-        public async Task<IEnumerable<TEntity>> Get<TEntity>(string sortColumn = null, string keywords = null, bool isAsc = true, int skip = 0, int take = 0) where TEntity : class
+        //OK
+        public async Task<IEnumerable<TEntity>> Get<TEntity>(string keywords = null, OrderModel model = null) where TEntity : class
         {
             var query = _context.Set<TEntity>().AsQueryable();
             if (!string.IsNullOrEmpty(keywords))
             {
                 query = query.Search(keywords);
             }
-            if (!string.IsNullOrEmpty(sortColumn))
-            {
-                query = isAsc ? query.OrderBy(sortColumn) : query.OrderByDescending(sortColumn);
-            }
             this.LastQueryTotalCount = await query.CountAsync();
-            if (skip > 0) query = query.Skip(skip);
-            if (take > 0) query = query.Take(take);
+            query = query.ApplyOrderModel(model);
             return await query.ToArrayAsync();
         }
 

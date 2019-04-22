@@ -14,10 +14,10 @@ import { CollectionResult } from './collection-result';
 })
 export class ProjectRepoService extends Repository<Project>{
   update(entity: Project): Observable<Project> {
-    return this.http.post<Project>('/projects/update/'+entity.url,entity,this.getOptions);
+    return this.http.post<Project>('api/projects/update/'+entity.url,entity,this.getOptions);
   }
   delete(entity: Project): Observable<Project> {
-    return this.http.post<Project>('/projects/delete/'+entity.url,entity,this.getOptions);
+    return this.http.post<Project>('api/projects/delete/'+entity.url,entity,this.getOptions);
   }
   getOptions = {
     headers: new HttpHeaders({

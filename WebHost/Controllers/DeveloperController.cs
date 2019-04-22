@@ -15,6 +15,8 @@ namespace Host.Controllers
         protected override void InitializeSets(Dictionary<string, Func<FilterModel, Task<IEnumerable<Developer>>>> sets)
         {
             sets.Add("associated", GetByProject);
+            sets.Add("nonassociated",GetNotByProject);
+
             sets.Add("all", GetAll);
         }
 
@@ -30,15 +32,20 @@ namespace Host.Controllers
 
         private Task<IEnumerable<Developer>> GetByProject(FilterModel filter)
         {
-            return _mng.GetAssignedDevelopers(Decode(filter.Context));
+            return _mng.GetAssignedDevelopers(Decode(filter.Context),filter.GetOrderModel());
         }
         private Task<IEnumerable<Developer>> GetAll(FilterModel filter)
         {
-            return _mng.Get<Developer>(filter.Sort, filter.Keywords, filter.Order == OrderDirection.Ascending, filter.Skip.Value, filter.Take.Value);
+            return _mng.Get<Developer>(filter.Keywords, filter.GetOrderModel());
+        }
+        private Task<IEnumerable<Developer>> GetNotByProject(FilterModel filter)
+        {
+            return _mng.GetNotAssignedDevelopers(Decode(filter.Context));
         }
 
         private async Task<bool> ValidateOrDefault(FilterModel filter)
         {
+            if (string.IsNullOrEmpty(filter.Set)) filter.Set = "all";
             //if order not provided use ascending
             if (!filter.Order.HasValue) filter.Order = OrderDirection.Ascending;
             //if no sort Column  given use fullName
@@ -57,11 +64,11 @@ namespace Host.Controllers
         }
         public async Task<IActionResult> Get(FilterModel filter)
         {
-            if (await ValidateOrDefault(filter)) return BadRequest(ModelState);
+            if (!await ValidateOrDefault(filter)) return BadRequest(ModelState);
 
             var developers = await Set(filter);
             var count = _mng.LastQueryTotalCount;
-            string projName = filter.Set.ToLower() == "associated" ? filter.Context : "";
+            string projName = filter.Set.ToLower() == "associated"? filter.Context : "";
             return new JsonResult(new CollectionResult<EditDeveloperViewModel>()
             {
                 Values = developers.Select(x => x.GetVM(Encode(x.Nickname), projName)).ToArray(),

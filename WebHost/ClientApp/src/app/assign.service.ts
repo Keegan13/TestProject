@@ -12,11 +12,9 @@ export class AssignService {
     'Content-Type': 'application/json'
   });
   constructor(private http: HttpClient) { }
-  public assign(model: AssignModel): Observable<HttpResponse<any>> {
-    return this.http.post<AssignModel>("/projects/assign", model, { observe: "response", headers: this.header });
-  }
-  public unassign(model: AssignModel): Observable<HttpResponse<any>> {
-    return this.http.post<AssignModel>("/projects/unassign", model, { observe: "response", headers: this.header });
+
+  public requestAssign(model: AssignModel): Observable<AssignModel> {
+    return this.http.post<AssignModel>("api/projects/assign", model, { headers: this.header });
   }
 
 }

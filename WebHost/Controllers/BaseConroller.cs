@@ -25,14 +25,10 @@ namespace Host.Controllers
         {
             if (Sets.ContainsKey(filter.Set))
             {
-                return Sets[filter.Set].Invoke(filter);
+                return Sets[filter.Set.ToLower()].Invoke(filter);
             }
             return Sets["default"].Invoke(filter);
         }
-
-
-
-
         public static string Encode(string input)
         {
             if (!string.IsNullOrEmpty(input))

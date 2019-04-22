@@ -3,7 +3,6 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { DeveloperRepoService } from './../developer-repo.service';
 import { Developer } from './../models/Developer';
 import { Router } from '@angular/router';
-import { BsModalRef } from 'ngx-bootstrap/modal';
 @Component({
   selector: 'app-create-developer',
   templateUrl: './create-developer.component.html',
@@ -15,7 +14,7 @@ export class CreateDeveloperComponent implements OnInit {
   @Input() developer: Developer;
   get nickname() { return this.createForm.get("nickname") }
   get fullName() { return this.createForm.get("fullName") }
-  constructor(public bsModalRef: BsModalRef, private fb: FormBuilder, private repo: DeveloperRepoService, private router: Router) { }
+  constructor(private fb: FormBuilder, private repo: DeveloperRepoService, private router: Router) { }
   ngOnInit() {
     if (this.developer) this.isEdit = true;
     if (!this.isEdit) this.isEdit = false;
@@ -43,7 +42,6 @@ export class CreateDeveloperComponent implements OnInit {
       action(dev).subscribe(((x) => {
         this.developer = x;
         if (this.developer != null) {
-          this.bsModalRef.hide();
           this.router.navigate(['/developer/' + this.developer.url]);
           
         }

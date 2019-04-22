@@ -1,44 +1,47 @@
-<div *ngIf="totalPages>1&&!isModal">
-<nav >
-  <ul class="pagination justify-content-end">
-    <li class="page-item">
-      <a class="page-link" (click)="previousPage()">Previous</a>
-    </li>
-    <li class="page-item">
-      <a class="page-link" (click)="nextPage()">Next</a>
-    </li>
-  </ul>
-</nav>
-</div>
+<div>
+  <div *ngIf="totalPages>1">
+    <nav>
+      <ul class="pagination justify-content-center">
+        <li class="page-item">
+          <a class="page-link" (click)="previousPage()">Previous</a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" (click)="nextPage()">Next</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+  
+  <div class="list-group" *ngIf="isModal">
+    <div *ngFor="let element of developers">
+      <a class="list-group-item list-group-item-action" [routerLink]='["/developer",element.url]'>{{element.nickname}}
+      </a>
+      <span class="badge ">
+        <app-assign-button [developer]="element.url" [project]="project" [isAssigned]="element.project==project">
+        </app-assign-button>
+      </span>
+    </div>
+  </div>
 
-
-<div *ngIf="isModal">
-  <div class="" *ngFor="let element of developers">
-    <a [routerLink]='["/developer",element.url]'>{{element.nickname}}</a>
+  <div *ngIf="!isModal">
+    <table class="table table-sm">
+      <thead>
+        <tr>
+          <th>Full name</th>
+          <th>Nickname</th>
+          <th>Skills</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let element of developers">
+          <td>{{element.fullName}}</td>
+          <td><a Activeli [routerLink]='["/developer",element.url]'>{{element.nickname}}</a></td>
+          <td>{{element.skills|json}}</td>
+          <app-assign-button [developer]="element.url" [project]="project" [isAssigned]="element.project==project">
+          </app-assign-button>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>
-
-<div *ngIf="!isModal">
-<table class="table table-sm">
-  <thead>
-    <tr>
-      <th>Full name</th>
-      <th>Nickname</th>
-      <th>Skills</th>
-      <th *ngIf="project"></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let element of developers">
-      <td>{{element.fullName}}</td>
-      <td><a [routerLink]='["/developer",element.url]'>{{element.nickname}}</a></td>
-      <td>{{element.skills|json}}</td>
-      <app-assign-button [developer]="element.url" [context]="project" [isAssigned]="element.project==project"></app-assign-button>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-

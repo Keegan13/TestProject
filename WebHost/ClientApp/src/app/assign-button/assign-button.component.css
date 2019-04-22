@@ -1,12 +1,22 @@
 button.assign
 {
-    background-color: cadetblue;
+    background-color: rgba(53, 136, 168, 0.342);
 }
 button.unassign
 {
-    background-color: brown;
+    background-color: rgba(165, 42, 42, 0.178);
 }
 button.disabled
 {
     display: none;
+}
+:host
+{
+    padding:5px;
+    margin: 10px;
+}
+span{
+    width: 20px;
+    height: 20px;
+    padding:0px;
 }

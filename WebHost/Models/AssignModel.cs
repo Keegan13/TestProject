@@ -9,6 +9,8 @@ namespace Host.Models
     public class AssignModel
     {
         [Required]
+        public bool isAssigned { get; set; }
+        [Required]
         public string Project { get; set; }
         [Required]
         public string Developer { get; set; }

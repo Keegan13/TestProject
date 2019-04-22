@@ -1,6 +1,6 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { AssignService } from '../assign.service';
-import { HttpHeaders } from '@angular/common/http';
+import { HttpHeaders, HttpResponse } from '@angular/common/http';
 import { AssignModel } from '../models/AssignModel';
 
 @Component({
@@ -9,47 +9,29 @@ import { AssignModel } from '../models/AssignModel';
   styleUrls: ['./assign-button.component.css']
 })
 export class AssignButtonComponent implements OnInit {
-  @Input() disabled: boolean;
+  disabled: boolean;
   @Input() project: string;
   @Input() developer: string;
   @Input() isAssigned: boolean;
-  @Input() context: string;
-
-  get text() { return "button text"; }
-
+  //@Output() changed: EventEmitter<AssignModel>;
 
   constructor(private srv: AssignService) { }
 
   ngOnInit() {
-    if (typeof this.disabled == 'undefined') {
+    //this.changed=new EventEmitter();
+    if (typeof this.project === "undefined" || !this.project || typeof this.developer === 'undefined' || !this.developer || typeof this.isAssigned === "undefined") {
       this.disabled = true;
     }
-    if (typeof this.context == 'undefined') {
-      this.disabled = true;
-    }
-    if (typeof this.isAssigned == 'undefined') {
-      this.disabled = true;
+    if (this.isAssigned === null)
       this.isAssigned = false;
-    }
-    if (typeof this.developer == 'undefined' && typeof this.project == 'undefined') {
-      this.disabled = true;
-    }
   }
   swap(): void {
     if (this.disabled) return;
-    var model: AssignModel = null;
-    if (this.project) {
-      model = new AssignModel(this.project, this.context);
-    }
-    else
-      if (this.developer) {
-        model = new AssignModel(this.context, this.developer);
-      }
-
-    if (model)
-      if (this.isAssigned)
-        this.srv.unassign(model);
-      else this.srv.assign(model);
+    var model: AssignModel = new AssignModel(this.project, this.developer, !this.isAssigned);
+    this.srv.requestAssign(model).subscribe(this.handleResponse.bind(this));
   }
-
+  handleResponse(model: AssignModel) {
+    this.isAssigned = model.isAssigned;
+    //this.changed.emit(model);
+  }
 }

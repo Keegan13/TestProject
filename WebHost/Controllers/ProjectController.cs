@@ -35,19 +35,11 @@ namespace Host.Controllers
 
         protected Task<IEnumerable<Project>> GetAll(FilterModel filter)
         {
-            return _mng.Get<Project>(
-                sortColumn: filter.Sort,
-                isAsc: filter.Order.Value == OrderDirection.Ascending,
-                skip: filter.Skip.Value,
-                take: filter.Take.Value);
+            return _mng.Get<Project>(filter.Keywords, filter.GetOrderModel());
         }
         protected Task<IEnumerable<Project>> GetActive(FilterModel filter)
         {
-            return _mng.GetActiveProjects(
-    sortColumn: filter.Sort,
-    isAsc: filter.Order.Value == OrderDirection.Ascending,
-    skip: filter.Skip.Value,
-    take: filter.Take.Value);
+            return _mng.GetByStatus(ProjectStatus.InProgress, filter.GetOrderModel());
         }
         protected Task<IEnumerable<Project>> GetAssociated(FilterModel filter)
         {
@@ -56,19 +48,11 @@ namespace Host.Controllers
 
         protected Task<IEnumerable<Project>> GetUpcomming(FilterModel filter)
         {
-            return _mng.GetUpcommingProjects(
-    sortColumn: filter.Sort,
-    isAsc: filter.Order.Value == OrderDirection.Ascending,
-    skip: filter.Skip.Value,
-    take: filter.Take.Value);
+            return _mng.GetByStatus(ProjectStatus.UnStarted, filter.GetOrderModel());
         }
         protected Task<IEnumerable<Project>> GetCompleted(FilterModel filter)
         {
-            return _mng.GetCompletedProjects(
-    sortColumn: filter.Sort,
-    isAsc: filter.Order.Value == OrderDirection.Ascending,
-    skip: filter.Skip.Value,
-    take: filter.Take.Value);
+            return _mng.GetByStatus(ProjectStatus.Completed, filter.GetOrderModel());
         }
 
 
@@ -117,6 +101,7 @@ namespace Host.Controllers
         private async Task<bool> ValidateOrDefault(FilterModel filter)
         {
             if (!filter.Order.HasValue) filter.Order = OrderDirection.Ascending;
+            if (string.IsNullOrEmpty(filter.Set)) filter.Set = "all";
             //if no sort Column  given use fullName
             if (string.IsNullOrEmpty(filter.Sort)) filter.Sort = "name";
             //if retriving associated data (devs of project) and context not given or project does't exist
@@ -149,29 +134,20 @@ namespace Host.Controllers
         }
         public async Task<IActionResult> Assign([FromBody] AssignModel model)
         {
-            return await Assign(model, false);
-
-        }
-        public async Task<IActionResult> Unassign([FromBody] AssignModel model)
-        {
-            return await Assign(model, true);
-        }
-        protected async Task<IActionResult> Assign(AssignModel model, bool expectedAssign)
-        {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             if (await _mng.GetProject(Decode(model.Project)) is Project project && await _mng.GetDeveloper(Decode(model.Developer)) is Developer developer)
             {
-                if (await _mng.IsAssigned(project, developer) != expectedAssign)
+                if (await _mng.IsAssigned(project, developer) == model.isAssigned)
                 {
                     //Developer ... already assign to project ...
                     //Developer ... already unassigned from project ...
-                    ModelState.AddModelError("model", string.Format("Developer {1} already {3} project {0}", project.Name, developer.Nickname, expectedAssign ? "unassigned from" : "assigned to"));
+                    ModelState.AddModelError("model", string.Format("Developer {1} already {2} project {0}", project.Name, developer.Nickname, !model.isAssigned ? "unassigned from" : "assigned to"));
                     return BadRequest(ModelState);
                 }
-                if (expectedAssign) await _mng.Unassign(project, developer);
+                if (!model.isAssigned) await _mng.Unassign(project, developer);
                 else await _mng.Assign(project, developer);
                 await _mng.SaveChanges();
-                return Ok();
+                return new JsonResult(model);
             }
             return NotFound();
         }

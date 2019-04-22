@@ -7,5 +7,5 @@ export class FilterModel {
     public take: number;
     public keywords: string;
     public context: string;
-    public set: Set;
+    public set: string;
 }

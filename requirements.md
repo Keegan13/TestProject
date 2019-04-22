@@ -22,10 +22,10 @@
 
 | Use case|Status| Manager |Status|Component|Status
 |-| - |-| - |-|-|
-| Create Project | unstrated | Add\<T>(T x)| done | create-project-| pre |
-| Create Developer| unstrated | Add\<T>(T x)| done | create-developer- | pre |
-| View Project| unstrated | Get\<T>(...)| pre | project- | pre (rename)|
-| View Developer| unstrated | Get\<T>(...)| pre | developer- | unstarted |
+| Create Project | pre | Add\<T>(T x)| done | create-project-| pre |
+| Create Developer| pre | Add\<T>(T x)| done | create-developer- | done |
+| View Project| pre | Get\<T>(...)| done | project- | done |
+| View Developer| pre | Get\<T>(...)| pre | developer- | unstarted |
 | View Active Projects| unstrated | GetActiveProjects(...)| unstarted | active-projects  | unstarted |
 | View all developers| unstrated | Get\<T>(...)| pre |all-developers,list-developers| unstarted |
 | View all project| unstrated | Get\<T>(...)| pre | all-projects,list-developers | unstarted |

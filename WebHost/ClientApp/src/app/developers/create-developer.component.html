@@ -1,13 +1,15 @@
 <div>
   <form [formGroup]="createForm" class="form-horizontal" (ngSubmit)="onSubmit()">
-    <h3 class="">developer</h3>
+    <h3 *ngIf="isEdit"> Edit {{developer.fullName}}</h3>
+    <h3 *ngIf="!isEdit">Create new developer</h3>
+
     <span class="has-error" *ngIf="createForm.errors?.serverError">
       {{createForm.errors.serverError}}
     </span>
 
-    <div class="form-group" [ngClass]="{'has-error':fullName.invalid &&(fullName.touched||fullName.dirty)}">
-      <label for="fullName" class="control-label col-sm-2">Full name</label>
-      <div class="col-sm-8">
+    <div class="form-group row" [ngClass]="{'has-error':fullName.invalid &&(fullName.touched||fullName.dirty)}">
+      <label for="fullName" class="col-form-label col-sm-2">Full name</label>
+      <div class="col-sm-10">
         <input id="fullName" placeholder="Developer Full Name here" formControlName="fullName" type="text"
           class="form-control">
         <span *ngIf="fullName.invalid &&(fullName.touched||fullName.dirty)">
@@ -20,9 +22,9 @@
     </div>
 
 
-    <div class="form-group" [ngClass]="{'has-error': nickname.errors&&(nickname.touched||nickname.dirty)}">
-      <label for="nickname" class="control-label col-sm-2">Nickname</label>
-      <div class="col-sm-8">
+    <div class="form-group row" [ngClass]="{'has-error': nickname.errors&&(nickname.touched||nickname.dirty)}">
+      <label for="nickname" class="col-form-label col-sm-2">Nickname</label>
+      <div class="col-sm-10">
         <input id="nickname" placeholder="Developer unique nickname" type="text" formControlName="nickname"
           class="form-control">
         <span *ngIf="nickname.invalid&&(nickname.touched||nickname.dirty)">
@@ -36,9 +38,9 @@
       </div>
     </div>
 
-    <div class="form-group">
-      <label for="skills" class="control-label col-sm-2">Skills</label>
-      <div class="col-sm-8">
+    <div class="form-group row">
+      <label for="skills" class="col-form-label col-sm-2">Skills</label>
+      <div class="col-sm-10">
         <input id="skills" type="text" formControlName="skills" class="form-control">
       </div>
     </div>

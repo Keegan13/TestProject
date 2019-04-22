@@ -1,0 +1,10 @@
+:host
+{
+    margin: auto;
+    padding: 1em;
+
+    padding-top:3 em;
+    
+    width: 100%;
+    max-width: 700px;
+}

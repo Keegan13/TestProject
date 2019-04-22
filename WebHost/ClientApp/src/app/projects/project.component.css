@@ -1,0 +1,8 @@
+div.body
+{
+    padding: 20px;
+}
+.body:first-child
+{
+   max-width: 900px;
+}

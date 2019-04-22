@@ -1,3 +1,4 @@
-assign-button workds
-<button [ngClass]="{'btn-success':!isAssigned,'d-none':disabled,'btn-danger':isAssigned}" class="btn" (click)="swap()">{{text}}</button>
-assign-button workds
+<button [ngClass]="{'assign':!isAssigned,'d-none':disabled,'unassign':isAssigned}" class="btn" (click)="swap()">
+        <span *ngIf="!isAssigned" octicon="checklist"></span>
+        <span *ngIf="isAssigned" octicon="x"></span>
+</button>

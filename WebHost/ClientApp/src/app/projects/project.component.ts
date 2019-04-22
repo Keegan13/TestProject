@@ -11,23 +11,25 @@ import { CreateProjectComponent } from './create-project.component';
   templateUrl: './project.component.html',
   styleUrls: ['./project.component.css']
 })
-export class ProjectComponent implements OnInit  {
+export class ProjectComponent implements OnInit {
   project: Project;
   bsModalRef: BsModalRef;
-  constructor(private modalService: BsModalService,private router:ActivatedRoute,private repo:ProjectRepoService) {
+  constructor(private modalService: BsModalService, private router: ActivatedRoute, private repo: ProjectRepoService) {
   }
+
+  get id() { 
+    return this.router.snapshot.params['id'];
+   }
   ngOnInit() {
-    this.repo.single(this.router.snapshot.params['id']).subscribe((x=>{
-      this.project=x;
+    this.repo.single(this.id).subscribe((x => {
+      this.project = x;
     }
-      ).bind(this),this.onGetError.bind(this),this.onSuccess.bind(this));
+    ).bind(this), this.onGetError.bind(this), this.onSuccess.bind(this));
   }
-  onGetError(error:any)
-  {
+  onGetError(error: any) {
 
   }
-  onSuccess()
-  {
+  onSuccess() {
   }
   delete() {
 
@@ -37,7 +39,7 @@ export class ProjectComponent implements OnInit  {
       project: this.project,
       isEdit: true
     };
-    this.bsModalRef=this.modalService.show(CreateProjectComponent, { initialState });
-    this.bsModalRef.content.project=this.project;
+    this.bsModalRef = this.modalService.show(CreateProjectComponent, { initialState });
+    this.bsModalRef.content.project = this.project;
   }
 }
