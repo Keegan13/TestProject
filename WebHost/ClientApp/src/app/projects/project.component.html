@@ -5,7 +5,7 @@
         <h2>{{project?.name}}</h2>
       </div>
 
-        <button class="btn-edit btn " octicon="gear" (click)="edit()"></button>
+      <button class="btn-edit btn " octicon="gear" (click)="edit()"></button>
 
     </div>
     <div class="row">
@@ -32,7 +32,8 @@
     <div class="row">
       <div class="col-sm-12">
         <h2 class="text-center info">Currently assigned developer</h2>
-        <app-list-developers class="col-sm-6" [project]="id" [perPage]="5" set="associated" [isModal]="false">
+        <app-list-developers class="col-sm-6" [project]="id" [perPage]="5" set="associated" [data]="developers"
+          [isModal]="false">
         </app-list-developers>
       </div>
     </div>

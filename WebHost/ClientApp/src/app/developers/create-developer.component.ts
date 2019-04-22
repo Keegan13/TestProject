@@ -43,13 +43,19 @@ export class CreateDeveloperComponent implements OnInit {
         this.developer = x;
         if (this.developer != null) {
           this.router.navigate(['/developer/' + this.developer.url]);
-          
+
         }
       }).bind(this), this.onSumbitError.bind(this), this.onSubmitSuccess.bind(this));
     }
   }
 
   public onSumbitError(error: any): void {
+
+    if (error.error) {
+      for (var field in error.error) {
+        this.addFieldErrors(field, error.error[field]);
+      }
+    }
     switch (error.status) {
       case 404:
         this.createForm.setErrors({ "serverError": "Service can't be reached" });
@@ -58,9 +64,6 @@ export class CreateDeveloperComponent implements OnInit {
         this.createForm.setErrors({ "serverError": "Whoops something went wrong" });
         break;
     }
-    var errors = error.error.errors;
-    if (errors)
-      errors.forEach((x) => this.addFieldErrors(x.field, x.messages));
   }
   addFieldErrors(field: string, messages: string[]) {
     field = field.charAt(0).toLowerCase() + field.substring(1);

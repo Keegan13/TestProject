@@ -85,14 +85,14 @@ namespace Host.Controllers
         }
         public async Task<IActionResult> Create([FromBody] EditDeveloperViewModel model)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState.GetErrorObject());
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var developer = model.GetInstance();
 
             if (await _mng.DeveloperExists(developer))
             {
                 ModelState.AddModelError(nameof(developer.Nickname), String.Format("Developer with nickname {0} already exists", developer.Nickname));
-                return BadRequest(ModelState.GetErrorObject());
+                return BadRequest(ModelState);
             }
 
             _mng.Add(developer);
@@ -102,13 +102,13 @@ namespace Host.Controllers
         }
         public async Task<IActionResult> Update([FromRoute] string name, [FromBody] EditDeveloperViewModel model)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState.GetErrorObject());
+            if (!ModelState.IsValid) return BadRequest(ModelState);
             if (await _mng.GetDeveloper(Decode(name)) is Developer original)
             {
                 if (original.Nickname != model.Nickname && await _mng.DeveloperExists(model.Nickname))
                 {
                     ModelState.AddModelError(nameof(original.Nickname), String.Format("Developer with nickname {0} already exists", model.Nickname));
-                    return BadRequest(ModelState.GetErrorObject());
+                    return BadRequest(ModelState);
                 }
                 model.Update(original);
                 _mng.Update(original);

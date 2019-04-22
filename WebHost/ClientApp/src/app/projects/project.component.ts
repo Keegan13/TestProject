@@ -5,6 +5,9 @@ import { DeveloperRepoService } from '../developer-repo.service';
 import { ProjectRepoService } from '../project-repo.service';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { CreateProjectComponent } from './create-project.component';
+import { Developer } from '../models/Developer';
+import { CollectionResult } from '../collection-result';
+import { FilterModel } from '../models/FilterModel';
 
 @Component({
   selector: 'app-project',
@@ -14,18 +17,18 @@ import { CreateProjectComponent } from './create-project.component';
 export class ProjectComponent implements OnInit {
   project: Project;
   bsModalRef: BsModalRef;
-
-  get start() {return this.formatDate(this.project.startDate);}
-  get end() {return this.formatDate(this.project.startDate);}
+  developers: CollectionResult<Developer>;
+  get start() { return this.formatDate(this.project.startDate); }
+  get end() { return this.formatDate(this.project.startDate); }
 
   formatDate(strDate: any) {
     let date = new Date(strDate);
-    let dd=date.getDate();
-    let mm=date.getMonth();
-    let yyyy=date.getFullYear();   
-    return  (dd<10?'0'+dd:dd) + '/' + (mm<10?'0'+mm:mm) + '/' + yyyy;
+    let dd = date.getDate();
+    let mm = date.getMonth();
+    let yyyy = date.getFullYear();
+    return (dd < 10 ? '0' + dd : dd) + '/' + (mm < 10 ? '0' + mm : mm) + '/' + yyyy;
   }
-  constructor(private modalService: BsModalService, private router: ActivatedRoute, private repo: ProjectRepoService) {
+  constructor(private modalService: BsModalService, private router: ActivatedRoute, private repo: ProjectRepoService, private devs: DeveloperRepoService) {
   }
 
   get id() {
@@ -36,6 +39,13 @@ export class ProjectComponent implements OnInit {
       this.project = x;
     }
     ).bind(this), this.onGetError.bind(this), this.onSuccess.bind(this));
+
+  }
+  loadProjects() {
+    var filter = new FilterModel();
+    filter.context = this.id;
+    filter.set = 'associated';
+    this.devs.get(filter).subscribe(((x) => { this.developers = x; }).bind(this));
   }
   onGetError(error: any) {
 

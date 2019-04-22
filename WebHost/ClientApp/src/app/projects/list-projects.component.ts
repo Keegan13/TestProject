@@ -20,10 +20,16 @@ export class ListProjectsComponent implements OnInit {
   projects: Project[];
   currentPage: number;
   totalPages: number;
+  totalCount: number;
 
   constructor(private repo: ProjectRepoService, private router: ActivatedRoute) {
   }
-
+  get hasParentData() {
+    if (typeof this.data != 'undefined' && this.data) {
+      return true;
+    }
+    return false;
+  }
   ngOnInit() {
     if (!this.isModal) this.isModal = false;
     if (this.perPage === undefined) this.perPage = 10;
@@ -46,14 +52,21 @@ export class ListProjectsComponent implements OnInit {
     }
   }
   private loadPage(page: number) {
-    this.currentPage = page;
-    var filter = new FilterModel();
-    filter.skip = this.perPage * (page - 1);
-    filter.take = this.perPage;
-    filter.sort = "name";
-    filter.context = this.developer;
-    filter.set = this.set;
-    this.repo.get(filter).subscribe(this.parseResult.bind(this));
+    if (this.hasParentData) {
+      this.projects=null;
+    }
+    else {
+
+
+      this.currentPage = page;
+      var filter = new FilterModel();
+      filter.skip = this.perPage * (page - 1);
+      filter.take = this.perPage;
+      filter.sort = "name";
+      filter.context = this.developer;
+      filter.set = this.set;
+      this.repo.get(filter).subscribe(this.parseResult.bind(this));
+    }
   }
   public nextPage(): void {
     if (this.totalPages > this.currentPage) {
