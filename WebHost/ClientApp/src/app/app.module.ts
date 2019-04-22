@@ -47,7 +47,7 @@ import { ProjectStatusComponent } from './project-status/project-status.componen
     ActiveProjectsComponent,
     CompletedProjectsComponent,
     OcticonDirective,
-    ProjectStatusComponent
+    ProjectStatusComponent,
   ],
   imports: [
     BrowserModule,

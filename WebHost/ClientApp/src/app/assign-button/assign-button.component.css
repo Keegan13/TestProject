@@ -1,21 +1,10 @@
-button.assign
+
+button:focus
 {
-}
-button.unassign
-{
-    
-}
-button.disabled
-{
-    display: none;
+    outline:none;
+    border: 0px;
 }
 :host
 {
     padding:5px;
-    margin: 10px;
-}
-span{
-    width: 20px;
-    height: 20px;
-    padding:0px;
 }

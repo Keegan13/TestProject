@@ -50,12 +50,7 @@ export class SearchComponent implements OnInit {
     this.developers = null;
     this.projects = null;
   }
-  onFocusOut()
-  {
-      this.clear();
-  }
-  onClick()
-  {
+  onClick() {
     console.log("click");
   }
   fetch() {
@@ -70,6 +65,9 @@ export class SearchComponent implements OnInit {
       if (this.type == 'any' || this.type == 'project')
         this.projs.get(filter).subscribe(this.hadnleProjs.bind(this));
     }
+  }
+  mouseLeave() {
+    this.clear();
   }
   private hadnleDevs(data: CollectionResult<Developer>) {
     this.developers = data;

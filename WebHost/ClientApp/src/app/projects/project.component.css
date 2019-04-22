@@ -6,6 +6,10 @@ div.body
 {
    max-width: 900px;
 }
+div.project-name
+{
+    margin-left:20px;
+}
 p.description
 {
     border: 0.5px grey solid;

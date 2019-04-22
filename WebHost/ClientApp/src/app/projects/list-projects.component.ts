@@ -24,47 +24,58 @@ export class ListProjectsComponent implements OnInit {
 
   constructor(private repo: ProjectRepoService, private router: ActivatedRoute) {
   }
-  get hasParentData() {
-    if (typeof this.data != 'undefined' && this.data) {
-      return true;
-    }
+
+  get hasContext(): boolean {
+    if (!this.developer) return true;
     return false;
   }
+
+  get hasParentData() {
+    if (!this.data) return false;
+    return false;
+  }
+
   ngOnInit() {
+    if (!this.perPage) this.perPage = 10;
+
     if (!this.isModal) this.isModal = false;
-    if (this.perPage === undefined) this.perPage = 10;
-    if (typeof this.data !== 'undefined') {
+
+    if (this.hasParentData) {
+      this.totalPages = this.countPages(this.data.totalCount);
       this.currentPage = 1;
       this.parseResult(this.data);
-    } else if (typeof this.projects !== 'undefined') {
-      this.currentPage = 1;
-    }
-    else {
-      this.loadPage(1);
-    }
-
+    } else this.loadPage(1);
   }
+
   private parseResult(result: CollectionResult<Project>): void {
     if (result) {
       this.projects = result.values;
-      this.totalPages = Math.ceil(result.totalCount / this.perPage);
-      console.log(result.totalCount);
+      this.totalPages = this.countPages(result.totalCount);
+      this.totalCount = result.totalCount;
     }
   }
+
+  private countPages(total: number) {
+    let count = Math.ceil(total / this.perPage);
+    if (count - 1 == total / this.perPage) {
+      return count - 1;
+    }
+    return count;
+  }
+
   private loadPage(page: number) {
+    this.currentPage = page;
+    var filter = new FilterModel();
+    filter.skip = this.perPage * (page - 1);
+    filter.take = this.perPage;
+    filter.sort = "name";
+    filter.context = this.developer;
+    filter.set = this.set;
+
     if (this.hasParentData) {
-      this.projects=null;
+      this.projects = this.data.values.slice(filter.skip, filter.skip + filter.take);
     }
     else {
-
-
-      this.currentPage = page;
-      var filter = new FilterModel();
-      filter.skip = this.perPage * (page - 1);
-      filter.take = this.perPage;
-      filter.sort = "name";
-      filter.context = this.developer;
-      filter.set = this.set;
       this.repo.get(filter).subscribe(this.parseResult.bind(this));
     }
   }
@@ -73,7 +84,6 @@ export class ListProjectsComponent implements OnInit {
       this.loadPage(this.currentPage + 1);
     }
   }
-
   public previousPage(): void {
     if (this.currentPage > 1) {
       this.loadPage(this.currentPage - 1);

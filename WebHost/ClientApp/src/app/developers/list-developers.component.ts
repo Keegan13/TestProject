@@ -14,30 +14,30 @@ export class ListDevelopersComponent implements OnInit {
 
   @Input() perPage: number;
   @Input() isModal: boolean;
-  @Input() project: string;//this is context
   @Input() data: CollectionResult<Developer>;
+  @Input() project: string;//this is context
   @Input() set: string;
   developers: Developer[];
   currentPage: number;
   totalPages: number;
-
+  totalCount: number;
 
   constructor(private repo: DeveloperRepoService, private router: ActivatedRoute) {
   }
   get hasContext(): boolean {
-    return typeof this.project !== 'undefined' && this.project != null;
-  }
-  get hasParentData() {
-    if (typeof this.data != 'undefined' && this.data) {
-      return true;
-    }
+    if (!this.project) return true;
     return false;
   }
+  get hasParentData() {
+    if (!this.data) return false;
+    return true;
+  }
+
   ngOnInit() {
     //perPage
-    if (this.perPage === undefined) this.perPage = 10;
+    if (!this.perPage) this.perPage = 10;
     //isModal
-    if (typeof this.isModal === 'undefined' || !this.isModal) this.isModal = false;
+    if (!this.isModal) this.isModal = false;
 
     if (this.hasParentData) {
       this.totalPages = this.countPages(this.data.totalCount);
@@ -48,12 +48,15 @@ export class ListDevelopersComponent implements OnInit {
       this.loadPage(1);
     }
   }
-  private parseResult(data: CollectionResult<Developer>): void {
-    if (data) {
-      this.developers = data.values;
-      this.totalPages = this.countPages(data.totalCount);
+
+  private parseResult(result: CollectionResult<Developer>): void {
+    if (result) {
+      this.developers = result.values;
+      this.totalPages = this.countPages(result.totalCount);
+      this.totalCount = result.totalCount;
     }
   }
+
   private countPages(total: number) {
     let count = Math.ceil(total / this.perPage);
     if (count - 1 == total / this.perPage) {
@@ -61,9 +64,9 @@ export class ListDevelopersComponent implements OnInit {
     }
     return count;
   }
+
   private loadPage(page: number) {
     this.currentPage = page;
-
     var filter = new FilterModel();
     filter.skip = this.perPage * (page - 1);
     filter.take = this.perPage;

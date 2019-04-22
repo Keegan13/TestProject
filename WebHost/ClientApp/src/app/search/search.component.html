@@ -2,15 +2,18 @@
     type="search" placeholder="Search" aria-label="Search">
   <button class="btn btn-outline-success my-2 my-sm-0" type="submit" (click)="fetch()">Search</button>
 </form>
-<div ngBlur="onFocusOut()" class="father">
+<div (mouseleave)="mouseLeave()" class="father">
   <div class="result">
     <div *ngIf="hasDevelopers">
       <h6>Developers</h6>
-      <app-list-developers isModal="true" [data]='developers' [project]="context" [set]="set" [perPage]="3">
+      <app-list-developers isModal="true" [data]='developers' [project]="context" [set]="set" [perPage]="5">
       </app-list-developers>
     </div>
-    <app-list-projects *ngIf="hasProjects" isModal="true" [data]='projects' [developer]="context" [set]="set"
-      [perPage]="3">
-    </app-list-projects>
+    <div *ngIf="hasProjects">
+      <h6>Projects</h6>
+      <app-list-projects *ngIf="hasProjects" isModal="true" [data]='projects' [developer]="context" [set]="set"
+        [perPage]="5">
+      </app-list-projects>
+    </div>
   </div>
 </div>

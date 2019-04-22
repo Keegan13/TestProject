@@ -1,7 +1,7 @@
 <div class="">
   <div>
     <div class="row">
-      <div class="d-inline-block">
+      <div class="d-inline-block project-name">
         <h2>{{project?.name}}</h2>
       </div>
 
@@ -10,10 +10,14 @@
     </div>
     <div class="row">
       <div class="col-sm-4 col">
-        <label>Start date</label>
-        <p>{{start}}</p>
-        <label>End date</label>
-        <p>{{end}}</p>
+        <span >Start date</span> 
+        <p>{{project?.startDate|date}}</p>
+        <span>End date</span>
+        <p>{{project?.endDate|date}}</p>
+        <span>status</span>
+        <p>
+          <app-project-status [status]="project.status"></app-project-status>
+        </p>
       </div>
       <div class="col-sm-8 col">
         <h4>Description</h4>
@@ -24,15 +28,17 @@
 
     </div>
     <div class="row">
-      <h5>Assign</h5>
-      <div class="">
-        <app-search set="nonassociated" type="developer" [context]="id"></app-search>
+      <div class="col-sm-6">
+        <label>Assign</label>
+        
+          <app-search set="nonassociated" type="developer" [context]="id"></app-search>
+        
       </div>
     </div>
     <div class="row">
       <div class="col-sm-12">
         <h2 class="text-center info">Currently assigned developer</h2>
-        <app-list-developers class="col-sm-6" [project]="id" [perPage]="5" set="associated" [data]="developers"
+        <app-list-developers class="col-sm-6" [project]="project.url" [perPage]="5" set="associated" [data]="developers"
           [isModal]="false">
         </app-list-developers>
       </div>
