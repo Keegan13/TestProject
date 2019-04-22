@@ -137,16 +137,16 @@ namespace Host.Controllers
             if (!ModelState.IsValid) return BadRequest(ModelState);
             if (await _mng.GetProject(Decode(model.Project)) is Project project && await _mng.GetDeveloper(Decode(model.Developer)) is Developer developer)
             {
-                if (await _mng.IsAssigned(project, developer) == model.isAssigned)
+                if (await _mng.IsAssigned(project, developer) != model.isAssigned)
                 {
-                    //Developer ... already assign to project ...
-                    //Developer ... already unassigned from project ...
-                    ModelState.AddModelError("model", string.Format("Developer {1} already {2} project {0}", project.Name, developer.Nickname, !model.isAssigned ? "unassigned from" : "assigned to"));
-                    return BadRequest(ModelState);
+                    if(model.isAssigned) await _mng.Assign(project, developer);
+                    else  await _mng.Unassign(project, developer);
+                    await _mng.SaveChanges();
+                    ////Developer ... already assign to project ...
+                    ////Developer ... already unassigned from project ...
+                    //ModelState.AddModelError("model", string.Format("Developer {1} already {2} project {0}", project.Name, developer.Nickname, !model.isAssigned ? "unassigned from" : "assigned to"));
+                    //return BadRequest(ModelState);
                 }
-                if (!model.isAssigned) await _mng.Unassign(project, developer);
-                else await _mng.Assign(project, developer);
-                await _mng.SaveChanges();
                 return new JsonResult(model);
             }
             return NotFound();
