@@ -51,7 +51,7 @@
           </span>
         </div>
       </div>
-
+{{startDate.errors}}
       <div class="form-group row" [ngClass]="{'has-error': endDate.errors&&(endDate.touched||endDate.dirty)}">
         <label for="endDate" class="col-form-label col-md-2">Project end date</label>
         <div class="col-md-4">
@@ -67,6 +67,7 @@
           </span>
         </div>
       </div>
+      {{endDate.errors}}
 
       <div class="form-group row">
         <label for="status" class="col-form-label col-md-2">Project status</label>

@@ -153,7 +153,7 @@ namespace Host.Controllers
         }
         protected virtual async Task<bool> ValidateProject(EditProjectViewModel model, Project original = null)
         {
-            if ((original == null || original.Name != model.Name) && await _mng.DeveloperExists(model.Name))
+            if ((original == null || original.Name != model.Name) &&  await _mng.ProjectExists(model.Name))
             {
                 ModelState.AddModelError(nameof(original.Name), String.Format("Projec with name {0} already exists", model.Name));
             }

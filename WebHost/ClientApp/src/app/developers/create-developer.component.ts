@@ -1,8 +1,10 @@
-import { Component, OnInit, Inject, Input } from '@angular/core';
+import { EventEmitter, Component, OnInit, Inject, Input } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { DeveloperRepoService } from './../developer-repo.service';
 import { Developer } from './../models/Developer';
 import { Router } from '@angular/router';
+import { routerNgProbeToken } from '@angular/router/src/router_module';
+
 @Component({
   selector: 'app-create-developer',
   templateUrl: './create-developer.component.html',
@@ -12,6 +14,7 @@ export class CreateDeveloperComponent implements OnInit {
   public createForm: FormGroup;
   @Input() isEdit: boolean;
   @Input() developer: Developer;
+  @Input() update: EventEmitter<Developer> = new EventEmitter<Developer>();
   get nickname() { return this.createForm.get("nickname") }
   get fullName() { return this.createForm.get("fullName") }
   constructor(private fb: FormBuilder, private repo: DeveloperRepoService, private router: Router) { }
@@ -42,12 +45,17 @@ export class CreateDeveloperComponent implements OnInit {
       action(dev).subscribe(((x) => {
         this.developer = x;
         if (this.developer != null) {
-          this.router.navigate(['/developer/' + this.developer.url]);
-
+          if (this.update.observers.length > 0)
+            this.update.emit(this.developer);
+          else
+            this.router.navigate(['/developer/' + this.developer.url]);
         }
       }).bind(this), this.onSumbitError.bind(this), this.onSubmitSuccess.bind(this));
     }
   }
+
+
+
 
   public onSumbitError(error: any): void {
 

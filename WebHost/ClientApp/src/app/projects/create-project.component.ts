@@ -1,10 +1,11 @@
-import { Component, OnInit, Inject, Input } from '@angular/core';
+import { Component, OnInit, Inject, Input, EventEmitter } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ProjectRepoService } from '../project-repo.service';
 import { Project } from '../models/Project';
 import { Router } from '@angular/router';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import { BsDatepickerConfig } from 'ngx-bootstrap/datepicker';
+import { Developer } from '../models/Developer';
 
 @Component({
   selector: 'app-create-project',
@@ -16,6 +17,7 @@ export class CreateProjectComponent implements OnInit {
   public createForm: FormGroup;
   @Input() isEdit: boolean;
   @Input() project: Project;
+  @Input() update: EventEmitter<Project> = new EventEmitter<Project>();
   get name() { return this.createForm.get("name"); }
   get description() { return this.createForm.get("description"); }
   get startDate() { return this.createForm.get('startDate'); }
@@ -36,8 +38,8 @@ export class CreateProjectComponent implements OnInit {
     this.createForm = this.fb.group({
       name: [this.project.name, Validators.required],
       description: [this.project.description],
-      startDate: [this.formatDate(this.project.startDate), Validators.required],
-      endDate: [this.formatDate(this.project.endDate), Validators.required],
+      startDate: [new Date(this.project.startDate), Validators.required],
+      endDate: [new Date(this.project.endDate), Validators.required],
       status: [this.project.status]
     });
   }
@@ -47,13 +49,10 @@ export class CreateProjectComponent implements OnInit {
       description: ['no description'],
       startDate: ['01/01/2019', Validators.required],
       endDate: ['01/01/2019', Validators.required],
-      status: []
+      status: [0]
     });
   }
-  private formatDate(dateStr: any) {
-    let date = new Date(dateStr);
-    return date.getMonth().toString() + "/" + date.getDay().toString() + '/' + date.getFullYear();
-  }
+
   public onSubmit() {
     if (this.createForm.valid) {
       var action = this.isEdit ? this.repo.update.bind(this.repo) : this.repo.create.bind(this.repo);
@@ -62,7 +61,10 @@ export class CreateProjectComponent implements OnInit {
       action(proj).subscribe(((x) => {
         this.project = x;
         if (this.project != null) {
-          this.router.navigate(['/project/' + this.project.url]);
+          if (this.update.observers.length > 0)
+            this.update.emit(this.project);
+          else
+            this.router.navigate(['/project/' + this.project.url]);
         }
       }).bind(this), this.onSumbitError.bind(this), this.onSubmitSuccess.bind(this));
     }
