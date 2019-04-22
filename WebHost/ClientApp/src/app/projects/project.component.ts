@@ -49,7 +49,7 @@ export class ProjectComponent implements OnInit {
   }
   onUpdate(val: Project) {
     this.project = val;
-    //this.bsModalRef.hide();
+    this.bsModalRef.hide();
     this.router.navigate(['/project/' + this.project.url]);
   }
   delete() {

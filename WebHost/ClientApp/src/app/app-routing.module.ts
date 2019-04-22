@@ -12,21 +12,23 @@ import { UpcommingProjectsComponent } from './projects/upcomming-projects.compon
 import { CompletedProjectsComponent } from './projects/completed-projects.component';
 
 const routes: Routes = [
-  {path:'developers/create',component: CreateDeveloperComponent},
-  {path:'projects/create',component: CreateProjectComponent},
+  { path: 'developers/create', component: CreateDeveloperComponent },
+  { path: 'projects/create', component: CreateProjectComponent },
 
-  {path:'project/:id',component:ProjectComponent},
-  {path:'developer/:id',component:DeveloperComponent},
+  { path: 'project/:id', component: ProjectComponent },
+  { path: 'developer/:id', component: DeveloperComponent },
 
-  {path:'',component: HomeComponent},
- 
-  {path:'developers/all',component: AllDevelopersComponent},
-
-  {path:'projects/all',component:AllProjectsComponent},
-  {path:'projects/completed',component:CompletedProjectsComponent},
-  {path:'projects/upcomming',component:UpcommingProjectsComponent},
-  {path:'projects/active',component:ActiveProjectsComponent},
+  { path: '', component: HomeComponent },
+  { path: 'home', component: HomeComponent },
   
+
+  { path: 'developers/all', component: AllDevelopersComponent },
+
+  { path: 'projects/all', component: AllProjectsComponent },
+  { path: 'projects/completed', component: CompletedProjectsComponent },
+  { path: 'projects/upcomming', component: UpcommingProjectsComponent },
+  { path: 'projects/active', component: ActiveProjectsComponent },
+
 ];
 
 @NgModule({
