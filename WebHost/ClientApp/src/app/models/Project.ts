@@ -20,7 +20,7 @@ export class Project {
   public static formatDate(strDate: any) {
     let date = new Date(strDate);
     let dd = date.getDate();
-    let mm = date.getMonth()+1;
+    let mm = date.getMonth() + 1;
     let yyyy = date.getFullYear();
     return (dd < 10 ? '0' + dd : dd) + '/' + (mm < 10 ? '0' + mm : mm) + '/' + yyyy;
   }

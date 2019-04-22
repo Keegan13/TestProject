@@ -25,6 +25,7 @@ import { ActiveProjectsComponent } from './projects/active-projects.component';
 import { CompletedProjectsComponent } from './projects/completed-projects.component';
 import { SearchComponent } from './search/search.component';
 import { OcticonDirective } from './octicon.directive';
+import { ProjectStatusComponent } from './project-status/project-status.component';
 
 
 @NgModule({
@@ -45,7 +46,8 @@ import { OcticonDirective } from './octicon.directive';
     AssignButtonComponent,
     ActiveProjectsComponent,
     CompletedProjectsComponent,
-    OcticonDirective
+    OcticonDirective,
+    ProjectStatusComponent
   ],
   imports: [
     BrowserModule,

@@ -11,7 +11,7 @@
       </ul>
     </nav>
   </div>
-  
+
   <div class="list-group" *ngIf="isModal">
     <div *ngFor="let element of developers">
       <a class="list-group-item list-group-item-action" [routerLink]='["/developer",element.url]'>{{element.nickname}}
@@ -24,22 +24,23 @@
   </div>
 
   <div *ngIf="!isModal">
-    <table class="table table-sm">
+    <table class="table table-sm table-hover">
       <thead>
         <tr>
-          <th>Full name</th>
-          <th>Nickname</th>
-          <th>Skills</th>
-          <th></th>
+          <th style="width:60%">Full name</th>
+          <th style="width:30%">Nickname</th>
+          <th style="width:10%"></th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let element of developers">
-          <td>{{element.fullName}}</td>
-          <td><a Activeli [routerLink]='["/developer",element.url]'>{{element.nickname}}</a></td>
-          <td>{{element.skills|json}}</td>
-          <app-assign-button [developer]="element.url" [project]="project" [isAssigned]="element.project==project">
-          </app-assign-button>
+          <td class="align-middle" [routerLink]='["/developer",element.url]'>{{element.fullName}}</td>
+          <td  class="align-middle" [routerLink]='["/developer",element.url]'>{{element.nickname}}</td>
+          <!-- <td   >{{element.skills|json}}</td> -->
+          <td>
+            <app-assign-button [developer]="element.url" [project]="project" [isAssigned]="element.project==project">
+            </app-assign-button>
+          </td>
         </tr>
       </tbody>
     </table>
