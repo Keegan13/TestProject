@@ -1,4 +1,16 @@
-<h2>{{developer?.fullName}} ({{developer?.nickname}})</h2>
-<button type="button" class="btn btn-primary"   (click)="edit()">Edit</button>
+<div>
+    <div class="row">
+        <div class="d-inline-block project-name">
+            <h2>{{developer?.fullName}}</h2>
+        </div>
+        <button class="btn-edit btn " octicon="gear" (click)="edit()"></button>
 
-<app-list-projects [isModal]="false" [developer]="developer.url" [perPage]="5" set="associated"></app-list-projects>
+    </div>
+    <div class="row">
+        <div class="col-sm-4 col">
+            <span>Nickname</span>
+            <p>{{developer?.nickname}}</p>
+        </div>
+    </div>
+    <app-list-projects [isModal]="false" [developer]="developer.url" [perPage]="5" set="associated"></app-list-projects>
+</div>
