@@ -14,7 +14,6 @@ export class SearchPageComponent implements OnInit {
 
   ngOnInit() {
     this.keywords = this.route.snapshot.params['keywords'];
-
     this.router.events.subscribe((val) => {
       // s
       if (val instanceof NavigationStart) {

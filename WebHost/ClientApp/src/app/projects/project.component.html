@@ -1,50 +1,56 @@
 <div class="">
-    <div>
-      <div class="row">
-        <div class="d-inline-block project-name">
-          <h2>{{project?.name}}</h2>
-        </div>
-  
-        <button class="btn-edit btn " octicon="gear" (click)="edit()"></button>
-  
-      </div>
-      <div class="row">
-        <div class="col-sm-4 col">
-          <span>Start date</span>
-          <p>{{project?.startDate|date}}</p>
-          <span>End date</span>
-          <p>{{project?.endDate|date}}</p>
-          <span>status</span>
-          <p>
-            <app-project-status [status]="project.status"></app-project-status>
-          </p>
-        </div>
-        <div class="col-sm-8 col">
-          <h4>Description</h4>
-          <p class="description col-sm-8">
-            {{project?.description}}
-          </p>
-        </div>
-  
-      </div>
-      <div class="row">
-        <div class="col-sm-12">
-          <h2 class="text-center info">Currently assigned developer</h2>
-          <app-list-developers class="col-sm-6" [project]="project.url" [perPage]="5" set="associated" [isModal]="false">
-          </app-list-developers>
-        </div>
+  <div>
+    <div class="row">
+      <div class="d-inline-block project-name">
+        <h2>{{project?.name}}</h2>
       </div>
 
+      <button class="btn-edit btn " octicon="gear" (click)="edit()"></button>
 
-
-      <div class="row">
-          <div class="col-sm-12">
-            
-            <h2 class="text-center info">notassgend</h2>
-            <app-search-bar text="random" (search)="onSearch($event)"></app-search-bar>
-            <app-list-developers [keywords]="keywords" [project]="project.url" [perPage]="5" set="nonassociated" [isModal]="false">
-            </app-list-developers>
-          </div>
-        </div> 
     </div>
+    <div class="row">
+      <div class="col-sm-4 col">
+        <span>Start date</span>
+        <p>{{project?.startDate|date}}</p>
+        <span>End date</span>
+        <p>{{project?.endDate|date}}</p>
+        <span>status</span>
+        <p>
+          <app-project-status [status]="project.status"></app-project-status>
+        </p>
+      </div>
+      <div class="col-sm-8 col">
+        <h4>Description</h4>
+        <p class="description col-sm-8">
+          {{project?.description}}
+        </p>
+      </div>
+
+    </div>
+
+    <div class="row">
+      <h3>Developers</h3>
+    </div>
+    <div class="row">
+
+      <div class="col-sm-6">
+        <h2 class="text-center info">Assigned</h2>
+        <app-list-developers [project]="project.url" [perPage]="5" set="associated" [isModal]="false">
+        </app-list-developers>
+      </div>
+      <div class="col-sm-6">
+        <h2 class="text-center info">Not assigned</h2>
+        <app-list-developers [keywords]="keywords" [project]="project.url" [perPage]="5" set="nonassociated"
+          [isModal]="false">
+        </app-list-developers>
+        <div class="search-bar-style">
+          <app-search-bar class="search-bar-style" text="find" (search)="onSearch($event)"></app-search-bar>
+        </div>
+      </div>
+    </div>
+
+
+
+
   </div>
+</div>
