@@ -2,17 +2,17 @@
     type="search" placeholder="Search" aria-label="Search">
   <button class="btn btn-outline-success my-2 my-sm-0" type="submit" (click)="fetch()">Search</button>
 </form>
+
 <div (mouseleave)="mouseLeave()" [ngClass]="{'father':isModal,'col-sm-12':!isModal}">
   <div [ngClass]="{'result':isModal}">
-    <div *ngIf="hasDevelopers">
-      <h6>Developers</h6>
-      <app-list-developers [isModal]="isModal" [keywords]='keywords' [project]="context" [set]="set" [perPage]="5">
+    <div *ngIf="devRender">
+      <h6 >Developers</h6>
+      <app-list-developers [isModal]="isModal" [project]="context" [set]="set" [perPage]="5" [disabled]="!show">
       </app-list-developers>
     </div>
-    <div *ngIf="hasProjects">
+    <div *ngIf="projRender">
       <h6>Projects</h6>
-      <app-list-projects *ngIf="hasProjects" [isModal]="isModal" [data]='projects' [developer]="context" [set]="set"
-        [perPage]="5">
+      <app-list-projects [isModal]="isModal" [developer]="context" [set]="set" [perPage]="5" [disabled]="!show">
       </app-list-projects>
     </div>
   </div>

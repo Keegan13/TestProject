@@ -1,43 +1,51 @@
-<div>
-  <div *ngIf="totalPages>1">
-    <nav>
-      <ul class="pagination justify-content-center">
-        <li class="page-item">
-          <a class="page-link" (click)="previousPage()">Previous</a>
-        </li>
-        <li class="page-item">
-          <a class="page-link" (click)="nextPage()">Next</a>
-        </li>
-      </ul>
-    </nav>
-  </div>
-  <div *ngIf="isModal">
-    <div *ngFor="let element of projects">
-      <a class="list-group-item list-group-item-action" [routerLink]='["/project",element.url]'>{{element.name}}
-      </a></div>
-  </div>
-</div>
+<div [ngClass]="{'d-none':disabled}"> -->
+  <div *ngIf="hasItems">
+    <div *ngIf="totalPages>1">
+      <nav>
+        <ul class="pagination justify-content-center">
+          <li class="page-item">
+            <a class="page-link" (click)="previousPage()">Previous</a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" (click)="nextPage()">Next</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
 
-<div *ngIf="!isModal">
-  <table class="table table-sm table-hover">
-    <thead>
-      <tr>
-        <th style="width: 50%">Project name</th>
-        <th style="width: 20%">Start</th>
-        <th style="width: 20%">Finish</th>
-        <th style="width:10%">Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let element of projects">
-        <td class="align-middle" [routerLink]='["/project",element.url]'>{{element.name}}</td>
-        <td class="align-middle" [routerLink]='["/project",element.url]'>{{element.startDate | date}}</td>
-        <td class="align-middle" [routerLink]='["/project",element.url]'>{{element.endDate | date}}</td>
-        <td class="align-middle" [routerLink]='["/project",element.url]'>
-          <app-project-status [status]="element.status">
-          </app-project-status>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+    <div *ngIf="isModal">
+      <div *ngFor="let element of projects">
+        <a class="list-group-item list-group-item-action" [routerLink]='["/project",element.url]'>{{element.name}}
+        </a></div>
+    </div>
+
+
+    <div *ngIf="!isModal">
+      <table class="table table-sm table-hover">
+        <thead>
+          <tr>
+            <th style="width: 50%">Project name</th>
+            <th style="width: 20%">Start</th>
+            <th style="width: 20%">Finish</th>
+            <th style="width:10%">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let element of projects">
+            <td class="align-middle" [routerLink]='["/project",element.url]'>{{element.name}}</td>
+            <td class="align-middle" [routerLink]='["/project",element.url]'>{{element.startDate | date}}</td>
+            <td class="align-middle" [routerLink]='["/project",element.url]'>{{element.endDate | date}}</td>
+            <td class="align-middle" [routerLink]='["/project",element.url]'>
+              <app-project-status [status]="element.status">
+              </app-project-status>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+  <div *ngIf="!hasItems">
+    no projects
+  </div>
 </div>

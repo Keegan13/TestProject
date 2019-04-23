@@ -27,7 +27,8 @@ import { SearchComponent } from './search/search.component';
 import { OcticonDirective } from './octicon.directive';
 import { ProjectStatusComponent } from './project-status/project-status.component';
 import { SearchBarComponent } from './search-bar/search-bar.component';
-import { SearhcOutletComponent } from './searhc-outlet/searhc-outlet.component';
+import { SearchPageComponent } from './search-page/search-page.component';
+
 
 @NgModule({
   declarations: [
@@ -50,7 +51,8 @@ import { SearhcOutletComponent } from './searhc-outlet/searhc-outlet.component';
     OcticonDirective,
     ProjectStatusComponent,
     SearchBarComponent,
-    SearhcOutletComponent,
+    SearchPageComponent
+
   ],
   imports: [
     BrowserModule,

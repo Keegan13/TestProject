@@ -20,6 +20,7 @@ export class ProjectComponent implements OnInit {
   project: Project;
   bsModalRef: BsModalRef;
   developers: CollectionResult<Developer>;
+  keywords: string;
 
   get start() {
     return Project.formatDate(this.project.startDate);
@@ -49,22 +50,28 @@ export class ProjectComponent implements OnInit {
 
   }
 
-  onAssignChanged(model: AssignModel) {
-    if (model.project != this.project.url) return;
-    for (var i = 0; i < this.developers.values.length; i++) {
-      if (this.developers.values[i].url == model.developer) {
-        this.developers.values.splice(i, 1);
-        this.developers.totalCount--;
-        break;
-      }
-    }
-  }
+  // onAssignChanged(model: AssignModel) {
+  //   if (model.project != this.project.url) return;
+  //   for (var i = 0; i < this.developers.values.length; i++) {
+  //     if (this.developers.values[i].url == model.developer) {
+  //       this.developers.values.splice(i, 1);
+  //       this.developers.totalCount--;
+  //       break;
+  //     }
+  //   }
+  // }
   onSuccess() {
   }
   onUpdate(val: Project) {
     this.project = val;
     this.bsModalRef.hide();
     this.router.navigate(['/project/' + this.project.url]);
+  }
+  onSearch(keywords: string) {
+    if (typeof keywords === 'string') {
+      console.log(keywords);
+      this.keywords = keywords;
+    }
   }
   delete() {
 

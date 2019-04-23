@@ -67,6 +67,9 @@ namespace Infrastructure.Services
                 int projId = proj.Id;
                 IEnumerable<int> devIds = this._context.Set<ProjectDeveloper>().Where(x => x.ProjectId == projId).Select(x => x.DeveloperId).ToArray();
                 var query = _context.Set<Developer>().Where(x => !devIds.Contains(x.Id));
+                
+                if (!string.IsNullOrEmpty(keywords))
+                   query = query.Search(keywords);
                 this.LastQueryTotalCount = await query.CountAsync();
                 query = query.ApplyOrderModel(model);
                 return await query.ToArrayAsync();

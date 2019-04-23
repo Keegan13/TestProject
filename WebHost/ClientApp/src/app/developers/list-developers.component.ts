@@ -16,16 +16,29 @@ export class ListDevelopersComponent implements OnInit {
 
   @Input() perPage: number = 25;
   @Input() isModal: boolean = false;
-  @Input() data: CollectionResult<Developer>;
+  //@Input() data: CollectionResult<Developer>;
   @Input() project: string = null;//this is context
   @Input() set: string = "all";
-  @Input() keywords: string = null;
   @Input() isPagination: boolean = true;
+
+  
+  private _keywords = '';
+
+  @Input()
+  set keywords(name: string) {
+    if (this._keywords != name) {
+      this._keywords = name;
+      this.update();
+    }
+  }
+
+  get keywords(): string { return this._keywords; }
   //@Output() assign: EventEmitter<AssignModel> = new EventEmitter<AssignModel>();
+  @Input() disabled: boolean = false;
   developers: Developer[];
+
   currentPage: number;
   totalPages: number;
-  totalCount: number;
 
   constructor(private repo: DeveloperRepoService, private router: ActivatedRoute, private assign: AssignService) {
     assign.anotherField.subscribe(this.onAssignChanged.bind(this));
@@ -34,18 +47,28 @@ export class ListDevelopersComponent implements OnInit {
     if (!this.project) return false;
     return true;
   }
-  get hasParentData() {
-    if (!this.data) return false;
+  // get hasParentData() {
+  //   if (!this.data) return false;
+  //   return true;
+  // }
+  get hasItems() {
+    if (!this.developers) return false;
+    if (this.developers.length == 0) return false;
     return true;
   }
 
+
   ngOnInit() {
-    if (this.hasParentData) {
-      this.totalPages = this.countPages(this.data.totalCount);
-      this.totalCount = this.data.totalCount;
-      this.currentPage = 1;
-    }
-    this.loadPage(1);
+    if (!this.perPage) this.perPage = 25;
+    // if (this.hasParentData) {
+    //   this.totalPages = this.countPages(this.data.totalCount);
+    //   this.totalCount = this.data.totalCount;
+    //   this.currentPage = 1;
+    // }
+    if (!this.isModal) this.isModal = false;
+    this.currentPage = 1;
+    this.update();
+    //this.loadPage(1);
   }
 
   onAssignChanged(model: AssignModel) {
@@ -54,11 +77,24 @@ export class ListDevelopersComponent implements OnInit {
     }
   }
 
+  public update(): void {
+    this.loadPage(this.currentPage);
+  }
+
   private onLoad(result: CollectionResult<Developer>): void {
     if (result) {
+
       this.developers = result.values;
-      this.totalPages = this.isPagination ? this.countPages(result.totalCount) : 1;
-      this.totalCount = result.totalCount;
+      
+      this.totalPages = this.isPagination ? this.countPages(result.totalCount)
+        : 1;
+        if(this.currentPage>this.totalPages)
+        {
+          this.currentPage--;
+          this.update();
+
+        }
+      //this.totalCount = result.totalCount;
     }
   }
 
@@ -71,26 +107,25 @@ export class ListDevelopersComponent implements OnInit {
   }
 
   private loadPage(page: number) {
+    if (this.disabled) return;
     this.currentPage = page;
+
     var filter = new FilterModel();
     filter.skip = this.perPage * (page - 1);
     filter.take = this.perPage;
     filter.sort = "fullName";
 
-    if (this.set)
-      filter.set = this.set;
-
-
+    if (this.set) filter.set = this.set;
     if (this.hasContext) filter.context = this.project;
-
     if (this.keywords) filter.keywords = this.keywords;
 
-    if (this.hasParentData) {
-      this.developers = this.data.values.slice(filter.skip, filter.skip + filter.take);
-    }
-    else {
-      this.repo.get(filter).subscribe(this.onLoad.bind(this));
-    }
+    this.repo.get(filter).subscribe(this.onLoad.bind(this));
+    // if (this.hasParentData) {
+    //   this.developers = this.data.values.slice(filter.skip, filter.skip + filter.take);
+    // }
+    // else {
+    //   this.repo.get(filter).subscribe(this.onLoad.bind(this));
+    // }
   }
 
   public nextPage(): void {

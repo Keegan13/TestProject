@@ -22,22 +22,22 @@
 
 | Use case|Status| Manager |Status|Component|Status
 |-| - |-| - |-|-|
-| Create Project | done | Add\<T>(T x)| done | create-project-| pre |
+| Create Project | done | Add\<T>(T x)| done | create-project-| done |
 | Create Developer| done | Add\<T>(T x)| done | create-developer- | done |
-| View Project| pre | Get\<T>(...)| done | project- | done |
-| View Developer| pre | Get\<T>(...)| pre | developer- | unstarted |
-| View Active Projects| pre | GetActiveProjects(...)| unstarted | active-projects  | unstarted |
-| View all developers| pre | Get\<T>(...)| pre |all-developers,list-developers| unstarted |
-| View all project| pre | Get\<T>(...)| pre | all-projects,list-developers | unstarted |
-| Edit Project| done | Update\<T>(T x)| done | edit-project | unstarted |
-| Edit Developer| done| Update\<T>(T x)| done | edit-developer | unstarted |
+| View Project| bata | Get\<T>(...)| done | project- | done |
+| View Developer| beta | Get\<T>(...)| done| developer- | done |
+| View Active Projects| done | GetActiveProjects(...)| done | active-projects  | done|
+| View all developers| done | Get\<T>(...)| done |all-developers,list-developers| done |
+| View all project| done | Get\<T>(...)| done | all-projects| done |
+| Edit Project| done | Update\<T>(T x)| done | create-project | inherit |
+| Edit Developer| done| Update\<T>(T x)| done | create-developer | inherit |
 | View Completed | pre | GetProjects(...)| unstrated | all-projects | unstarted |
-| View upcomming projects| pre| GetProjects(...)| unstrated | all-projects | unstarted |
-| Delete projects/developers| skip? | Remove\<T>(T x)| unstrated | edit-developer | unstarted |
-| Assign Developers to projects| pre| Assign(proj,dev) // try | unstrated | ? | unstarted |
-| Unassign devlopers from projects| pre | Unassign(proj,dev) //try | unstrated | ? | unstarted |
-| View assigned developers for current project| pre | GetDevelopers(...)| unstrated | view-develoeprs | unstarted |
-| Search developer| unstrated | Get\<T>(...keys)| done | search-component | unstarted |
-| Search project| unstrated | Get\<T>(...keys)| done | search-component | unstarted |
+| View upcomming projects|  done | GetProjectsByStatus(...)| done| upcomming-projects | done |
+| Delete projects/developers| skip? | Remove\<T>(T x)| done |  - | skip |
+| Assign Developers to projects| done | Assign(proj,dev) | done | assign-button,assign-service | done |
+| Unassign devlopers from projects| done | Unassign(proj,dev) | done | assign-button ,assign-service | done |
+| View assigned developers for current project| done | GetDevelopers(...)| done | view-develoeprs | done |
+| Search developer| done | Get\<T>(...)| done | list-developers | done|
+| Search project| done | Get\<T>(...)| done | list-projects | done|
 
 

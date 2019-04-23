@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter, Output, ViewChild } from '@angular/core';
 import { FormControl, FormBuilder, FormGroup } from '@angular/forms';
 import { Developer } from '../models/Developer';
 import { Project } from '../models/Project';
@@ -10,6 +10,9 @@ import { MockNgModuleResolver } from '@angular/compiler/testing';
 import { CollectionResult } from '../collection-result';
 import { ActivatedRoute, Router, NavigationEnd, NavigationStart } from '@angular/router';
 import { AssignModel } from '../models/AssignModel';
+import { ListDevelopersComponent } from '../developers/list-developers.component';
+import { ListProjectsComponent } from '../projects/list-projects.component';
+import { ProjectStatusComponent } from '../project-status/project-status.component';
 
 @Component({
   selector: 'app-search',
@@ -20,24 +23,49 @@ export class SearchComponent implements OnInit {
   @Input() type: string;
   @Input() set: string;
   @Input() context: string;
-  @Input() isModal: boolean;
+  @Input() isModal: boolean = false;
+  @ViewChild(ListDevelopersComponent) developersComp: ListDevelopersComponent;
+  @ViewChild(ListProjectsComponent) projectsComp: ListProjectsComponent;
 
-  developers: CollectionResult<Developer>;
-  projects: CollectionResult<Project>;
-  path: string;
+  
+
+  // developers: CollectionResult<Developer> = new CollectionResult<Developer>();
+  // projects: CollectionResult<Developer> = new CollectionResult<Developer>();
   searchForm: FormGroup;
-  constructor(private route: ActivatedRoute, private fb: FormBuilder, private devs: DeveloperRepoService, private projs: ProjectRepoService, private router: Router) {
+
+  get keywords(): string { return this.searchForm.get('keywords').value; }
+  set keywords(val: string) { this.searchForm.get('keywords').setValue(val); }
+
+  // get hasProjects(): boolean { return this.developers.totalCount > 0 }
+  // get hasDevelopers() { return this.projects.totalCount > 0 }
+
+  get isInContext() {
+    if (!this.context) return false;
+    return true;
+  }
+
+  get devRender(): boolean {
+    return this.type == 'any' || this.type == 'developer';
+  }
+  get projRender(): boolean {
+    return this.type == 'any' || this.type == 'project';
+  }
+
+
+  show: boolean = true;
+  constructor(private route: ActivatedRoute, private fb: FormBuilder, private devRepo: DeveloperRepoService, private projRepo: ProjectRepoService, private router: Router) {
     router.events.subscribe((event) => {
       if (event instanceof NavigationStart) {
-        this.developers = null;
-        this.projects = null;
-        this.keywords.setValue("");
+        this.keywords = "";
         // Hide loading indicator
       }
     });
   }
 
   ngOnInit() {
+    if (this.isModal) {
+      this.show = false;
+    }
     if (!this.context) this.context = "";
     if (!this.set) this.set = 'all';
     this.searchForm = this.fb.group({
@@ -47,8 +75,15 @@ export class SearchComponent implements OnInit {
 
 
   clear() {
-    this.developers = null;
-    this.projects = null;
+
+    if (this.developersComp) {
+      this.developersComp.disabled = true;
+      this.developersComp.keywords = null;
+    }
+    if (this.projectsComp) {
+      this.projectsComp.disabled = true;
+      this.projectsComp.keywords = null;
+    }
   }
   onClick() {
     console.log("click");
@@ -56,35 +91,44 @@ export class SearchComponent implements OnInit {
   fetch() {
     if (this.searchForm.touched) {
       var filter = new FilterModel();
-      filter.keywords = this.keywords.value;
+      filter.keywords = this.keywords;
       filter.context = this.context;
       filter.set = this.set;
       this.clear();
-      if (this.type == 'any' || this.type == "developer")
-        this.devs.get(filter).subscribe(this.hadnleDevs.bind(this));
-      if (this.type == 'any' || this.type == 'project')
-        this.projs.get(filter).subscribe(this.hadnleProjs.bind(this));
+
+      if (this.devRender) {
+        this.developersComp.disabled = false;
+        this.developersComp.keywords = this.keywords;
+        this.developersComp.update();
+      }
+
+      if (this.projRender) {
+        this.developersComp.disabled = false;
+        this.projectsComp.keywords = this.keywords;
+        this.projectsComp.update();
+      }
     }
+
+    // if (this.searchForm.touched) {
+    //   this.clear();
+    //   this.show = true;
+
+    //   if (this.type == 'any' || this.type == "developer") {
+    //     this.developersComp.keywords = this.keywords;
+    //     this.developersComp.update();
+    //   }
+
+    //   if (this.type == 'any' || this.type == 'project')
+    //     this.developersComp.keywords = this.keywords;
+    // }
   }
+
   mouseLeave() {
     if (this.isModal) {
       this.clear();
+      this.show = false;
     }
   }
-  private hadnleDevs(data: CollectionResult<Developer>) {
-    this.developers = data;
-  }
 
-  private hadnleProjs(data: CollectionResult<Project>) {
-    this.projects = data;
-  }
 
-  // private handleData<T>(data: CollectionResult<T>) {
-  //     if(typeof T===typeof 'Developer')
-
-  // }
-  get keywords() { return this.searchForm.get('keywords'); }
-  get hasProjects() { return this.projects && this.projects.totalCount > 0; }
-  get hasDevelopers() { return this.developers && this.developers.totalCount > 0; }
-  get isInContext() { return this.context == null; }
 }

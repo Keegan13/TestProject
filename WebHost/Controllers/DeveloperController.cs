@@ -40,7 +40,7 @@ namespace Host.Controllers
         }
         private Task<IEnumerable<Developer>> GetNotByProject(FilterModel filter)
         {
-            return _mng.GetNotAssignedDevelopers(Decode(filter.Context));
+            return _mng.GetNotAssignedDevelopers(Decode(filter.Context),filter.Keywords,filter.GetOrderModel());
         }
 
         private async Task<bool> ValidateOrDefault(FilterModel filter)
