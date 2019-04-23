@@ -9,6 +9,7 @@ using System;
 using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace Host.Controllers
 {
@@ -43,7 +44,7 @@ namespace Host.Controllers
         }
         protected Task<IEnumerable<Project>> GetAssociated(FilterModel filter)
         {
-            return _mng.GetAssignedProjects(Decode(filter.Context));
+            return _mng.GetAssignedProjects(Decode(filter.Context),filter.GetOrderModel());
         }
 
         protected Task<IEnumerable<Project>> GetUpcomming(FilterModel filter)
@@ -153,6 +154,11 @@ namespace Host.Controllers
         }
         protected virtual async Task<bool> ValidateProject(EditProjectViewModel model, Project original = null)
         {
+            if (Regex.IsMatch(model.Name, "-"))
+            {
+                ModelState.AddModelError(nameof(original.Name), String.Format("Projec should not contain - (minus) character", model.Name));
+            }
+
             if ((original == null || original.Name != model.Name) &&  await _mng.ProjectExists(model.Name))
             {
                 ModelState.AddModelError(nameof(original.Name), String.Format("Projec with name {0} already exists", model.Name));

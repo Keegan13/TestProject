@@ -8,10 +8,11 @@ namespace Infrastructure.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static void AddCustomDbContext(this IServiceCollection services, bool includeSeed = false)
+        public static void AddCustomDbContext(this IServiceCollection services)
         {
             var provider = services.BuildServiceProvider();
             var config = provider.GetRequiredService<IConfiguration>();
+
             services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(config.GetConnectionString("DefaultConnection")));
         }
         public static void AddProjectManager(this IServiceCollection services)

@@ -1,6 +1,7 @@
 ﻿using Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Linq;
 
 namespace Infrastructure.Data
 {
@@ -12,7 +13,12 @@ namespace Infrastructure.Data
 
         public ApplicationContext(DbContextOptions options) : base(options)
         {
-          //Database.EnsureCreated();
+            Database.EnsureCreated();
+            //Database.Migrate();
+            //if (this.Projects.Count() < 10 || this.Developers.Count() < 10)
+            //{
+            //    (new DataBaseSeed(this)).Initialize();
+            //}
         }
 
         protected override void OnModelCreating(ModelBuilder mb)
@@ -20,6 +26,8 @@ namespace Infrastructure.Data
             mb.Entity<Project>(ConfigureProjects);
             mb.Entity<Developer>(ConfigureDevelopers);
             mb.Entity<ProjectDeveloper>(ConfigureBindEntity);
+
+            
         }
 
         protected void ConfigureProjects(EntityTypeBuilder<Project> proj)

@@ -64,9 +64,13 @@ namespace Host
                 app.UseHsts();
             }
 
+            
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
+
+            app.UseDBSeed();
 
             app.UseMvc(routes =>
             {
