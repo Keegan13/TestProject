@@ -15,6 +15,7 @@ export class AssignButtonComponent implements OnInit {
   @Input() developer: string;
   @Input() isAssigned: boolean;
   @Input() size: number;
+  @Input() assignChanged: EventEmitter<AssignModel> = new EventEmitter<AssignModel>();
   octicon: string;
   color: string;
 
@@ -27,13 +28,13 @@ export class AssignButtonComponent implements OnInit {
   }
   //hover
   mouseEnter() {
-    this.octicon=this.isAssigned?'x':"checklist";
+    this.octicon = this.isAssigned ? 'x' : "checklist";
     this.color = this.isAssigned ? "red" : "green";
     this.update();
   }
   mouseLeave() {
     this.octicon = "checklist";
-    
+
     this.color = this.isAssigned ? "#007bff" : "grey";
     this.update();
   }
@@ -65,7 +66,12 @@ export class AssignButtonComponent implements OnInit {
     var model: AssignModel = new AssignModel(this.project, this.developer, !this.isAssigned);
     this.srv.requestAssign(model).subscribe(this.handleResponse.bind(this));
   }
+  
   handleResponse(model: AssignModel) {
+    if (this.isAssigned != model.isAssigned) {
+      this.srv.send(model);
+      //this.assignChanged.emit(model);
+    }
     this.isAssigned = model.isAssigned;
     this.update();
   }

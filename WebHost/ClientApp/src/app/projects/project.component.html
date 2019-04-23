@@ -10,7 +10,7 @@
     </div>
     <div class="row">
       <div class="col-sm-4 col">
-        <span >Start date</span> 
+        <span>Start date</span>
         <p>{{project?.startDate|date}}</p>
         <span>End date</span>
         <p>{{project?.endDate|date}}</p>
@@ -28,20 +28,27 @@
 
     </div>
     <div class="row">
-      <div class="col-sm-6">
-        <label>Assign</label>
-        
-          <app-search set="nonassociated" type="developer" [context]="id"></app-search>
-        
-      </div>
-    </div>
-    <div class="row">
       <div class="col-sm-12">
         <h2 class="text-center info">Currently assigned developer</h2>
-        <app-list-developers class="col-sm-6" [project]="project.url" [perPage]="5" set="associated" [data]="developers"
-          [isModal]="false">
+        <app-list-developers class="col-sm-6" [project]="project.url" [perPage]="5" set="associated" [isModal]="false">
         </app-list-developers>
       </div>
     </div>
+
+
+
+    <div class="row">
+      <button>Assign developers</button>
+      <div class="col-sm-12">
+        <app-search set="nonassociated" type="developer" [context]="project.url" [isModal]="false"></app-search>
+        <!-- <div class="collapse multi-collapse" id="multiCollapseExample1">
+          <div class="card card-body">
+            Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. Nihil anim
+            keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
+          </div>
+        </div> -->
+      </div>
+    </div>
+
   </div>
 </div>

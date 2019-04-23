@@ -20,7 +20,7 @@ export class SearchComponent implements OnInit {
   @Input() type: string;
   @Input() set: string;
   @Input() context: string;
-
+  @Input() isModal: boolean;
 
   developers: CollectionResult<Developer>;
   projects: CollectionResult<Project>;
@@ -38,8 +38,8 @@ export class SearchComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (typeof this.context === 'undefined' || !this.context) this.context = null;
-    if (typeof this.set === 'undefined' || !this.set) this.set = 'all';
+    if (!this.context) this.context = "";
+    if (!this.set) this.set = 'all';
     this.searchForm = this.fb.group({
       keywords: ['']
     });
@@ -67,7 +67,9 @@ export class SearchComponent implements OnInit {
     }
   }
   mouseLeave() {
-    this.clear();
+    if (this.isModal) {
+      this.clear();
+    }
   }
   private hadnleDevs(data: CollectionResult<Developer>) {
     this.developers = data;

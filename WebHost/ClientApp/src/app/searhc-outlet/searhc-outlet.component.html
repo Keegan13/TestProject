@@ -1,0 +1,15 @@
+<div (mouseleave)="mouseLeave()" class="father">
+  <div class="result">
+    <div *ngIf="hasDevelopers">
+      <h6>Developers</h6>
+      <app-list-developers isModal="true" [data]='developers' [project]="context" [set]="set" [perPage]="5">
+      </app-list-developers>
+    </div>
+    <div *ngIf="hasProjects">
+      <h6>Projects</h6>
+      <app-list-projects *ngIf="hasProjects" isModal="true" [data]='projects' [developer]="context" [set]="set"
+        [perPage]="5">
+      </app-list-projects>
+    </div>
+  </div>
+</div>

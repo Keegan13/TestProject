@@ -26,7 +26,8 @@ import { CompletedProjectsComponent } from './projects/completed-projects.compon
 import { SearchComponent } from './search/search.component';
 import { OcticonDirective } from './octicon.directive';
 import { ProjectStatusComponent } from './project-status/project-status.component';
-
+import { SearchBarComponent } from './search-bar/search-bar.component';
+import { SearhcOutletComponent } from './searhc-outlet/searhc-outlet.component';
 
 @NgModule({
   declarations: [
@@ -48,6 +49,8 @@ import { ProjectStatusComponent } from './project-status/project-status.componen
     CompletedProjectsComponent,
     OcticonDirective,
     ProjectStatusComponent,
+    SearchBarComponent,
+    SearhcOutletComponent,
   ],
   imports: [
     BrowserModule,
@@ -56,7 +59,8 @@ import { ProjectStatusComponent } from './project-status/project-status.componen
     HttpClientModule,
     BsDatepickerModule.forRoot(),
     ModalModule.forRoot(),
-    ProgressbarModule
+    ProgressbarModule,
+
   ],
   providers: [{ provide: APP_BASE_HREF, useValue: '/' }],
   bootstrap: [AppComponent]

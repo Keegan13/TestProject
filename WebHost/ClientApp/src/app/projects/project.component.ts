@@ -8,6 +8,8 @@ import { CreateProjectComponent } from './create-project.component';
 import { Developer } from '../models/Developer';
 import { CollectionResult } from '../collection-result';
 import { FilterModel } from '../models/FilterModel';
+import { AssignModel } from '../models/AssignModel';
+import { AssignService } from '../assign.service';
 
 @Component({
   selector: 'app-project',
@@ -24,26 +26,38 @@ export class ProjectComponent implements OnInit {
   }
   get end() { return Project.formatDate(this.project.startDate); }
 
-  constructor(private modalService: BsModalService, private route: ActivatedRoute, private router: Router, private repo: ProjectRepoService, private devs: DeveloperRepoService) {
+  constructor(private modalService: BsModalService, private route: ActivatedRoute, private router: Router, private repo: ProjectRepoService, private devs: DeveloperRepoService, private assign: AssignService) {
   }
 
   get id() {
     return this.route.snapshot.params['id'];
   }
   ngOnInit() {
-    this.repo.single(this.id).subscribe((x => {
-      this.project = x;
-    }
+
+    this.repo.single(this.id).subscribe((x => { this.project = x; }
     ).bind(this), this.onGetError.bind(this), this.onSuccess.bind(this));
+    this.loadProject();
+    this.developers = new CollectionResult<Developer>();
+
   }
-  loadProjects() {
-    var filter = new FilterModel();
-    filter.context = this.id;
-    filter.set = 'associated';
-    this.devs.get(filter).subscribe(((x) => { this.developers = x; }).bind(this));
+  loadProject() {
+
   }
+
+
   onGetError(error: any) {
 
+  }
+
+  onAssignChanged(model: AssignModel) {
+    if (model.project != this.project.url) return;
+    for (var i = 0; i < this.developers.values.length; i++) {
+      if (this.developers.values[i].url == model.developer) {
+        this.developers.values.splice(i, 1);
+        this.developers.totalCount--;
+        break;
+      }
+    }
   }
   onSuccess() {
   }

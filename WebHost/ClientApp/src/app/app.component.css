@@ -4,3 +4,15 @@ div.main-body
     
     margin:auto;
 }
+
+div.ad
+{
+    float:right;
+    top: 50px;
+    
+    margin-left:20px;
+    
+    width: 100px;
+    height: 300px;
+    background-color: rgba(189, 189, 189, 0.699);
+}

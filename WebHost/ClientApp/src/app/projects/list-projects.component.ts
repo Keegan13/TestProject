@@ -4,6 +4,7 @@ import { Project } from '../models/Project';
 import { ProjectRepoService } from '../project-repo.service';
 import { ActivatedRoute } from '@angular/router';
 import { FilterModel } from '../models/FilterModel';
+import { SearchModel } from '../models/SearchModel';
 
 @Component({
   selector: 'app-list-projects',
@@ -12,11 +13,13 @@ import { FilterModel } from '../models/FilterModel';
 })
 export class ListProjectsComponent implements OnInit {
 
-  @Input() perPage: number;
+  @Input() perPage: number=25;
   @Input() isModal: boolean;
   @Input() data: CollectionResult<Project>;
   @Input() developer: string;
   @Input() set: string;
+  @Input() keywords: string;
+  @Input() isPagination: boolean = true;
   projects: Project[];
   currentPage: number;
   totalPages: number;
@@ -70,6 +73,7 @@ export class ListProjectsComponent implements OnInit {
     filter.take = this.perPage;
     filter.sort = "name";
     filter.context = this.developer;
+    filter.keywords = this.keywords;
     filter.set = this.set;
 
     if (this.hasParentData) {
