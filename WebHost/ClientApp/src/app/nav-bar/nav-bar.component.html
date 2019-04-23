@@ -20,32 +20,32 @@
               <div class="dropdown-divider"></div>
               <a class="dropdown-item" [routerLink]='["/projects/upcomming"]'>Upcomming</a>
               <a class="dropdown-item" [routerLink]='["/projects/active"]'>Active</a>
-              <a class="dropdown-item" [routerLink]='["/projects/completed"]'>Completed</a>   
-              <a class="dropdown-item" [routerLink]='["/projects/all"]'>All</a>   
-                     
+              <a class="dropdown-item" [routerLink]='["/projects/completed"]'>Completed</a>
+              <a class="dropdown-item" [routerLink]='["/projects/all"]'>All</a>
+
             </div>
           </li>
 
           <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
-                aria-haspopup="true" aria-expanded="false">
-                Developers
-              </a>
-              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <a class="dropdown-item" [routerLink]='["/developers/create"]'>Create</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" [routerLink]='["/developers/all"]'>All</a>
-                <!-- <a class="dropdown-item" [routerLink]='["/projects/active"]'>Currently Busy</a>
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false">
+              Developers
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" [routerLink]='["/developers/create"]'>Create</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" [routerLink]='["/developers/all"]'>All</a>
+              <!-- <a class="dropdown-item" [routerLink]='["/projects/active"]'>Currently Busy</a>
                 <a class="dropdown-item" [routerLink]='["/projects/completed"]'>Currently Free</a>           -->
-              </div>
-            </li>
+            </div>
+          </li>
 
-        
 
-            <li class="form-inline my-2 my-lg-0">
-                <app-search [type]="'any'" [isModal]="true" perPage="5"></app-search>
-            </li>
-            
+
+          <li class="form-inline my-2 my-lg-0">
+            <app-search-bar text="Search" (search)="onSearch($event)"></app-search-bar>
+          </li>
+
 
         </ul>
       </div>

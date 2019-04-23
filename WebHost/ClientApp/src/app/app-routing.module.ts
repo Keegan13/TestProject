@@ -10,6 +10,7 @@ import { AllProjectsComponent } from './projects/all-projects.component';
 import { ActiveProjectsComponent } from './projects/active-projects.component';
 import { UpcommingProjectsComponent } from './projects/upcomming-projects.component';
 import { CompletedProjectsComponent } from './projects/completed-projects.component';
+import { SearchPageComponent } from './search-page/search-page.component';
 
 const routes: Routes = [
   { path: 'developers/create', component: CreateDeveloperComponent },
@@ -20,7 +21,8 @@ const routes: Routes = [
 
   { path: '', component: HomeComponent },
   { path: 'home', component: HomeComponent },
-  
+
+  { path: 'search/:keywords', component: SearchPageComponent },
 
   { path: 'developers/all', component: AllDevelopersComponent },
 
