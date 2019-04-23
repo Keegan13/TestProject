@@ -6,7 +6,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CreateDeveloperComponent } from './developers/create-developer.component';
 import { NavBarComponent } from './nav-bar/nav-bar.component';
-import { from } from 'rxjs';
 import { HomeComponent } from './home/home.component';
 import { UpcommingProjectsComponent } from './projects/upcomming-projects.component';
 import { ListProjectsComponent } from './projects/list-projects.component';
@@ -23,7 +22,6 @@ import { ProgressbarModule } from 'ngx-bootstrap/progressbar';
 import { AssignButtonComponent } from './assign-button/assign-button.component';
 import { ActiveProjectsComponent } from './projects/active-projects.component';
 import { CompletedProjectsComponent } from './projects/completed-projects.component';
-import { SearchComponent } from './search/search.component';
 import { OcticonDirective } from './octicon.directive';
 import { ProjectStatusComponent } from './project-status/project-status.component';
 import { SearchBarComponent } from './search-bar/search-bar.component';
@@ -44,7 +42,6 @@ import { SearchPageComponent } from './search-page/search-page.component';
     AllDevelopersComponent,
     ProjectComponent,
     AllProjectsComponent,
-    SearchComponent,
     AssignButtonComponent,
     ActiveProjectsComponent,
     CompletedProjectsComponent,

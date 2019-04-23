@@ -1,3 +1,10 @@
-<p>
-  search-page works!
-</p>
+<div class="row">
+  <div class="col-sm-12">
+    <h6>Developers</h6>
+    <app-list-developers [isModal]="false" [perPage]="10" [keywords]="keywords">
+    </app-list-developers>
+    <h6>Projects</h6>
+    <app-list-projects [isModal]="false" [perPage]="10" [keywords]="keywords">
+    </app-list-projects>
+  </div>
+</div>
