@@ -8,21 +8,17 @@
 
 ## Installation
 ```
-1. Clone/Download the repo:
+1. Clone/Download repo:
     git clone https://github.com/Keegan13/TestProject
 2. Restore packages:
-    cd %PROJECT_PATH%_
+    cd %PROJECT_PATH%
     dotnet restore TestProject.sln
+    cd WebHost/ClientApp
     npm install
-3. Data base restor
-    3.1 from vscode
-      dotnet ef update-database
-    3.2 from VS studio
-      update-database
-4. Run project
-    4.1 From console
-      dotnet start
-      cd src/AspNetCoreSpa.Web/ClientApp:
-      npm start
-    4.2 From VisualStudio
-      F5 project Host 
+3. Run project
+    3.1 From console
+      cd ./..
+      dotnet run
+    3.2 From VisualStudio
+      F5 project "Host" 
+4. Navigate to https://localhost:5001/ 
