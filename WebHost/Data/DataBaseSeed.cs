@@ -40,7 +40,7 @@ namespace Host.Data
         {
             Shuffle(ProjectNames);
 
-            var names = ProjectNames.Take(count);
+            var names = ProjectNames.Take(count).Distinct();
 
             //var conflicts = _context.Set<Project>().Join(names, p => p.Name, n => n, (p, n) => n).ToArray();
 
@@ -74,7 +74,7 @@ namespace Host.Data
             Shuffle(FullNames);
             Shuffle(NickNames);
 
-            var names = NickNames.Take(count);
+            var names = NickNames.Take(count).Distinct();
 
             //var conflicts = _context.Set<Developer>().Join(names, p => p.Nickname, n => n, (p, n) => n).ToArray();
 
