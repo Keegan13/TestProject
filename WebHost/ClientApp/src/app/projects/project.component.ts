@@ -62,17 +62,20 @@ export class ProjectComponent implements OnInit {
   // }
   onSuccess() {
   }
+
   onUpdate(val: Project) {
     this.project = val;
     this.bsModalRef.hide();
     this.router.navigate(['/project/' + this.project.url]);
   }
+  
   onSearch(keywords: string) {
     if (typeof keywords === 'string') {
       console.log(keywords);
       this.keywords = keywords;
     }
   }
+
   delete() {
 
   }

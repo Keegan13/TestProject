@@ -49,6 +49,13 @@ export class ListProjectsComponent implements OnInit {
     return true;
   }
 
+  get hasNext() {
+    return this.currentPage < this.totalPages;
+  }
+  get hasPrevious() {
+    return this.currentPage > 1;
+  }
+
   // get hasParentData() {
   //   if (!this.data) return false;
   //   return false;

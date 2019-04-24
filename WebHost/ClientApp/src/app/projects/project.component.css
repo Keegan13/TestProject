@@ -10,15 +10,7 @@ div.project-name
 {
     margin-left:20px;
 }
-p.description
-{
-    border: 0.5px grey solid;
-    margin:0.1em;
-    border-radius: 0.25em;
-    padding:0.5em;
-    font-weight: 300;
-    font-size: 1em;
-}
+
 div.ggg
 {
     border: 0.5px grey solid;

@@ -46,3 +46,23 @@ button {
   td:focus {
       outline: none;
 }
+.btn-page-nav
+{
+    color:#212529;
+    margin: 0px;
+    border:0px;
+    background-color: transparent;
+}
+.btn-page-nav-off
+{
+    color: rgba(124, 124, 124, 0.514);
+}
+span.page
+{
+    font-size: 1em;
+
+}
+.page, .btn-page-nav
+{
+    padding: 5px;
+}

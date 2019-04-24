@@ -9,7 +9,6 @@ import * as octicons from 'octicons';
 export class OcticonDirective implements OnInit {
 
   @Input() octicon: string;
-  @Input() color: string;
   @Input() width: number;
 
   constructor(private elementRef: ElementRef, private renderer: Renderer2) { }
@@ -19,9 +18,7 @@ export class OcticonDirective implements OnInit {
     el.innerHTML = octicons[this.octicon].toSVG();
 
     const icon: Node = el.firstChild;
-    if (!this.color) this.color = "#007bff"
-
-    this.renderer.setStyle(icon, 'color', this.color)
+   
 
     if (!this.width) this.width = 26;
 

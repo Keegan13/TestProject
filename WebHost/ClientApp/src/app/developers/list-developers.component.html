@@ -8,6 +8,29 @@
       </div>
     </div>
     <div *ngIf="!isModal">
+      <div class="row">
+        <div class="col-sm-12">
+
+          <div *ngIf="totalPages>1" class="list-control d-inline float-right">
+            <span class="btn-page-nav" [ngClass]="{'btn-page-nav-off':!hasPrevious}" width="10" octicon="chevron-left"
+              (click)="previousPage()"></span>
+            <span class="page">{{currentPage}}</span>
+            <span class="btn-page-nav" [ngClass]="{'btn-page-nav-off':!hasNext}" width="10" octicon="chevron-right"
+              (click)="nextPage()"></span>
+          </div>
+          <!-- 
+          <div class="list-control d-inline float-right">
+            <span>{{from}}</span>
+            to
+            <span>{{to}}</span>
+            of
+            <span>{{totalCount}}</span>
+          </div> -->
+
+          <!-- <div class="list-control d-inline float-right">Search</div>
+        </div> -->
+      </div>
+
       <table class="table table-sm table-hover">
         <thead>
           <tr>
@@ -29,18 +52,7 @@
         </tbody>
       </table>
     </div>
-    <div *ngIf="totalPages>1">
-      <nav>
-        <ul class="pagination justify-content-center">
-          <li class="page-item">
-            <a class="page-link" (click)="previousPage()">Previous</a>
-          </li>
-          <li class="page-item">
-            <a class="page-link" (click)="nextPage()">Next</a>
-          </li>
-        </ul>
-      </nav>
-    </div>
+
   </div>
   <div *ngIf="!hasItems">
     no developers

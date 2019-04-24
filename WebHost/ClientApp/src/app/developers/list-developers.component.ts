@@ -6,6 +6,7 @@ import { FilterModel } from '../models/FilterModel';
 import { CollectionResult } from '../collection-result';
 import { AssignModel } from '../models/AssignModel';
 import { AssignService } from '../assign.service';
+import { hasAlignedHourOffset } from 'ngx-bootstrap/chronos/units/offset';
 
 @Component({
   selector: 'app-list-developers',
@@ -21,7 +22,7 @@ export class ListDevelopersComponent implements OnInit {
   @Input() set: string = "all";
   @Input() isPagination: boolean = true;
 
-  
+
   private _keywords = '';
 
   @Input()
@@ -37,8 +38,9 @@ export class ListDevelopersComponent implements OnInit {
   @Input() disabled: boolean = false;
   developers: Developer[];
 
-  currentPage: number;
-  totalPages: number;
+  currentPage: number=1;
+  totalPages: number=1;
+  totalCount: number=0;
 
   constructor(private repo: DeveloperRepoService, private router: ActivatedRoute, private assign: AssignService) {
     assign.anotherField.subscribe(this.onAssignChanged.bind(this));
@@ -47,10 +49,7 @@ export class ListDevelopersComponent implements OnInit {
     if (!this.project) return false;
     return true;
   }
-  // get hasParentData() {
-  //   if (!this.data) return false;
-  //   return true;
-  // }
+
   get hasItems() {
     if (!this.developers) return false;
     if (this.developers.length == 0) return false;
@@ -85,16 +84,15 @@ export class ListDevelopersComponent implements OnInit {
     if (result) {
 
       this.developers = result.values;
-      
+
       this.totalPages = this.isPagination ? this.countPages(result.totalCount)
         : 1;
-        if(this.currentPage>this.totalPages)
-        {
-          this.currentPage--;
-          this.update();
+      if (this.currentPage > this.totalPages) {
+        this.currentPage--;
+        this.update();
 
-        }
-      //this.totalCount = result.totalCount;
+      }
+      this.totalCount = result.totalCount;
     }
   }
 
@@ -128,13 +126,35 @@ export class ListDevelopersComponent implements OnInit {
     // }
   }
 
-  public nextPage(): void {
-    if (this.totalPages > this.currentPage) {
-      this.loadPage(this.currentPage + 1);
+
+  public get from() {
+    if(this.totalPages=1)
+    {
+      return this.totalCount;
     }
+
+    return (this.currentPage-1) * this.perPage + 1;
   }
+  public get to() {
+    if (this.hasNext) {
+      return (this.currentPage) * this.perPage;
+    }
+    return this.totalCount;
+  }
+
+  public nextPage(): void {
+    if (this.hasNext)
+      this.loadPage(this.currentPage + 1);
+  }
+  public get hasPrevious() {
+    return this.currentPage > 1;
+  }
+  public get hasNext() {
+    return this.currentPage < this.totalPages;
+  }
+
   public previousPage(): void {
-    if (this.currentPage > 1) {
+    if (this.hasPrevious) {
       this.loadPage(this.currentPage - 1);
     }
   }
