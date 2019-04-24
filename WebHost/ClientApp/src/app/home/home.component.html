@@ -4,12 +4,12 @@
   <div class="col-sm-6">
     <!-- <h1>Upcomming</h1> -->
     <app-upcomming-projects [isPagination]='isPagination' [perPage]="5"></app-upcomming-projects>
-    <a [routerLink]="['/projects/active']">View all</a>
+    <a [routerLink]="['/projects/upcomming']">View all</a>
   </div>
   <div class="col-sm-6">
     <!-- <h1>Active</h1> -->
     <app-active-projects [isPagination]='isPagination' [perPage]="5"></app-active-projects>
-    <a [routerLink]="['/projects/completed']">View all</a>
+    <a [routerLink]="['/projects/active']">View all</a>
   </div>
 </div>
 
@@ -17,7 +17,7 @@
   <div class="col-sm-6">
     <!-- <h1>Completed</h1> -->
     <app-completed-projects [isPagination]='isPagination' [perPage]="5"></app-completed-projects>
-    <a [routerLink]="['/projects/upcomming']">View all</a>
+    <a [routerLink]="['/projects/completed']">View all</a>
   </div>
   <div class="col-sm-6">
     <!-- <h2>Top developers</h2> -->
