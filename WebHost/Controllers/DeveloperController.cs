@@ -7,6 +7,7 @@ using Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
 using Host.Extensions;
 using Host.Models;
+using System.Text.RegularExpressions;
 
 namespace Host.Controllers
 {
@@ -15,7 +16,7 @@ namespace Host.Controllers
         protected override void InitializeSets(Dictionary<string, Func<FilterModel, Task<IEnumerable<Developer>>>> sets)
         {
             sets.Add("associated", GetByProject);
-            sets.Add("nonassociated",GetNotByProject);
+            sets.Add("nonassociated", GetNotByProject);
 
             sets.Add("all", GetAll);
         }
@@ -32,7 +33,7 @@ namespace Host.Controllers
 
         private Task<IEnumerable<Developer>> GetByProject(FilterModel filter)
         {
-            return _mng.GetAssignedDevelopers(Decode(filter.Context),filter.GetOrderModel());
+            return _mng.GetAssignedDevelopers(Decode(filter.Context), filter.GetOrderModel());
         }
         private Task<IEnumerable<Developer>> GetAll(FilterModel filter)
         {
@@ -40,10 +41,10 @@ namespace Host.Controllers
         }
         private Task<IEnumerable<Developer>> GetNotByProject(FilterModel filter)
         {
-            return _mng.GetNotAssignedDevelopers(Decode(filter.Context),filter.Keywords,filter.GetOrderModel());
+            return _mng.GetNotAssignedDevelopers(Decode(filter.Context), filter.Keywords, filter.GetOrderModel());
         }
 
-        private async Task<bool> ValidateOrDefault(FilterModel filter)
+        private async Task<bool> ValidateFilterOrDefault(FilterModel filter)
         {
             if (string.IsNullOrEmpty(filter.Set)) filter.Set = "all";
             //if order not provided use ascending
@@ -54,7 +55,7 @@ namespace Host.Controllers
             if (filter.Set.ToLower() == "associated")
                 if (string.IsNullOrEmpty(filter.Context))
                 {
-                    ModelState.AddModelError(nameof(filter.Context), "Project url not provided in \"Context\" field");
+                    ModelState.AddModelError(nameof(filter.Context), "Project name not provided in \"Context\" field");
                 }
                 else if (!await _mng.ProjectExists(Decode(filter.Context)))
                 {
@@ -64,11 +65,11 @@ namespace Host.Controllers
         }
         public async Task<IActionResult> Get(FilterModel filter)
         {
-            if (!await ValidateOrDefault(filter)) return BadRequest(ModelState);
+            if (!await ValidateFilterOrDefault(filter)) return BadRequest(ModelState);
 
             var developers = await Set(filter);
             var count = _mng.LastQueryTotalCount;
-            string projName = filter.Set.ToLower() == "associated"? filter.Context : "";
+            string projName = filter.Set.ToLower() == "associated" ? filter.Context : "";
             return new JsonResult(new CollectionResult<EditDeveloperViewModel>()
             {
                 Values = developers.Select(x => x.GetVM(Encode(x.Nickname), projName)).ToArray(),
@@ -85,31 +86,36 @@ namespace Host.Controllers
         }
         public async Task<IActionResult> Create([FromBody] EditDeveloperViewModel model)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (!ModelState.IsValid || !await ValidateModel(model)) return BadRequest(ModelState);
 
             var developer = model.GetInstance();
 
-            if (await _mng.DeveloperExists(developer))
-            {
-                ModelState.AddModelError(nameof(developer.Nickname), String.Format("Developer with nickname {0} already exists", developer.Nickname));
-                return BadRequest(ModelState);
-            }
-
             _mng.Add(developer);
+
             await _mng.SaveChanges();
 
             return new JsonResult(developer.GetVM(Encode(developer.Nickname), null));
         }
+
+        protected virtual async Task<bool> ValidateModel(EditDeveloperViewModel model, Developer original = null)
+        {
+            if ((original != null || model.Nickname != model.Nickname) && await _mng.DeveloperExists(model.Nickname))
+            {
+                ModelState.AddModelError(nameof(model.Nickname), String.Format("Developer with nickname {0} already exists", model.Nickname));
+            }
+            if (Regex.IsMatch(model.Nickname, "-"))
+            {
+                ModelState.AddModelError(nameof(model.Nickname), String.Format("Developer nickname should not contain \"-\" (dash) character"));
+            }
+            return ModelState.IsValid;
+        }
+
+        
         public async Task<IActionResult> Update([FromRoute] string name, [FromBody] EditDeveloperViewModel model)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
             if (await _mng.GetDeveloper(Decode(name)) is Developer original)
             {
-                if (original.Nickname != model.Nickname && await _mng.DeveloperExists(model.Nickname))
-                {
-                    ModelState.AddModelError(nameof(original.Nickname), String.Format("Developer with nickname {0} already exists", model.Nickname));
-                    return BadRequest(ModelState);
-                }
+                if (!ModelState.IsValid||!await ValidateModel(model,original)) return BadRequest(ModelState);
                 model.Update(original);
                 _mng.Update(original);
                 await _mng.SaveChanges();

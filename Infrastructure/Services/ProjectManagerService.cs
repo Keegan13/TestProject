@@ -76,6 +76,27 @@ namespace Infrastructure.Services
             }
             return Enumerable.Empty<Developer>();
         }
+
+        public async Task<IEnumerable<Project>> GetNotAssignedProjects(string nickname,string keywords=null,OrderModel model=null)
+        {
+            if (await GetDeveloper(nickname) is Developer dev)
+            {
+                int devId = dev.Id;
+                IEnumerable<int> projIds = this._context.Set<ProjectDeveloper>().Where(x => x.DeveloperId == devId).Select(x => x.ProjectId).ToArray();
+
+                var query = _context.Set<Project>().Where(x => !projIds.Contains(x.Id));
+
+                if (!string.IsNullOrEmpty(keywords))
+                {
+                    query = query.Search(keywords);
+                }
+                this.LastQueryTotalCount = await query.CountAsync();
+                query = query.ApplyOrderModel(model);
+                return await query.ToArrayAsync();
+            }
+            return Enumerable.Empty<Project>();
+        }
+
         //OK
         public async Task<IEnumerable<Project>> GetByStatus(ProjectStatus status, OrderModel model = null)
         {

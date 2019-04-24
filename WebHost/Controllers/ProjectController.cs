@@ -22,6 +22,12 @@ namespace Host.Controllers
             sets.Add("active", GetActive);
             sets.Add("upcomming", GetUpcomming);
             sets.Add("completed", GetCompleted);
+            sets.Add("nonassociated", GetNonAssociated);
+        }
+
+        private Task<IEnumerable<Project>> GetNonAssociated(FilterModel filter)
+        {
+            return _mng.GetNotAssignedProjects(filter.Context,filter.Keywords,filter.GetOrderModel());
         }
 
         protected override Task<IEnumerable<Project>> DefaultSet(FilterModel filter)
@@ -156,7 +162,7 @@ namespace Host.Controllers
         {
             if (Regex.IsMatch(model.Name, "-"))
             {
-                ModelState.AddModelError(nameof(original.Name), String.Format("Projec should not contain - (minus) character", model.Name));
+                ModelState.AddModelError(nameof(original.Name), String.Format("Project name should not contain \"-\" (dash) character", model.Name));
             }
 
             if ((original == null || original.Name != model.Name) &&  await _mng.ProjectExists(model.Name))
