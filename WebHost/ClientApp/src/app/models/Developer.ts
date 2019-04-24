@@ -5,13 +5,13 @@ export class Developer {
   public url:string;
   public fullName: string;
   public nickname: string;
-  public skills: string[];
+  //public skills: string[];
   public project:string;
   constructor(form: AbstractControl) {
 
     this.fullName = form.get('fullName').value;
     this.nickname = form.get('nickname').value;
-    this.skills = Developer.parseSkills(form.get('skills').value);
+    //this.skills = Developer.parseSkills(form.get('skills').value);
     this.url="";
     this.project="";
   }
