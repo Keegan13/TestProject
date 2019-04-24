@@ -27,14 +27,14 @@ export class CreateDeveloperComponent implements OnInit {
     this.createForm = this.fb.group({
       fullName: ['', Validators.required],
       nickname: ['', Validators.required],
-      skills: ['']
+      //skills: ['']
     });
   }
   private initEdit() {
     this.createForm = this.fb.group({
       fullName: [this.developer.fullName, Validators.required],
       nickname: [this.developer.nickname, Validators.required],
-      skills: ['']
+      //skills: ['']
     });
   }
   public onSubmit() {
