@@ -1,11 +1,11 @@
 import { Set } from './Set';
 
 export class FilterModel {
-    public sort: string;
-    public order: string;
-    public skip: number;
-    public take: number;
-    public keywords: string;
-    public context: string;
-    public set: string;
+    public sort: string; //ToDo
+    public order: string; // ToDo
+    public skip: number; // ListControlComponent
+    public take: number; //ListControlComponent
+    public keywords: string; //ListControlComponent
+    public context: string;  //{{}} parent}}
+    public set: string; //{{parent}}
 }

@@ -38,17 +38,14 @@
 
       <div class="col-sm-6">
         <h2 class="text-center info">Assigned</h2>
-        <app-list-developers [project]="project.url" [perPage]="5" set="associated" [isModal]="false">
+        <app-list-developers [project]="project.url" [pageSize]="5" set="associated" [isModal]="false">
         </app-list-developers>
       </div>
       <div class="col-sm-6">
         <h2 class="text-center info">Not assigned</h2>
-        <app-list-developers [keywords]="keywords" [project]="project.url" [perPage]="5" set="nonassociated"
+        <app-list-developers [project]="project.url" [pageSize]="5" set="nonassociated"
           [isModal]="false">
         </app-list-developers>
-        <div class="search-bar-style">
-          <app-search-bar class="search-bar-style" text="find" (search)="onSearch($event)"></app-search-bar>
-        </div>
       </div>
     </div>
 

@@ -1,60 +1,40 @@
-<div *ngIf="!disabled">
-
-  <div *ngIf="hasItems">
-    <div class="list-group" *ngIf="isModal">
-      <div *ngFor="let element of developers">
-        <a class="list-group-item list-group-item-action" [routerLink]='["/developer",element.url]'>{{element.nickname}}
-        </a>
-      </div>
+  <div class="list-group" *ngIf="isModal">
+    <div *ngFor="let element of developers">
+      <a class="list-group-item list-group-item-action" [routerLink]='["/developer",element.url]'>{{element.nickname}}
+      </a>
     </div>
-    <div *ngIf="!isModal">
-      <div class="row">
-        <div class="col-sm-12">
-
-          <div *ngIf="totalPages>1" class="list-control d-inline float-right">
-            <span class="btn-page-nav" [ngClass]="{'btn-page-nav-off':!hasPrevious}" width="10" octicon="chevron-left"
-              (click)="previousPage()"></span>
-            <span class="page">{{currentPage}}</span>
-            <span class="btn-page-nav" [ngClass]="{'btn-page-nav-off':!hasNext}" width="10" octicon="chevron-right"
-              (click)="nextPage()"></span>
-          </div>
-          <!-- 
-          <div class="list-control d-inline float-right">
-            <span>{{from}}</span>
-            to
-            <span>{{to}}</span>
-            of
-            <span>{{totalCount}}</span>
-          </div> -->
-
-          <!-- <div class="list-control d-inline float-right">Search</div>
-        </div> -->
-      </div>
-
-      <table class="table table-sm table-hover">
-        <thead>
+  </div>
+  <div *ngIf="!isModal">
+    <app-list-controls *ngIf="!NoPanel" [collectionSize]="collectionSize" [page]="page" [pageSize]="pageSize"
+      (pageChange)="onPageChange($event)" [filter]="filter"></app-list-controls>
+    <table class="table table-sm table-hover">
+      <thead>
+        <tr>
+          <th style="width:60%">Full name</th>
+          <th style="width:30%">Nickname</th>
+          <th style="width:10%"></th>
+        </tr>
+      </thead>
+      <tbody *ngIf="hasItems">
+        <tr *ngFor="let element of developers">
+          <td class="align-middle" [routerLink]='["/developer",element.url]'>{{element.fullName}}</td>
+          <td class="align-middle" [routerLink]='["/developer",element.url]'>{{element.nickname}}</td>
+          <!-- <td   >{{element.skills|json}}</td> -->
+          <td>
+            <app-assign-button class="col-sm-12" [developer]="element.url" [project]="project"
+              [isAssigned]="element.project==project">
+            </app-assign-button>
+          </td>
+        </tr>
+      </tbody>
+      <tbody *ngIf="!hasItems">
           <tr>
-            <th style="width:60%">Full name</th>
-            <th style="width:30%">Nickname</th>
-            <th style="width:10%"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let element of developers">
-            <td class="align-middle" [routerLink]='["/developer",element.url]'>{{element.fullName}}</td>
-            <td class="align-middle" [routerLink]='["/developer",element.url]'>{{element.nickname}}</td>
-            <!-- <td   >{{element.skills|json}}</td> -->
-            <td>
-              <app-assign-button [developer]="element.url" [project]="project" [isAssigned]="element.project==project">
-              </app-assign-button>
+            <td colspan="3">
+                No developers
             </td>
           </tr>
-        </tbody>
-      </table>
-    </div>
+
+      </tbody>
+    </table>
 
   </div>
-  <div *ngIf="!hasItems">
-    no developers
-  </div>
-</div>

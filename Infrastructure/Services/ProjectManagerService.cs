@@ -47,14 +47,19 @@ namespace Infrastructure.Services
             return Enumerable.Empty<Project>();
         }
 
-        public async Task<IEnumerable<Developer>> GetAssignedDevelopers(string projName, OrderModel model = null)
+        public async Task<IEnumerable<Developer>> GetAssignedDevelopers(string projName, string keywords = null, OrderModel model = null)
         {
             if (await GetProject(projName) is Project proj)
             {
                 int projId = proj.Id;
                 IEnumerable<int> devIds = this._context.Set<ProjectDeveloper>().Where(x => x.ProjectId == projId).Select(x => x.DeveloperId).ToArray();
                 var query = _context.Set<Developer>().Where(x => devIds.Contains(x.Id));
+                if (!string.IsNullOrEmpty(keywords))
+                {
+                    query = query.Search(keywords);
+                }
                 this.LastQueryTotalCount = await query.CountAsync();
+
                 query = query.ApplyOrderModel(model);
                 return await query.ToArrayAsync();
             }
@@ -67,9 +72,9 @@ namespace Infrastructure.Services
                 int projId = proj.Id;
                 IEnumerable<int> devIds = this._context.Set<ProjectDeveloper>().Where(x => x.ProjectId == projId).Select(x => x.DeveloperId).ToArray();
                 var query = _context.Set<Developer>().Where(x => !devIds.Contains(x.Id));
-                
+
                 if (!string.IsNullOrEmpty(keywords))
-                   query = query.Search(keywords);
+                    query = query.Search(keywords);
                 this.LastQueryTotalCount = await query.CountAsync();
                 query = query.ApplyOrderModel(model);
                 return await query.ToArrayAsync();
@@ -77,7 +82,7 @@ namespace Infrastructure.Services
             return Enumerable.Empty<Developer>();
         }
 
-        public async Task<IEnumerable<Project>> GetNotAssignedProjects(string nickname,string keywords=null,OrderModel model=null)
+        public async Task<IEnumerable<Project>> GetNotAssignedProjects(string nickname, string keywords = null, OrderModel model = null)
         {
             if (await GetDeveloper(nickname) is Developer dev)
             {

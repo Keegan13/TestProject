@@ -1,0 +1,32 @@
+<div class="col-sm-12">
+  <div class="d-inline float-right">
+    <span class="btn-page-nav" [ngClass]="{'btn-page-nav-off':!hasPrevious}" width="10" octicon="chevron-left"
+      (click)="previousPage()"></span>
+    <span class="page">{{page}}</span>
+    <span class="btn-page-nav" [ngClass]="{'btn-page-nav-off':!hasNext}" width="10" octicon="chevron-right"
+      (click)="nextPage()"></span>
+  </div>
+  <div class="d-inline float-right">
+    <span *ngIf="pageCount>1">
+      <span *ngIf="from!=to">
+        <span>{{from}}</span>
+        to
+        <span>{{to}}</span>
+      </span>
+
+      <span *ngIf="from==to">
+        <span>{{from}} th</span>
+
+      </span>
+    </span>
+    <span *ngIf="1>=pageCount">
+      <span>{{collectionSize}}</span>
+    </span>
+
+    of
+    <span>{{collectionSize}}</span>
+  </div>
+  <div class="d-inline float-right">
+    <app-search-bar class="btn-search" (searchEvent)="onSearch($event)" text="search"></app-search-bar>
+  </div>
+</div>

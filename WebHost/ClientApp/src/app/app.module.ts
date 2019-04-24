@@ -26,6 +26,7 @@ import { OcticonDirective } from './octicon.directive';
 import { ProjectStatusComponent } from './project-status/project-status.component';
 import { SearchBarComponent } from './search-bar/search-bar.component';
 import { SearchPageComponent } from './search-page/search-page.component';
+import { ListControlsComponent } from './list-controls/list-controls.component';
 
 
 @NgModule({
@@ -48,7 +49,8 @@ import { SearchPageComponent } from './search-page/search-page.component';
     OcticonDirective,
     ProjectStatusComponent,
     SearchBarComponent,
-    SearchPageComponent
+    SearchPageComponent,
+    ListControlsComponent
 
   ],
   imports: [

@@ -33,7 +33,7 @@ namespace Host.Controllers
 
         private Task<IEnumerable<Developer>> GetByProject(FilterModel filter)
         {
-            return _mng.GetAssignedDevelopers(Decode(filter.Context), filter.GetOrderModel());
+            return _mng.GetAssignedDevelopers(Decode(filter.Context),filter.Keywords, filter.GetOrderModel());
         }
         private Task<IEnumerable<Developer>> GetAll(FilterModel filter)
         {
