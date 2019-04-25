@@ -46,7 +46,7 @@ namespace Host.Controllers
         }
         protected Task<IEnumerable<Project>> GetActive(FilterModel filter)
         {
-            return _mng.GetByStatus(ProjectStatus.InProgress, filter.GetOrderModel());
+            return _mng.GetByStatus(ProjectStatus.InProgress, filter.Keywords ,filter.GetOrderModel());
         }
         protected Task<IEnumerable<Project>> GetAssociated(FilterModel filter)
         {
@@ -55,11 +55,11 @@ namespace Host.Controllers
 
         protected Task<IEnumerable<Project>> GetUpcomming(FilterModel filter)
         {
-            return _mng.GetByStatus(ProjectStatus.UnStarted, filter.GetOrderModel());
+            return _mng.GetByStatus(ProjectStatus.UnStarted,filter.Keywords, filter.GetOrderModel());
         }
         protected Task<IEnumerable<Project>> GetCompleted(FilterModel filter)
         {
-            return _mng.GetByStatus(ProjectStatus.Completed, filter.GetOrderModel());
+            return _mng.GetByStatus(ProjectStatus.Completed, filter.Keywords, filter.GetOrderModel());
         }
 
 

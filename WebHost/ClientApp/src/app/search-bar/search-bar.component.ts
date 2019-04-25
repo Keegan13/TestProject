@@ -23,10 +23,11 @@ export class SearchBarComponent implements OnInit {
     this.searchForm = this.fb.group({
       keywords: ['']
     });
+
   }
   onSubmit() {
     console.log("submit triggered");
-    if (this.searchForm.touched) {
+    if (this.searchForm.touched||this.searchForm.dirty) {
       this.searchEvent.emit(this.keywords);
     } else {
       this.invalid = true;

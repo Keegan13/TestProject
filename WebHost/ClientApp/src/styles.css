@@ -66,3 +66,44 @@ span.page
 {
     padding: 5px;
 }
+
+
+div.search-panel input,div.search-panel button
+{
+  
+  height: 100%;
+  margin-top:0px;
+  margin-bottom:0px;
+  margin-left: 0px;
+  margin-right: 0px;
+  padding:0px 5px;
+  border-radius:0px;
+
+  border: 1px grey solid;
+}
+
+ div.search-panel
+{
+  background-color:red;
+}
+
+
+div.search-panel input
+{
+border-top-left-radius:3px;
+border-bottom-left-radius:3px;
+box-sizing:content-box;
+outline: 0px;
+
+}
+div.search-panel button
+{
+  box-sizing: border-box;
+  color:grey;
+  margin-right: 10px;
+  border-bottom-right-radius: 3px;
+  border-top-right-radius: 3px;
+
+}
+
+

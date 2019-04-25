@@ -11,21 +11,26 @@ namespace Infrastructure.Services
 {
     public class ProjectManagerService
     {
-        private readonly DbContext _context;
-
+        protected readonly DbContext _context;
 
         public ProjectManagerService(ApplicationContext context)
         {
             this._context = context;
         }
-        public void Add<TEntity>(TEntity entity) where TEntity : class => _context.Set<TEntity>().Add(entity);
-        public IQueryable<TEntity> Set<TEntity>() where TEntity : class => _context.Set<TEntity>();
+
+
+        //public IQueryable<TEntity> Set<TEntity>() where TEntity : class => _context.Set<TEntity>();
         //public Project GetProject(int id)
         //{
         //    return _context.Set<Project>().Find(id);
         //}
 
         public int LastQueryTotalCount = 0;
+
+
+        #region READ
+
+
 
         public Task<Project> GetProject(string name)
         {
@@ -103,46 +108,29 @@ namespace Infrastructure.Services
         }
 
         //OK
-        public async Task<IEnumerable<Project>> GetByStatus(ProjectStatus status, OrderModel model = null)
+        public async Task<IEnumerable<Project>> GetByStatus(ProjectStatus status, string keywords = null, OrderModel model = null)
         {
             var query = _context.Set<Project>().Where(x => x.Status == status);
+
+            if (!string.IsNullOrEmpty(keywords))
+            {
+                query = query.Search(keywords);
+            }
+
             this.LastQueryTotalCount = await query.CountAsync();
+
             if (model == null)
             {
-                switch (status)
-                {
-                    default:
-                    case ProjectStatus.Completed:
-                        model = new OrderModel
-                        {
-                            SortColumn = nameof(Project.EndDate),
-                            isAscendingOrder = false
-                        };
-                        break;
-                    case ProjectStatus.InProgress:
-                        model = new OrderModel
-                        {
-                            SortColumn = nameof(Project.EndDate),
-                            isAscendingOrder = true
-                        };
-                        break;
-                    case ProjectStatus.UnStarted:
-                        model = new OrderModel
-                        {
-                            SortColumn = nameof(Project.StartDate),
-                            isAscendingOrder = true
-                        };
-                        break;
-
-                }
+                model = new OrderModel { SortColumn = nameof(Project.EndDate), isAscendingOrder = true };
+                //  Completed EndDate DSC // recently completed
+                //  InProgress EndDate ASC // closest to deadline
+                //  UnStarted StartDate ASC // almost there
+                if (status == ProjectStatus.Completed) model.isAscendingOrder = false;
+                if (status == ProjectStatus.UnStarted) model.SortColumn = nameof(Project.StartDate);
             }
             return await query.ApplyOrderModel(model).ToArrayAsync();
         }
 
-        //public Developer GetDeveloper(int id)
-        //{
-        //    return _context.Set<Developer>().Find(id);
-        //}
         //OK
         public Task<Developer> GetDeveloper(string nickname)
         {
@@ -161,6 +149,27 @@ namespace Infrastructure.Services
             return await query.ToArrayAsync();
         }
 
+
+        #endregion
+
+        #region  Create
+        public void Add<TEntity>(TEntity entity) where TEntity : class => _context.Set<TEntity>().Add(entity);
+        #endregion
+        #region Delete
+        public void Delete<TEntilty>(TEntilty entity) where TEntilty : class
+        {
+            _context.Set<TEntilty>().Remove(entity);
+        }
+        #endregion
+        #region Update
+
+        public void Update<TEntity>(TEntity entity) where TEntity : class => _context.Set<TEntity>().Update(entity);
+
+        #endregion
+
+        #region Unitily
+
+
         public int CountProjects(string keywords = null)
         {
             var query = _context.Set<Project>().AsQueryable();
@@ -171,22 +180,19 @@ namespace Infrastructure.Services
             return query.Count();
         }
 
-        public void Delete<T>(T entity) where T : class
-        {
-            _context.Set<T>().Remove(entity);
-        }
 
-        public int CountDevelopers(string keywords = null)
-        {
-            var query = _context.Set<Developer>().AsQueryable();
-            if (!string.IsNullOrEmpty(keywords))
-            {
-                query = query.Where(x => x.FullName.Contains(keywords) | x.Nickname.Contains(keywords));
-            }
-            return query.Count();
-        }
 
-        public void Update<T>(T entity) where T : class => _context.Set<T>().Update(entity);
+        ////public int CountDevelopers(string keywords = null)
+        ////{
+        ////    var query = _context.Set<Developer>().AsQueryable();
+        ////    if (!string.IsNullOrEmpty(keywords))
+        ////    {
+        ////        query = query.Where(x => x.FullName.Contains(keywords) | x.Nickname.Contains(keywords));
+        ////    }
+        ////    return query.Count();
+        ////}
+
+
         public async Task Assign(Project project, Developer developer)
         {
             await _context.Set<ProjectDeveloper>().AddAsync(new ProjectDeveloper() { Project = project, Developer = developer });
@@ -258,6 +264,8 @@ namespace Infrastructure.Services
             return false;
         }
         public Task<int> SaveChanges() => _context.SaveChangesAsync();
+
+        #endregion
 
     }
 }
