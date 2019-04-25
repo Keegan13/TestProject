@@ -5,7 +5,7 @@
     </div>
   </div>
   <div *ngIf="!isModal">
-    <app-list-controls *ngIf="!NoPanel" [collectionSize]="collectionSize" [page]="page" [pageSize]="pageSize"
+    <app-list-controls *ngIf="!noPanel" [collectionSize]="collectionSize" [page]="page" [pageSize]="pageSize"
       (pageChange)="onPageChange($event)" [filter]="filter"></app-list-controls>
     <table class="table table-sm table-hover">
       <thead>

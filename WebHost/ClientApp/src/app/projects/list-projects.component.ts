@@ -11,37 +11,33 @@ import { FilterModel } from '../models/FilterModel';
   styleUrls: ['./list-projects.component.css']
 })
 export class ListProjectsComponent implements OnInit {
+  private _pageDelta: number=0;
 
-  @Input() perPage: number = 25;
-  @Input() isModal: boolean;
-  //@Input() data: CollectionResult<Project>;
-  @Input() developer: string;
+  @Input() pageSize: number = 25;
+  @Input() isModal: boolean=false;
+
+  @Input() developer: string=null;
   @Input() set: string = "all";
-  @Input() isPagination: boolean = true;
+  @Input() noPanel: boolean = false;
 
-  @Input() disabled: boolean = false;
+  filter: FilterModel = new FilterModel();
+  projects: Project[];
+  page: number = 1;
+  collectionSize: number = 0;
 
-  private _keywords = '';
 
-  @Input()
-  set keywords(name: string) {
-    if (this._keywords != name) {
-      this._keywords = name;
-      this.update();
+  onPageChange($page: number) {
+    if ($page > this.page) {
+      this._pageDelta = 1;
     }
+    if ($page < this.page) {
+      this._pageDelta = -1;
+    }
+    this.loadData();
   }
 
-  get keywords(): string { return this._keywords; }
 
-
-
-  projects: Project[];
-
-  currentPage: number;
-  totalPages: number;
-
-
-  constructor(private repo: ProjectRepoService, private router: ActivatedRoute) {
+  constructor(private repo: ProjectRepoService){
   }
 
   get hasContext(): boolean {
@@ -49,17 +45,6 @@ export class ListProjectsComponent implements OnInit {
     return true;
   }
 
-  get hasNext() {
-    return this.currentPage < this.totalPages;
-  }
-  get hasPrevious() {
-    return this.currentPage > 1;
-  }
-
-  // get hasParentData() {
-  //   if (!this.data) return false;
-  //   return false;
-  // }
   get hasItems() {
     if (!this.projects) return false;
     if (this.projects.length == 0) return false;
@@ -68,66 +53,59 @@ export class ListProjectsComponent implements OnInit {
 
 
   ngOnInit() {
-    if (!this.perPage) this.perPage = 10;
-
     if (!this.isModal) this.isModal = false;
-    this.currentPage = 1;
-    this.update();
-    // if (this.hasParentData) {
-    //   this.totalPages = this.countPages(this.data.totalCount);
-    //   this.parseResult(this.data);
-    // } else this.update();
+    if (!this.pageSize) this.pageSize = 25;
+    if (!this.set) this.set = "all";
+    this.page = 1;
+    //init filter
+    if (this.hasContext) this.filter.context = this.developer;
+    this.filter.sort = "name";//sort should handle
+    this.filter.order = "ascending"; // sort
+    this.filter.set = this.set; // parent
+    this.filter.take = this.pageSize; // list-panel
+    this.filter.skip = 0; //list-panel
+    this.filter.keywords = ""; //list-panel
+    this.loadData();
   }
 
   private onLoad(result: CollectionResult<Project>): void {
+    this.projects = result.values;
     if (result) {
-      this.projects = result.values;
-      this.totalPages = this.isPagination ? this.countPages(result.totalCount) : 1;
-      //this.totalCount = result.totalCount;
+
+      this.collectionSize = result.totalCount;
+
+      if (this.collectionSize == 0) {
+        this._pageDelta = 0;
+        this.page = 1;
+        return;
+      }
+      if(result.values.length==0)
+      {
+        let lastPage = result.totalCount / this.pageSize;
+
+        this.page = Number.isInteger(lastPage) ? lastPage : Math.ceil(lastPage);
+
+        this.filter.skip = (this.page - 1) * this.pageSize;
+        this._pageDelta = 0;
+        this.loadData();
+      }
+      this.page+=this._pageDelta;
+      this._pageDelta=0;
+      this.projects=result.values;
+
     }
+    else
+    {
+            //if no data
+            console.log("handle this later TODO");
+    }
+    this._pageDelta = 0;
   }
 
-  private countPages(total: number) {
-    let count = Math.ceil(total / this.perPage);
-    if (count - 1 == total / this.perPage) {
-      return count - 1;
-    }
-    return count;
-  }
   public update(): void {
-    this.loadPage(this.currentPage);
+    this.loadData();
   }
-  private loadPage(page: number) {
-    if (this.disabled) return;
-    this.currentPage = page;
-    var filter = new FilterModel();
-    filter.skip = this.perPage * (page - 1);
-    filter.take = this.perPage;
-    filter.sort = "name";
-
-    if (this.set) filter.set = this.set;
-    if (this.hasContext) filter.context = this.developer;
-    if (this.keywords) filter.keywords = this.keywords;
-
-    this.repo.get(filter).subscribe(this.onLoad.bind(this));
-
-    // if (this.hasParentData) {
-    //   this.projects = this.data.values.slice(filter.skip, filter.skip + filter.take);
-    // }
-    // else {
-    //   this.repo.get(filter).subscribe(this.parseResult.bind(this));
-    // }
+  private loadData() {
+    this.repo.get(this.filter).subscribe(this.onLoad.bind(this));
   }
-  public nextPage(): void {
-    if (this.totalPages > this.currentPage) {
-      this.loadPage(this.currentPage + 1);
-    }
-  }
-  public previousPage(): void {
-    if (this.currentPage > 1) {
-      this.loadPage(this.currentPage - 1);
-    }
-  }
-
-
 }

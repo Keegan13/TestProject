@@ -4,7 +4,6 @@
             <h2>{{developer?.fullName}}</h2>
         </div>
         <button class="btn-edit btn " octicon="gear" (click)="edit()"></button>
-
     </div>
     <div class="row">
         <div class="col-sm-4 col">
@@ -12,5 +11,5 @@
             <p>{{developer?.nickname}}</p>
         </div>
     </div>
-    <app-list-projects [isModal]="false" [developer]="developer.url" [perPage]="5" set="associated"></app-list-projects>
+    <app-list-projects [developer]="developer.url" [pageSize]="5" set="associated"></app-list-projects>
 </div>

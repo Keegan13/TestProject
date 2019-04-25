@@ -16,12 +16,14 @@ import { hasAlignedHourOffset } from 'ngx-bootstrap/chronos/units/offset';
 export class ListDevelopersComponent implements OnInit {
   //do not refresh page until it loads
   private _pageDelta: number = 0;
+
   @Input() pageSize: number = 25;
   @Input() isModal: boolean = false;
+  
   //@Input() data: CollectionResult<Developer>;
   @Input() project: string = null;//this is context
   @Input() set: string = "all";
-  @Input() noPanel: boolean = true;
+  @Input() noPanel: boolean = false;
   filter: FilterModel = new FilterModel();
   developers: Developer[];
   page: number = 1;
