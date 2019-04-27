@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Abstractions
 {
-    public interface IDeveloperRepository
+    public interface IDeveloperRepository : IUnitOfWork, IPaginationRepository
     {
         Task<Developer> Single(string nickname);
 

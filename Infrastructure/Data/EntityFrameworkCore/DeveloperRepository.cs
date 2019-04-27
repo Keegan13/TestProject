@@ -97,5 +97,10 @@ namespace Infrastructure.Data.EntityFrameworkCore
         }
 
         public Task<int> SaveChangesAsync() => this._context.SaveChangesAsync();
+
+        public int SaveChanges()
+        {
+            return _context.SaveChanges();
+        }
     }
 }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Abstractions
 {
-    public interface IProjectRepository
+    public interface IProjectRepository : IUnitOfWork, IPaginationRepository
     {
         Task<Project> Single(string name);
 

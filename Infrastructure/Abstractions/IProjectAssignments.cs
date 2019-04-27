@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Abstractions
 {
-    public interface IProjectAssignments
+    public interface IProjectAssignments: IUnitOfWork
     {
         //Task Assign(string projName, string devNickname);
         Task Assign(Project project, Developer developer);

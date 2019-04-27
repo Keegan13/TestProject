@@ -31,6 +31,7 @@ namespace Host
 
             services.AddProjectManager();
 
+            services.AddEFCoreRepositories();
 
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
