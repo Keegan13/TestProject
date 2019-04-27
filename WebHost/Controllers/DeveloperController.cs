@@ -17,7 +17,6 @@ namespace Host.Controllers
         {
             sets.Add("associated", GetByProject);
             sets.Add("nonassociated", GetNotByProject);
-
             sets.Add("all", GetAll);
         }
 
@@ -26,6 +25,7 @@ namespace Host.Controllers
         {
             return this.GetAll(filter);
         }
+
         public DeveloperController(ProjectManagerService projectManager) : base(projectManager)
         {
 
@@ -35,10 +35,12 @@ namespace Host.Controllers
         {
             return _mng.GetAssignedDevelopers(Decode(filter.Context),filter.Keywords, filter.GetOrderModel());
         }
+
         private Task<IEnumerable<Developer>> GetAll(FilterModel filter)
         {
             return _mng.Get<Developer>(filter.Keywords, filter.GetOrderModel());
         }
+
         private Task<IEnumerable<Developer>> GetNotByProject(FilterModel filter)
         {
             return _mng.GetNotAssignedDevelopers(Decode(filter.Context), filter.Keywords, filter.GetOrderModel());
@@ -61,8 +63,10 @@ namespace Host.Controllers
                 {
                     ModelState.AddModelError(nameof(filter.Context), string.Format("Project with name {0} was not found", Decode(filter.Context)));
                 }
+
             return ModelState.IsValid;
         }
+
         public async Task<IActionResult> Get(FilterModel filter)
         {
             if (!await ValidateFilterOrDefault(filter)) return BadRequest(ModelState);
@@ -76,6 +80,7 @@ namespace Host.Controllers
                 TotalCount = count
             });
         }
+
         public async Task<IActionResult> Single(string name)
         {
             if (await _mng.GetDeveloper(Decode(name)) is Developer developer)
@@ -84,6 +89,7 @@ namespace Host.Controllers
             }
             return NotFound();
         }
+
         public async Task<IActionResult> Create([FromBody] EditDeveloperViewModel model)
         {
             if (!ModelState.IsValid || !await ValidateModel(model)) return BadRequest(ModelState);
@@ -107,6 +113,7 @@ namespace Host.Controllers
             {
                 ModelState.AddModelError(nameof(model.Nickname), String.Format("Developer nickname should not contain \"-\" (dash) character"));
             }
+
             return ModelState.IsValid;
         }
 
@@ -119,8 +126,10 @@ namespace Host.Controllers
                 model.Update(original);
                 _mng.Update(original);
                 await _mng.SaveChanges();
+
                 return new JsonResult(original.GetVM(Encode(original.Nickname), null));
             }
+
             return NotFound();
         }
 

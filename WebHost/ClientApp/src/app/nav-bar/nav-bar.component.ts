@@ -13,6 +13,8 @@ export class NavBarComponent implements OnInit {
   ngOnInit() {
   }
   onSearch(keys: string | Event) {
+
+    
     console.log(keys);
     if (typeof keys === 'string') {
       this.router.navigate(['search', keys]);

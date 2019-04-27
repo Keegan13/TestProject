@@ -1,10 +1,13 @@
 <div class="row">
   <div class="col-sm-12">
-    <!-- <h6>Developers</h6>
-    <app-list-developers [isModal]="false" [perPage]="10" [keywords]="keywords">
-    </app-list-developers>
-    <h6>Projects</h6>
-    <app-list-projects [isModal]="false" [perPage]="10" [keywords]="keywords">
-    </app-list-projects> -->
+
+
+    <h2>Developers</h2>
+    <app-list-developers [pageSize]="10" [filter]="developerFilter" [isModal]="true"></app-list-developers>
+
+    <h2>Projects</h2>
+    <app-list-projects [pageSize]="10" [filter]="projectFilter" [isModal]="true"></app-list-projects>
+
+
   </div>
 </div>

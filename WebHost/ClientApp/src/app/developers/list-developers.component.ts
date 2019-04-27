@@ -7,6 +7,7 @@ import { CollectionResult } from '../collection-result';
 import { AssignModel } from '../models/AssignModel';
 import { AssignService } from '../assign.service';
 import { hasAlignedHourOffset } from 'ngx-bootstrap/chronos/units/offset';
+import { fillProperties } from '@angular/core/src/util/property';
 
 @Component({
   selector: 'app-list-developers',
@@ -19,12 +20,12 @@ export class ListDevelopersComponent implements OnInit {
 
   @Input() pageSize: number = 25;
   @Input() isModal: boolean = false;
-  
+
   //@Input() data: CollectionResult<Developer>;
   @Input() project: string = null;//this is context
   @Input() set: string = "all";
   @Input() noPanel: boolean = false;
-  filter: FilterModel = new FilterModel();
+  @Input() filter: FilterModel;
   developers: Developer[];
   page: number = 1;
   collectionSize: number = 0;
@@ -56,13 +57,16 @@ export class ListDevelopersComponent implements OnInit {
     if (!this.set) this.set = "all";
     this.page = 1;
     //init filter
+    if (!this.filter) {
+      this.filter = new FilterModel();
+      this.filter.sort = "fullName";//sort should handle
+      this.filter.order = "ascending"; // sort
+      this.filter.set = this.set; // parent
+      this.filter.take = this.pageSize; // list-panel
+      this.filter.skip = 0; //list-panel
+      this.filter.keywords = ""; //list-panel
+    }
     if (this.hasContext) this.filter.context = this.project;
-    this.filter.sort = "fullName";//sort should handle
-    this.filter.order = "ascending"; // sort
-    this.filter.set = this.set; // parent
-    this.filter.take = this.pageSize; // list-panel
-    this.filter.skip = 0; //list-panel
-    this.filter.keywords = ""; //list-panel
     this.loadData();
   }
 

@@ -18,17 +18,11 @@ namespace Host.Middleware
         public DbSeedMiddleware(RequestDelegate next)
         {
             _next = next;
-
         }
 
         public async Task InvokeAsync(HttpContext httpContext, ApplicationContext context)
         {
-            if (
-                await context.Projects.Skip(10).Take(1).CountAsync() == 0 ||
-                await context.Developers.Skip(10).Take(1).CountAsync() == 0)
-            {
-                (new DataBaseSeed(context)).Initialize();
-            }
+            (new DataBaseSeed(context)).Initialize();
             await _next(httpContext);
         }
     }

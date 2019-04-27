@@ -20,6 +20,7 @@ namespace Host.Controllers
             InitializeSets(this.Sets);
         }
         protected abstract void InitializeSets(Dictionary<string, Func<FilterModel, Task<IEnumerable<T>>>> sets);
+
         protected abstract Task<IEnumerable<T>> DefaultSet(FilterModel filter);
         protected Task<IEnumerable<T>> Set(FilterModel filter)
         {
@@ -27,18 +28,23 @@ namespace Host.Controllers
             {
                 return Sets[filter.Set.ToLower()].Invoke(filter);
             }
+
             return Sets["default"].Invoke(filter);
         }
+
         public static string Encode(string input)
         {
             if (!string.IsNullOrEmpty(input))
                 return HttpUtility.UrlEncode(input).Replace('+', '-');
+
             return null;
         }
+
         public static string Decode(string encoded)
         {
             if (!string.IsNullOrEmpty(encoded))
                 return HttpUtility.UrlDecode(encoded.Replace('-', '+'));
+
             return null;
         }
     }

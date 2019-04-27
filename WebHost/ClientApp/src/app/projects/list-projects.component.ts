@@ -11,16 +11,16 @@ import { FilterModel } from '../models/FilterModel';
   styleUrls: ['./list-projects.component.css']
 })
 export class ListProjectsComponent implements OnInit {
-  private _pageDelta: number=0;
+  private _pageDelta: number = 0;
 
   @Input() pageSize: number = 25;
-  @Input() isModal: boolean=false;
+  @Input() isModal: boolean = false;
 
-  @Input() developer: string=null;
+  @Input() developer: string = null;
   @Input() set: string = "all";
   @Input() noPanel: boolean = false;
 
-  filter: FilterModel = new FilterModel();
+  @Input() filter: FilterModel;// = new FilterModel();
   projects: Project[];
   page: number = 1;
   collectionSize: number = 0;
@@ -37,7 +37,7 @@ export class ListProjectsComponent implements OnInit {
   }
 
 
-  constructor(private repo: ProjectRepoService){
+  constructor(private repo: ProjectRepoService) {
   }
 
   get hasContext(): boolean {
@@ -58,13 +58,20 @@ export class ListProjectsComponent implements OnInit {
     if (!this.set) this.set = "all";
     this.page = 1;
     //init filter
+
+
+    if (!this.filter) {
+      this.filter = new FilterModel();
+      this.filter.sort = "name";//sort should handle
+      this.filter.order = "ascending"; // sort
+      this.filter.set = this.set; // parent
+      this.filter.take = this.pageSize; // list-panel
+      this.filter.skip = 0; //list-panel
+      this.filter.keywords = ""; //list-panel}
+     
+    }
+
     if (this.hasContext) this.filter.context = this.developer;
-    this.filter.sort = "name";//sort should handle
-    this.filter.order = "ascending"; // sort
-    this.filter.set = this.set; // parent
-    this.filter.take = this.pageSize; // list-panel
-    this.filter.skip = 0; //list-panel
-    this.filter.keywords = ""; //list-panel
     this.loadData();
   }
 
@@ -79,8 +86,7 @@ export class ListProjectsComponent implements OnInit {
         this.page = 1;
         return;
       }
-      if(result.values.length==0)
-      {
+      if (result.values.length == 0) {
         let lastPage = result.totalCount / this.pageSize;
 
         this.page = Number.isInteger(lastPage) ? lastPage : Math.ceil(lastPage);
@@ -89,15 +95,14 @@ export class ListProjectsComponent implements OnInit {
         this._pageDelta = 0;
         this.loadData();
       }
-      this.page+=this._pageDelta;
-      this._pageDelta=0;
-      this.projects=result.values;
+      this.page += this._pageDelta;
+      this._pageDelta = 0;
+      this.projects = result.values;
 
     }
-    else
-    {
-            //if no data
-            console.log("handle this later TODO");
+    else {
+      //if no data
+      console.log("handle this later TODO");
     }
     this._pageDelta = 0;
   }
