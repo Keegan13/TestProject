@@ -13,6 +13,8 @@ namespace Infrastructure.Abstractions
 
         void Add(Project project);
 
+        void Update(Project project);
+
         Task<bool> Exist(string projName);
 
         Task<bool> Exist(int id);

@@ -12,46 +12,122 @@ using Infrastructure.Abstractions;
 
 namespace Host.Controllers
 {
-    public class DeveloperController : BaseConroller<Developer>
+    public class DeveloperController : BaseConroller
     {
         private readonly IDeveloperRepository Repo;
-        protected override void InitializeSets(Dictionary<string, Func<FilterModel, Task<IEnumerable<Developer>>>> sets)
-        {
-            sets.Add("associated", GetByProject);
-            sets.Add("nonassociated", GetNotByProject);
-            sets.Add("all", GetAll);
-        }
 
-
-        protected override Task<IEnumerable<Developer>> DefaultSet(FilterModel filter)
-        {
-            return this.GetAll(filter);
-        }
-
-        public DeveloperController(ProjectManagerService projectManager, IDeveloperRepository devRepo) : base(projectManager)
+        public DeveloperController(IDeveloperRepository devRepo)
         {
             this.Repo = devRepo;
         }
 
-        private Task<IEnumerable<Developer>> GetByProject(FilterModel filter)
+        #region API
+
+        //Get api/developer
+        [HttpGet]
+        public async Task<IActionResult> Get([FromBody] FilterModel filter)
         {
-            return Repo.GetAssignedTo(Decode(filter.Context), filter.Keywords, filter.GetOrderModel());
-            //return _mng.GetAssignedDevelopers(Decode(filter.Context), filter.Keywords, filter.GetOrderModel());
+            if (!await ValidateFilterOrDefault(filter))
+            {
+                return BadRequest(ModelState);
+            }
+
+            var developers = await GetSetOrAll(filter);
+
+            string projName = filter.Set.ToLower() == "associated" ? filter.Context : "";
+
+            return new JsonResult(new CollectionResult<EditDeveloperViewModel>()
+            {
+                Values = developers.Select(x => x.GetVM(Encode(x.Nickname), projName)).ToArray(),
+                TotalCount = Repo.LastQueryTotalCount
+            });
         }
 
-        private Task<IEnumerable<Developer>> GetAll(FilterModel filter)
+        //Get api/developer/Dr-Manhattan
+        [HttpGet("{name}")]
+        public async Task<IActionResult> Get([FromQuery] string name)
         {
+            if (await Repo.Single(Decode(name)) is Developer developer)
+            {
+                return new JsonResult(developer.GetVM(name, null));
+            }
+
+            return NotFound();
+        }
+
+        //Post api/developer
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] EditDeveloperViewModel model)
+        {
+            if (!ModelState.IsValid || !await ValidateModel(model))
+            {
+                return BadRequest(ModelState);
+            }
+
+            var developer = model.GetInstance();
+
+            Repo.Add(developer);
+
+            await Repo.SaveChangesAsync();
+
+            return new JsonResult(developer.GetVM(Encode(developer.Nickname)));
+        }
+
+        //put api/developer/frekyyy-doctor
+        [HttpPut("{name}")]
+        public async Task<IActionResult> Put([FromRoute] string name, [FromBody] EditDeveloperViewModel model)
+        {
+            if (await Repo.Single(Decode(name)) is Developer original)
+            {
+                if (!ModelState.IsValid || !await ValidateModel(model, original))
+                {
+                    return BadRequest(ModelState);
+                }
+                //updates fields of orginal enitty
+                model.Update(original);
+                //sets EntityState to Modifed
+                Repo.Update(original);
+                // ...
+                await Repo.SaveChangesAsync();
+                // returns updated entity
+                return new JsonResult(original.GetVM(Encode(original.Nickname)));
+            }
+
+            return NotFound();
+        }
+
+        #endregion
+
+        protected virtual async Task<bool> ValidateModel(EditDeveloperViewModel model, Developer original = null)
+        {
+            if ((original != null || model.Nickname != model.Nickname) && await Repo.Exist(model.Nickname))
+            {
+                ModelState.AddModelError(nameof(model.Nickname), String.Format("Developer with nickname {0} already exists", model.Nickname));
+            }
+            if (Regex.IsMatch(model.Nickname, "-"))
+            {
+                ModelState.AddModelError(nameof(model.Nickname), String.Format("Developer nickname should not contain \"-\" (dash) character"));
+            }
+
+            return ModelState.IsValid;
+        }
+
+        protected virtual Task<IEnumerable<Developer>> GetSetOrAll(FilterModel filter)
+        {
+            if (filter.Set.ToLower() == "associated")
+            {
+                return Repo.GetAssignedTo(Decode(filter.Context), filter.Keywords, filter.GetOrderModel());
+            }
+
+            if (filter.Set.ToLower() == "nonassociated")
+            {
+                return Repo.GetAssignableTo(Decode(filter.Context), filter.Keywords, filter.GetOrderModel());
+            }
+
             return Repo.Get(filter.Keywords, filter.GetOrderModel());
-            //return _mng.Get<Developer>(filter.Keywords, filter.GetOrderModel());
         }
 
-        private Task<IEnumerable<Developer>> GetNotByProject(FilterModel filter)
-        {
-            return Repo.GetAssignableTo(Decode(filter.Context), filter.Keywords, filter.GetOrderModel());
-            //return _mng.GetNotAssignedDevelopers(Decode(filter.Context), filter.Keywords, filter.GetOrderModel());
-        }
-
-        private async Task<bool> ValidateFilterOrDefault(FilterModel filter)
+        protected virtual async Task<bool> ValidateFilterOrDefault(FilterModel filter)
         {
             if (string.IsNullOrEmpty(filter.Set)) filter.Set = "all";
             //if order not provided use ascending
@@ -72,74 +148,5 @@ namespace Host.Controllers
 
             return ModelState.IsValid;
         }
-
-        public async Task<IActionResult> Get(FilterModel filter)
-        {
-            if (!await ValidateFilterOrDefault(filter)) return BadRequest(ModelState);
-
-            var developers = await Set(filter);
-
-            string projName = filter.Set.ToLower() == "associated" ? filter.Context : "";
-
-            return new JsonResult(new CollectionResult<EditDeveloperViewModel>()
-            {
-                Values = developers.Select(x => x.GetVM(Encode(x.Nickname), projName)).ToArray(),
-                TotalCount = Repo.LastQueryTotalCount
-            });
-        }
-
-        public async Task<IActionResult> Single(string name)
-        {
-            if (await Repo.Single(Decode(name)) is Developer developer)
-            {
-                return new JsonResult(developer.GetVM(name, null));
-            }
-            return NotFound();
-        }
-
-        public async Task<IActionResult> Create([FromBody] EditDeveloperViewModel model)
-        {
-            if (!ModelState.IsValid || !await ValidateModel(model)) return BadRequest(ModelState);
-
-            var developer = model.GetInstance();
-
-            Repo.Add(developer);
-
-            await Repo.SaveChangesAsync();
-
-            return new JsonResult(developer.GetVM(Encode(developer.Nickname), null));
-        }
-
-        protected virtual async Task<bool> ValidateModel(EditDeveloperViewModel model, Developer original = null)
-        {
-            if ((original != null || model.Nickname != model.Nickname) && await Repo.Exist(model.Nickname))
-            {
-                ModelState.AddModelError(nameof(model.Nickname), String.Format("Developer with nickname {0} already exists", model.Nickname));
-            }
-            if (Regex.IsMatch(model.Nickname, "-"))
-            {
-                ModelState.AddModelError(nameof(model.Nickname), String.Format("Developer nickname should not contain \"-\" (dash) character"));
-            }
-
-            return ModelState.IsValid;
-        }
-
-
-        public async Task<IActionResult> Update([FromRoute] string name, [FromBody] EditDeveloperViewModel model)
-        {
-            if (await Repo.Single(Decode(name)) is Developer original)
-            {
-                if (!ModelState.IsValid || !await ValidateModel(model, original)) return BadRequest(ModelState);
-                model.Update(original);
-                Repo.Update(original);
-                await Repo.SaveChangesAsync();
-
-                return new JsonResult(original.GetVM(Encode(original.Nickname), null));
-            }
-
-            return NotFound();
-        }
-
-
     }
 }

@@ -128,5 +128,10 @@ namespace Infrastructure.Data.EntityFrameworkCore
         {
             return this._context.SaveChanges();
         }
+
+        public void Update(Project project)
+        {
+            Projects.Update(project);
+        }
     }
 }

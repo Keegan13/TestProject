@@ -10,8 +10,10 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Services
 {
+    [Obsolete]
     public class ProjectManagerService : IProjectRepository, IDeveloperRepository, IPaginationRepository, IProjectAssignments//,IDisposable 
     {
+        private readonly IProjectRepository Repo;
         protected readonly DbContext _context;
 
         public int LastQueryTotalCount { get; protected set; }
@@ -19,8 +21,9 @@ namespace Infrastructure.Services
 
 
 
-        public ProjectManagerService(ApplicationContext context)
+        public ProjectManagerService(IProjectRepository Repo, ApplicationContext context)
         {
+            this.Repo = Repo;
             this._context = context;
             this.LastQueryTotalCount = 0;
         }
@@ -37,9 +40,22 @@ namespace Infrastructure.Services
             return _context.Set<Project>().SingleOrDefaultAsync(x => x.Name == name);
         }
 
-        public async Task<IEnumerable<Project>> GetProjectsAssignedToDeveloper(string devNickname, OrderModel model = null)
+        public async Task<IEnumerable<Project>> GetProjectsAssignedToDeveloper(string devName, OrderModel model = null)
         {
-            return _context.Set<Developer>().FirstOrDefault(x => x.Nickname == devNickname).ProjectAssignments.Select(x => x.Project);
+            var query = _context.Set<Project>().Where(proj => proj.ProjectAssignments.Any(x => x.Developer.Nickname == devName));
+
+
+            LastQueryTotalCount = await query.CountAsync();
+
+            if (model == null)
+            {
+                model = new OrderModel { SortColumn = "Name", isAscendingOrder = true };
+            }
+
+            return await query.ApplyOrderModel(model).ToArrayAsync();
+
+
+            //return _context.Set<Developer>().Include(x => x.ProjectAssignments).FirstOrDefault(x => x.Nickname == devNickname).ProjectAssignments.Select(x => x.Project);
 
             //if (await Single(devNickname) is Developer dev)
             //{
@@ -331,7 +347,7 @@ namespace Infrastructure.Services
             throw new NotImplementedException();
         }
 
-      
+
 
         #endregion
 
@@ -357,6 +373,21 @@ namespace Infrastructure.Services
         }
 
         Task<bool> IDeveloperRepository.Exist(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> SaveChangesAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        int IUnitOfWork.SaveChanges()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Update(Project project)
         {
             throw new NotImplementedException();
         }

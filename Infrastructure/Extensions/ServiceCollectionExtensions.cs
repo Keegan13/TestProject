@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Infrastructure.Services;
 using Infrastructure.Data.EntityFrameworkCore;
 using Infrastructure.Abstractions;
+using System;
 
 namespace Infrastructure.Extensions
 {
@@ -17,6 +18,8 @@ namespace Infrastructure.Extensions
 
             services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(config.GetConnectionString("DefaultConnection")));
         }
+
+        [Obsolete]
         public static void AddProjectManager(this IServiceCollection services)
         {
             services.AddScoped<ProjectManagerService>();

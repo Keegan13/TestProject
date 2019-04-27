@@ -61,6 +61,16 @@ namespace Infrastructure.Data.EntityFrameworkCore
             Assignments.Remove(assignment);
         }
 
+        public Task Assign(string projName, string devNickname)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task Unassign(Project project, Developer developer)
+        {
+            throw new NotImplementedException();
+        }
+
 
         #endregion
     }
