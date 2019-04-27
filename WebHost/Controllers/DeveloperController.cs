@@ -83,7 +83,7 @@ namespace Host.Controllers
 
         public async Task<IActionResult> Single(string name)
         {
-            if (await _mng.GetDeveloper(Decode(name)) is Developer developer)
+            if (await _mng.Single(Decode(name)) is Developer developer)
             {
                 return new JsonResult(developer.GetVM(name, null));
             }
@@ -120,7 +120,7 @@ namespace Host.Controllers
         
         public async Task<IActionResult> Update([FromRoute] string name, [FromBody] EditDeveloperViewModel model)
         {
-            if (await _mng.GetDeveloper(Decode(name)) is Developer original)
+            if (await _mng.Single(Decode(name)) is Developer original)
             {
                 if (!ModelState.IsValid||!await ValidateModel(model,original)) return BadRequest(ModelState);
                 model.Update(original);

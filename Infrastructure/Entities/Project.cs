@@ -17,6 +17,6 @@
 
         public ProjectStatus Status { get; set; }
 
-        public IEnumerable<ProjectDeveloper> ProjectDevelopers { get; set; }
+        public IEnumerable<ProjectAssignment> ProjectAssignments { get; set; }
     }
 }

@@ -9,7 +9,7 @@ namespace Infrastructure.Data
     {
         public DbSet<Project> Projects { get; set; }
         public DbSet<Developer> Developers { get; set; }
-        public DbSet<ProjectDeveloper> BindEntity { get; set; }
+        public DbSet<ProjectAssignment> BindEntity { get; set; }
 
         public ApplicationContext(DbContextOptions options) : base(options)
         {
@@ -25,7 +25,7 @@ namespace Infrastructure.Data
         {
             mb.Entity<Project>(ConfigureProjects);
             mb.Entity<Developer>(ConfigureDevelopers);
-            mb.Entity<ProjectDeveloper>(ConfigureBindEntity);
+            mb.Entity<ProjectAssignment>(ConfigureBindEntity);
 
             
         }
@@ -48,14 +48,14 @@ namespace Infrastructure.Data
             dev.Property(x => x.FullName).HasColumnName("developer_fullname").IsRequired().HasMaxLength(150);
             dev.Property(x => x.Nickname).HasColumnName("developer_nickname").HasMaxLength(100);
         }
-        protected void ConfigureBindEntity(EntityTypeBuilder<ProjectDeveloper> bind)
+        protected void ConfigureBindEntity(EntityTypeBuilder<ProjectAssignment> bind)
         {
             bind.ToTable("project_developer");
             bind.HasKey(x => new { x.ProjectId, x.DeveloperId });
             bind.Property(x => x.ProjectId).HasColumnName("project_id");
             bind.Property(x => x.DeveloperId).HasColumnName("developer_id");
-            bind.HasOne(x => x.Project).WithMany(x => x.ProjectDevelopers).HasForeignKey(x => x.ProjectId).OnDelete(DeleteBehavior.Cascade);
-            bind.HasOne(x => x.Developer).WithMany(x => x.ProjectDevelopers).HasForeignKey(x => x.DeveloperId).OnDelete(DeleteBehavior.Cascade);
+            bind.HasOne(x => x.Project).WithMany(x => x.ProjectAssignments).HasForeignKey(x => x.ProjectId).OnDelete(DeleteBehavior.Cascade);
+            bind.HasOne(x => x.Developer).WithMany(x => x.ProjectAssignments).HasForeignKey(x => x.DeveloperId).OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

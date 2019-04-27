@@ -50,7 +50,7 @@ namespace Host.Controllers
         }
         protected Task<IEnumerable<Project>> GetAssociated(FilterModel filter)
         {
-            return _mng.GetAssignedProjects(Decode(filter.Context),filter.GetOrderModel());
+            return _mng.GetProjectsAssignedToDeveloper(Decode(filter.Context),filter.GetOrderModel());
         }
 
         protected Task<IEnumerable<Project>> GetUpcomming(FilterModel filter)
@@ -142,7 +142,7 @@ namespace Host.Controllers
         public async Task<IActionResult> Assign([FromBody] AssignModel model)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            if (await _mng.GetProject(Decode(model.Project)) is Project project && await _mng.GetDeveloper(Decode(model.Developer)) is Developer developer)
+            if (await _mng.GetProject(Decode(model.Project)) is Project project && await _mng.Single(Decode(model.Developer)) is Developer developer)
             {
                 if (await _mng.IsAssigned(project, developer) != model.isAssigned)
                 {
