@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Infrastructure.Entities;
-using Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
 using Host.Extensions;
 using Host.Models;
@@ -16,6 +15,10 @@ namespace Host.Controllers
     {
         private readonly IDeveloperRepository Repo;
 
+        protected string[] Sets = new[] { "all", "associated", "nonassociated" };
+
+        protected string[] Sorts = new[] { "fullname", "nickname" };
+
         public DeveloperController(IDeveloperRepository devRepo)
         {
             this.Repo = devRepo;
@@ -23,7 +26,7 @@ namespace Host.Controllers
 
         #region API
 
-        //Get api/developer
+        //GET api/developer
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery] FilterModel filter)
         {
@@ -36,26 +39,27 @@ namespace Host.Controllers
 
             string projName = filter.Set.ToLower() == "associated" ? filter.Context : "";
 
-            return new JsonResult(new CollectionResult<EditDeveloperViewModel>()
+
+            return Ok(new CollectionResult<EditDeveloperViewModel>()
             {
                 Values = developers.Select(x => x.GetVM(Encode(x.Nickname), projName)).ToArray(),
                 TotalCount = Repo.LastQueryTotalCount
             });
         }
 
-        //Get api/developer/Dr-Manhattan
+        //GET api/developer/Dr-Manhattan
         [HttpGet("{name}")]
         public async Task<IActionResult> Get([FromRoute] string name)
         {
             if (await Repo.Single(Decode(name)) is Developer developer)
             {
-                return new JsonResult(developer.GetVM(name, null));
+                return Ok(developer.GetVM(name, null));
             }
 
             return NotFound();
         }
 
-        //Post api/developer
+        //POST api/developer
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] EditDeveloperViewModel model)
         {
@@ -73,7 +77,7 @@ namespace Host.Controllers
             return new JsonResult(developer.GetVM(Encode(developer.Nickname)));
         }
 
-        //put api/developer/frekyyy-doctor
+        //PUT api/developer/frekyyy-doctor
         [HttpPut("{name}")]
         public async Task<IActionResult> Put([FromRoute] string name, [FromBody] EditDeveloperViewModel model)
         {
@@ -93,7 +97,23 @@ namespace Host.Controllers
                 // ...
                 await Repo.SaveChangesAsync();
                 // returns updated entity
-                return new JsonResult(original.GetVM(Encode(original.Nickname)));
+                return Ok(original.GetVM(Encode(original.Nickname)));
+            }
+
+            return NotFound();
+        }
+
+        //DELETE api/developer/frekkyy-doctor
+        [HttpDelete("name")]
+        public async Task<IActionResult> Delete([FromRoute] string name)
+        {
+            if (await Repo.Single(Decode(name)) is Developer developer)
+            {
+                Repo.Delete(developer);
+
+                await Repo.SaveChangesAsync();
+
+                return Ok();
             }
 
             return NotFound();
@@ -137,26 +157,39 @@ namespace Host.Controllers
             return Repo.Get(filter.Keywords, filter.GetOrderModel());
         }
 
-        protected virtual async Task<bool> ValidateFilterOrDefault(FilterModel filter)
+        protected virtual Task<bool> ValidateFilterOrDefault(FilterModel filter)
         {
+            //seting defaults
             if (string.IsNullOrEmpty(filter.Set)) filter.Set = "all";
-            //if order not provided use ascending
+
             if (!filter.Order.HasValue) filter.Order = OrderDirection.Ascending;
-            //if no sort Column  given use fullName
+
             if (string.IsNullOrEmpty(filter.Sort)) filter.Sort = "fullname";
+
+            //adding errors for bad fields
+
+            if (!this.Sets.Contains(filter.Set.ToLower()))
+            {
+                ModelState.AddModelError(nameof(filter.Set), String.Format("Unrecognizable set was requested \"{0}\"", filter.Set));
+            }
+
+            if (!this.Sorts.Contains(filter.Sort.ToLower()))
+            {
+                ModelState.AddModelError(nameof(filter.Set), String.Format("Unrecognizable sort column was requested \"{0}\"", filter.Sort));
+            }
+
             //if retriving associated data (devs of project) and context not given or project does't exist
-            if (filter.Set.ToLower() == "associated")
-                if (string.IsNullOrEmpty(filter.Context))
-                {
-                    ModelState.AddModelError(nameof(filter.Context), "Project name not provided in \"Context\" field");
-                }
+            if (filter.Set.ToLower() == "associated" && string.IsNullOrEmpty(filter.Context))
+            {
+                ModelState.AddModelError(nameof(filter.Context), "Project name not provided in \"Context\" field of request object");
+            }
+
             // not sure where it goes
             //else if (!await _mng.ProjectExists(Decode(filter.Context)))  
             //{
             //    ModelState.AddModelError(nameof(filter.Context), string.Format("Project with name {0} was not found", Decode(filter.Context)));
             //}
-
-            return ModelState.IsValid;
+            return Task.FromResult<bool>(ModelState.IsValid);
         }
     }
 }

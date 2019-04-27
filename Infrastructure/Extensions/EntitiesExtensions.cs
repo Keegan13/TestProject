@@ -6,7 +6,8 @@
 
     public static partial class EntitiesExtensions
     {
-        public static IEnumerable<Developer> AssignedDevelopers(this Project project) => project.ProjectAssignments.Select(x => x.Developer);
+        public static IEnumerable<Developer> Developers(this Project project) => project.ProjectAssignments.Select(x => x.Developer);
+
         public static IEnumerable<Project> Projects(this Developer developer) => developer.ProjectAssignments.Select(x => x.Project);
     }
 }

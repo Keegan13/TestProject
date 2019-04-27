@@ -10,6 +10,7 @@ using AutoMapper;
 using Host.Extensions;
 using Microsoft.AspNetCore.Http;
 using System.IO;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace Host
 {
@@ -26,6 +27,11 @@ namespace Host
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info { Title = "Host API", Version = "v1" });
+            });
 
             services.AddCustomDbContext();
 
@@ -63,29 +69,46 @@ namespace Host
                 app.UseHsts();
             }
 
-            
+
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseSpaStaticFiles();
+           app.UseSpaStaticFiles();
 
             app.UseDBSeed();
 
-            app.UseMvc(routes =>
+
+
+
+            //app.UseMvc(routes =>
+            //{
+            //    //routes.MapRoute(
+            //    //    name: "default",
+            //    //    template: "{Controller?}/{Action?}",
+            //    //    defaults: new { controller = "Home", Action = "Index" });
+            //    routes.MapRoute(
+            //        name: "main",
+            //        template: "api/{Controller}/{name}",
+            //        defaults: new { action = "Single" });
+            //    routes.MapRoute(
+            //        name: "manage",
+            //        template: "api/{controller}s/{action}/{name?}"
+            //       );
+            //});
+            app.UseMvcWithDefaultRoute();
+
+            app.Map("/swagger", (x) =>
             {
-                //routes.MapRoute(
-                //    name: "default",
-                //    template: "{Controller?}/{Action?}",
-                //    defaults: new { controller = "Home", Action = "Index" });
-                routes.MapRoute(
-                    name: "main",
-                    template: "api/{Controller}/{name}",
-                    defaults: new { action = "Single" });
-                routes.MapRoute(
-                    name: "manage",
-                    template: "api/{controller}s/{action}/{name?}"
-                   );
+                app.UseSwagger();
+
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                });
+
             });
+
+
 
             app.UseSpa(spa =>
             {
