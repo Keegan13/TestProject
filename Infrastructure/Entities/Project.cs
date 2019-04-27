@@ -5,6 +5,11 @@
 
     public class Project
     {
+        public Project()
+        {
+            this.ProjectAssignments = new List<ProjectAssignment>();
+        }
+
         public int Id { get; set; }
 
         public string Name { get; set; }
@@ -17,6 +22,6 @@
 
         public ProjectStatus Status { get; set; }
 
-        public IEnumerable<ProjectAssignment> ProjectAssignments { get; set; }
+        public ICollection<ProjectAssignment> ProjectAssignments { get; set; }
     }
 }
