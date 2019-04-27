@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, Input, EventEmitter } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ProjectRepoService } from '../project-repo.service';
+import { ProjectRepoService } from '../services/project-repo.service';
 import { Project } from '../models/Project';
 import { Router } from '@angular/router';
 import { BsModalRef } from 'ngx-bootstrap/modal';

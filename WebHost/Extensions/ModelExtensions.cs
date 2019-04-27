@@ -11,22 +11,6 @@ namespace Host.Extensions
             return Mapper.Map<Developer>(model);
         }
 
-        public static void Update(this EditDeveloperViewModel model, Developer toUpdate)
-        {
-            toUpdate.FullName = model.FullName;
-            toUpdate.Nickname = model.Nickname;
-        }
-
-        public static void Update(this EditProjectViewModel model, Project toUpdate)
-        {
-            toUpdate.Name = model.Name;
-            toUpdate.Description = model.Description;
-            toUpdate.StartDate = model.StartDate.HasValue ? model.StartDate.Value : toUpdate.StartDate;
-            toUpdate.EndDate = model.EndDate.HasValue ? model.EndDate.Value : toUpdate.EndDate;
-            toUpdate.Status = model.Status.HasValue ? model.Status.Value : toUpdate.Status;
-        }
-
-
         public static EditDeveloperViewModel GetVM(this Developer developer, string url, string projectUrl = null)
         {
             var result = Mapper.Map<EditDeveloperViewModel>(developer);

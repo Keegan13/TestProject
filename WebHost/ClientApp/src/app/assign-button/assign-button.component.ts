@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, EventEmitter, Output, Renderer2, ElementRef } from '@angular/core';
-import { AssignService } from '../assign.service';
+import { AssignService } from '../Services/assign.service';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
 import { AssignModel } from '../models/AssignModel';
 import * as octicons from 'octicons';

@@ -1,11 +1,11 @@
 import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
-import { DeveloperRepoService } from '../developer-repo.service';
+import { DeveloperRepoService } from '../services/developer-repo.service';
 import { ActivatedRoute } from '@angular/router';
 import { Developer } from '../models/Developer';
 import { FilterModel } from '../models/FilterModel';
-import { CollectionResult } from '../collection-result';
+import { CollectionResult } from '../models/collection-result';
 import { AssignModel } from '../models/AssignModel';
-import { AssignService } from '../assign.service';
+import { AssignService } from '../Services/assign.service';
 import { hasAlignedHourOffset } from 'ngx-bootstrap/chronos/units/offset';
 import { fillProperties } from '@angular/core/src/util/property';
 

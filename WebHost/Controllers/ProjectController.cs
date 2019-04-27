@@ -26,9 +26,9 @@ namespace Host.Controllers
 
         // api/project
         #region API
-        //POST api/projects
+        //POST api/project
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] EditProjectViewModel model)
+        public async Task<IActionResult> Post([FromBody] EditProjectViewModel model)
         {
             if (!ModelState.IsValid || !await ValidateProject(model))
             {
@@ -44,9 +44,9 @@ namespace Host.Controllers
             return new JsonResult(project.GetVM(url: Encode(project.Name)));
         }
 
-        //PUT api/projects/TestProject
+        //PUT api/project/TestProject
         [HttpPut("{name}")]
-        public async Task<IActionResult> Update([FromRoute] string name, [FromBody] EditProjectViewModel model)
+        public async Task<IActionResult> Put([FromRoute] string name, [FromBody] EditProjectViewModel model)
         {
             if (await Repo.Single(Decode(name)) is Project original)
             {
@@ -57,9 +57,9 @@ namespace Host.Controllers
 
                 original.Name = model.Name;
                 original.Description = model.Description;
-                original.StartDate = model.StartDate.HasValue ? model.StartDate.Value : original.StartDate;
-                original.EndDate = model.EndDate.HasValue ? model.EndDate.Value : original.EndDate;
-                original.Status = model.Status.HasValue ? model.Status.Value : original.Status;
+                original.StartDate = model.StartDate;
+                original.EndDate = model.EndDate;
+                original.Status = model.Status;
 
                 Repo.Update(original);
 
@@ -71,7 +71,7 @@ namespace Host.Controllers
             return NotFound();
         }
 
-        // GET api/projects/TestProject
+        // GET api/project/TestProject
         [HttpGet("{name}")]
         public async Task<IActionResult> Get([FromRoute] string name)
         {
@@ -83,7 +83,7 @@ namespace Host.Controllers
             return NotFound();
         }
 
-        // DELETE api/projects/TestProject
+        // DELETE api/project/TestProject
         [HttpDelete("{name}")]
         public async Task<IActionResult> Delete([FromRoute] string name)
         {
@@ -99,9 +99,9 @@ namespace Host.Controllers
             return NotFound();
         }
 
-        // GET api/projects
+        // GET api/project
         [HttpGet]
-        public async Task<IActionResult> Get([FromBody] FilterModel filter)
+        public async Task<IActionResult> Get([FromQuery] FilterModel filter)
         {
             if (!await ValidateFilterOrDefault(filter))
             {
@@ -191,10 +191,10 @@ namespace Host.Controllers
                 {
                     ModelState.AddModelError(nameof(filter.Context), "Developer url not provided in \"Context\" field");
                 }
-                //else if (!await _mng.DeveloperExists(Decode(filter.Context)))
-                //{
-                //    ModelState.AddModelError(nameof(filter.Context), string.Format("Developer with nickname {0} was not found", Decode(filter.Context)));
-                //}
+            //else if (!await _mng.DeveloperExists(Decode(filter.Context)))
+            //{
+            //    ModelState.AddModelError(nameof(filter.Context), string.Format("Developer with nickname {0} was not found", Decode(filter.Context)));
+            //}
             return ModelState.IsValid;
         }
     }

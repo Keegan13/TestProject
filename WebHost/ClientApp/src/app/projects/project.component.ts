@@ -1,15 +1,15 @@
 import { Component, OnInit, Input, EventEmitter } from '@angular/core';
 import { Project } from '../models/Project';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DeveloperRepoService } from '../developer-repo.service';
-import { ProjectRepoService } from '../project-repo.service';
+import { DeveloperRepoService } from '../services/developer-repo.service';
+import { ProjectRepoService } from '../services/project-repo.service';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { CreateProjectComponent } from './create-project.component';
 import { Developer } from '../models/Developer';
-import { CollectionResult } from '../collection-result';
+import { CollectionResult } from '../models/collection-result';
 import { FilterModel } from '../models/FilterModel';
 import { AssignModel } from '../models/AssignModel';
-import { AssignService } from '../assign.service';
+import { AssignService } from '../Services/assign.service';
 
 @Component({
   selector: 'app-project',

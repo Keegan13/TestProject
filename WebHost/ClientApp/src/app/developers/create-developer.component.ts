@@ -1,6 +1,6 @@
 import { EventEmitter, Component, OnInit, Inject, Input } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { DeveloperRepoService } from './../developer-repo.service';
+import { DeveloperRepoService } from '../services/developer-repo.service';
 import { Developer } from './../models/Developer';
 import { Router } from '@angular/router';
 import { routerNgProbeToken } from '@angular/router/src/router_module';

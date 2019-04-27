@@ -25,7 +25,7 @@ namespace Host.Controllers
 
         //Get api/developer
         [HttpGet]
-        public async Task<IActionResult> Get([FromBody] FilterModel filter)
+        public async Task<IActionResult> Get([FromQuery] FilterModel filter)
         {
             if (!await ValidateFilterOrDefault(filter))
             {
@@ -45,7 +45,7 @@ namespace Host.Controllers
 
         //Get api/developer/Dr-Manhattan
         [HttpGet("{name}")]
-        public async Task<IActionResult> Get([FromQuery] string name)
+        public async Task<IActionResult> Get([FromRoute] string name)
         {
             if (await Repo.Single(Decode(name)) is Developer developer)
             {
@@ -84,7 +84,10 @@ namespace Host.Controllers
                     return BadRequest(ModelState);
                 }
                 //updates fields of orginal enitty
-                model.Update(original);
+
+                original.FullName = model.FullName;
+                original.Nickname = model.Nickname;
+
                 //sets EntityState to Modifed
                 Repo.Update(original);
                 // ...
@@ -104,6 +107,7 @@ namespace Host.Controllers
             {
                 ModelState.AddModelError(nameof(model.Nickname), String.Format("Developer with nickname {0} already exists", model.Nickname));
             }
+
             if (Regex.IsMatch(model.Nickname, "-"))
             {
                 ModelState.AddModelError(nameof(model.Nickname), String.Format("Developer nickname should not contain \"-\" (dash) character"));
@@ -116,12 +120,18 @@ namespace Host.Controllers
         {
             if (filter.Set.ToLower() == "associated")
             {
-                return Repo.GetAssignedTo(Decode(filter.Context), filter.Keywords, filter.GetOrderModel());
+                return Repo.GetAssignedTo(
+                    projName: Decode(filter.Context),
+                    keywords: filter.Keywords,
+                    order: filter.GetOrderModel());
             }
 
             if (filter.Set.ToLower() == "nonassociated")
             {
-                return Repo.GetAssignableTo(Decode(filter.Context), filter.Keywords, filter.GetOrderModel());
+                return Repo.GetAssignableTo(
+                    projName: Decode(filter.Context),
+                    keywords: filter.Keywords,
+                    order: filter.GetOrderModel());
             }
 
             return Repo.Get(filter.Keywords, filter.GetOrderModel());
