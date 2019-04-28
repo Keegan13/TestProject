@@ -1,9 +1,9 @@
-import { EventEmitter, Component, OnInit, Inject, Input } from '@angular/core';
+import { EventEmitter, Component, OnInit, Input } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { DeveloperRepoService } from '../services/developer-repo.service';
 import { Developer } from './../models/Developer';
 import { Router } from '@angular/router';
-import { routerNgProbeToken } from '@angular/router/src/router_module';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-create-developer',
@@ -11,74 +11,141 @@ import { routerNgProbeToken } from '@angular/router/src/router_module';
   styleUrls: ['./create-developer.component.css']
 })
 export class CreateDeveloperComponent implements OnInit {
-  public createForm: FormGroup;
-  @Input() isEdit: boolean;
-  @Input() developer: Developer;
+
+  validation_messages = {
+    'fullName': [
+      { type: 'required', message: 'Full name is required' },
+      { type: 'maxlength', message: 'Full name should be less than 250 character long' },
+      { type: 'minlength', message: 'Full name should have more than 2 characters' }
+    ],
+    'nickname': [
+      { type: 'required', message: 'Nickname is required' },
+      { type: 'maxlength', message: 'Nickname should be less than 150 character' },
+      { type: 'minlength', message: 'Nickname shoud have more than 5 character' }
+    ]
+  };
+
+  createForm: FormGroup;
+
+  @Input() isEdit: boolean = false;
+
+  @Input() developer: Developer = null;
+
   @Input() update: EventEmitter<Developer> = new EventEmitter<Developer>();
+
   get nickname() { return this.createForm.get("nickname") }
+
   get fullName() { return this.createForm.get("fullName") }
-  constructor(private fb: FormBuilder, private repo: DeveloperRepoService, private router: Router) { }
+
+  constructor(private router: Router, private fb: FormBuilder, private repo: DeveloperRepoService) { }
+
   ngOnInit() {
+
     if (this.developer) this.isEdit = true;
+
     if (!this.isEdit) this.isEdit = false;
-    if (this.isEdit && this.developer) this.initEdit(); else this.initCreate();
+
+    this.initForm();
   }
-  private initCreate() {
-    this.createForm = this.fb.group({
-      fullName: ['', Validators.required],
-      nickname: ['', Validators.required],
-      //skills: ['']
-    });
-  }
-  private initEdit() {
-    this.createForm = this.fb.group({
-      fullName: [this.developer.fullName, Validators.required],
-      nickname: [this.developer.nickname, Validators.required],
-      //skills: ['']
-    });
-  }
-  public onSubmit() {
-    if (this.createForm.valid) {
-      var action = this.isEdit ? this.repo.update.bind(this.repo) : this.repo.create.bind(this.repo);
-      var dev = new Developer(this.createForm);
-      dev.url = this.isEdit && this.developer ? this.developer.url : null
-      action(dev).subscribe(((x) => {
-        this.developer = x;
-        if (this.developer != null) {
-          if (this.update.observers.length > 0)
-            this.update.emit(this.developer);
-          else
-            this.router.navigate(['/developer/' + this.developer.url]);
-        }
-      }).bind(this), this.onSumbitError.bind(this), this.onSubmitSuccess.bind(this));
+
+  initForm() {
+
+    let fullNameInit = '';
+    let nickNameInit = '';
+
+    if (this.isEdit && this.developer) {
+      fullNameInit = this.developer.fullName;
+      nickNameInit = this.developer.nickname;
     }
+
+    this.createForm = this.fb.group({
+      fullName: [fullNameInit, Validators.compose([
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(250)
+      ])],
+
+      nickname: [nickNameInit, Validators.compose([
+        Validators.required,
+        Validators.minLength(5),
+        Validators.pattern('^([^-]+)$'), //any character excep dash
+        Validators.maxLength(150)
+      ])],
+      //skills: ['']
+    });
+
   }
 
+  onSubmit() {
+    if (this.createForm.valid) {
+      let developer = new Developer(this.createForm);
 
+      if (this.isEdit) {
 
+        developer.url = this.developer.url;
+        this.repo.update(developer).subscribe(this.onSubmitResult.bind(this
+        ), this.onSubmitError.bind(this
+        ));
+      }
+      else {
+        this.repo.create(developer).subscribe(this.onSubmitResult.bind(this
+        ), this.onSubmitError.bind(this
+        ));
 
-  public onSumbitError(error: any): void {
-
-    if (error.error.errors) {
-      for (var field in error.error.errors) {
-        this.addFieldErrors(field, error.error.errors[field]);
       }
     }
-    switch (error.status) {
-      case 404:
-        this.createForm.setErrors({ "serverError": "Service can't be reached" });
-        break;
-      default:
-        this.createForm.setErrors({ "serverError": "Whoops something went wrong" });
-        break;
-    }
-  }
-  addFieldErrors(field: string, messages: string[]) {
-    field = field.charAt(0).toLowerCase() + field.substring(1);
-    this.createForm.get(field).setErrors({ 'serverError': messages.join("<br/>") });
+    this.markFormGroupTouched(this.createForm);
   }
 
-  public onSubmitSuccess() {
-    console.log("submited succesfully");
+  onSubmitResult(developer: Developer) {
+    this.developer = developer;
+    if (this.developer) {
+      this.fullName.setValue(this.developer.fullName);
+      this.nickname.setValue(this.developer.nickname);
+    }
+    if (this.update.observers.length > 0)
+      this.update.emit(this.developer);
+    else
+      this.router.navigate(['developer', this.developer.url]);
+  }
+
+  onSubmitError(error: HttpErrorResponse): void {
+    this.handle4XXError(error);
+    this.handle5XXError(error);
+  }
+
+  handle5XXError(error: HttpErrorResponse) {
+    if (error.status >= 500) {
+      this.createForm.setErrors({ 'serverError': 'Whoops something went wrong' });
+      console.log(JSON.stringify(error));
+    }
+  }
+
+  handle4XXError(error: HttpErrorResponse) {
+    if (error.status >= 400 && error.status < 500) {
+      var errors = error.error.errors;
+      if (errors) {
+        for (var field in errors) {
+          var input = this.createForm.get(field.charAt(0).toLowerCase() + field.substring(1));
+          if (input) {
+            input.setErrors({ 'serverValidationError': errors[field].join('</br>') });
+          }
+        }
+      }
+    }
+  }
+  /**
+ * Marks all controls in a form group as touched
+ * @param formGroup - The form group to touch
+ * src: https://stackoverflow.com/a/44150793
+ */
+  private markFormGroupTouched(formGroup: FormGroup) {
+    (<any>Object).values(formGroup.controls).forEach(control => {
+      control.markAsTouched();
+
+      if (control.controls) {
+        this.markFormGroupTouched(control);
+      }
+    });
   }
 }

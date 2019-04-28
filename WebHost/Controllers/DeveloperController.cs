@@ -123,7 +123,7 @@ namespace Host.Controllers
 
         protected virtual async Task<bool> ValidateModel(EditDeveloperViewModel model, Developer original = null)
         {
-            if ((original == null || model.Nickname != model.Nickname) && await Repo.Exist(model.Nickname))
+            if ((original == null || model.Nickname != original.Nickname) && await Repo.Exist(model.Nickname))
             {
                 ModelState.AddModelError(nameof(model.Nickname), String.Format("Developer with nickname {0} already exists", model.Nickname));
             }
