@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { Project } from '../models/Project';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FilterModel } from '../models/FilterModel';
@@ -24,7 +25,11 @@ export class ProjectRepoService extends Repository<Project>{
   }
 
   update(project: Project): Observable<Project> {
-    return this.http.put<Project>('api/project/' + project.url, project, this.httpOptions);
+    return this.http.put<Project>('api/project/' + project.url, project, this.httpOptions).pipe(map(item => {
+      item.startDate = new Date(item.startDate);
+      item.endDate = new Date(item.endDate);
+      return Object.assign(new Project(), item);
+    }));
   }
 
   delete(project: Project): Observable<Project> {
@@ -32,15 +37,32 @@ export class ProjectRepoService extends Repository<Project>{
   }
 
   create(project: Project): Observable<Project> {
-    return this.http.post<Project>("api/project", project, this.httpOptions);
+    return this.http.post<Project>("api/project", project, this.httpOptions).pipe(map(item => {
+      item.startDate = new Date(item.startDate);
+      item.endDate = new Date(item.endDate);
+      return Object.assign(new Project(), item);
+    }));
   }
 
   single(name: string): Observable<Project> {
-    return this.http.get<Project>("api/project/" + name, this.httpOptions);
+
+    return this.http.get<Project>("api/project/" + name, this.httpOptions).pipe(map(item => {
+      item.startDate = new Date(item.startDate);
+      item.endDate = new Date(item.endDate);
+      return Object.assign(new Project(), item);
+    }));
   }
 
   get(filter: FilterModel): Observable<CollectionResult<Project>> {
-    return this.http.get<CollectionResult<Project>>("api/project?" + this.getQueryStringFromObject(filter));
+
+    return this.http.get<CollectionResult<Project>>("api/project?" + this.getQueryStringFromObject(filter)).pipe(map(result => {
+      result.values = result.values.map(item => {
+        item.startDate = new Date(item.startDate);
+        item.endDate = new Date(item.endDate);
+        return Object.assign(new Project(), item);
+      });
+      return result;
+    }));
   }
 }
 

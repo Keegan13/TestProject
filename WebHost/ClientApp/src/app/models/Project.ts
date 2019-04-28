@@ -8,20 +8,18 @@ export class Project {
   public startDate: Date;
   public endDate: Date;
   public status: string;
-  constructor(form: AbstractControl) {
 
-    this.name = form.get('name').value;
-    this.description = form.get('description').value;
-    this.startDate = new Date(form.get('startDate').value);
-    this.endDate = new Date(form.get('endDate').value);
-    this.status = form.get('status').value;
+  constructor() {
+
+
   }
-
-  public static formatDate(strDate: any) {
-    let date = new Date(strDate);
-    let dd = date.getDate();
-    let mm = date.getMonth() + 1;
-    let yyyy = date.getFullYear();
-    return (dd < 10 ? '0' + dd : dd) + '/' + (mm < 10 ? '0' + mm : mm) + '/' + yyyy;
+  public static fromForm(form: AbstractControl): Project {
+    let newProj = new Project();
+    newProj.name = form.get('name').value;
+    newProj.description = form.get('description').value;
+    newProj.startDate = new Date(form.get('startDate').value);
+    newProj.endDate = new Date(form.get('endDate').value);
+    newProj.status = form.get('status').value;
+    return newProj;
   }
 }

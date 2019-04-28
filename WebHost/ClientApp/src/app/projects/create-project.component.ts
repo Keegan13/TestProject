@@ -31,7 +31,7 @@ export class CreateProjectComponent implements OnInit {
       { type: 'required', message: 'Project name is required' },
       { type: 'minlength', message: "Project name must be at least " + this.constrains.name.minLength + " characters long" },
       { type: 'maxlength', message: "Project name must be less than" + (this.constrains.name.maxLength + 1) + " characters" },
-      { type:'pattern',message: "Project name must not contain '-' (dash) characters"}
+      { type: 'pattern', message: "Project name must not contain '-' (dash) characters" }
     ],
     'description': [
       { type: 'maxlength', message: 'Description must be less than ' + (this.constrains.description.maxLength + 1) + ' characters' }
@@ -45,7 +45,9 @@ export class CreateProjectComponent implements OnInit {
   };
 
 
-  private dateConfig: Partial<BsDatepickerConfig>;
+  private dateConfig = {
+    dateInputFormat: 'DD/MM/YYYY'
+  };
 
   public createForm: FormGroup;
 
@@ -80,8 +82,8 @@ export class CreateProjectComponent implements OnInit {
     if (this.isEdit && this.project) {
       name = this.project.name;
       description = this.project.description;
-      startDate = new Date(this.project.startDate);
-      endDate = new Date(this.project.endDate);
+      startDate = this.project.startDate;
+      endDate = this.project.endDate;
       status = this.project.status;
     }
 
@@ -89,7 +91,7 @@ export class CreateProjectComponent implements OnInit {
       name: [name,
         Validators.compose([
           Validators.required,
-          Validators.maxLength(this.constrains.name.maxLength), 
+          Validators.maxLength(this.constrains.name.maxLength),
           Validators.pattern('^([^-]+)$'),
           Validators.minLength(this.constrains.name.minLength)])
 
@@ -112,7 +114,7 @@ export class CreateProjectComponent implements OnInit {
       this.markFormGroupTouched(this.createForm);
 
     if (this.createForm.valid) {
-      let project = new Project(this.createForm);
+      let project = Project.fromForm(this.createForm);
       if (this.isEdit) {
         project.url = this.project.url;
         this.repo.update(project).subscribe(this.onSubmitResult.bind(this), this.onSumbitError.bind(this));
@@ -125,6 +127,7 @@ export class CreateProjectComponent implements OnInit {
 
 
   onSubmitResult(project: Project) {
+    console.log(JSON.stringify(project));
     this.project = project;
     if (this.project) {
       this.name.setValue(this.project.name);

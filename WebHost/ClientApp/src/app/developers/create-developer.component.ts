@@ -28,13 +28,13 @@ export class CreateDeveloperComponent implements OnInit {
       { type: 'required', message: 'Full name is required' },
       { type: 'maxlength', message: 'Full name must be less than ' + (this.constrains.fullName.minLength + 1) + ' characters long' },
       { type: 'minlength', message: 'Full name must be at least ' + this.constrains.fullName.minLength + ' characters long' }
-      
+
     ],
     'nickname': [
       { type: 'required', message: 'Nickname is required' },
       { type: 'maxlength', message: 'Nickname must be less than ' + (this.constrains.nickname.maxLength + 1) + ' characters' },
       { type: 'minlength', message: 'Nickname must be at least' + this.constrains.nickname.minLength + ' characters long' },
-      { type: "pattern",message: "Full name should not contain -"}
+      { type: "pattern", message: "Full name should not contain -" }
     ]
   };
 
@@ -91,7 +91,8 @@ export class CreateDeveloperComponent implements OnInit {
 
   onSubmit() {
     if (this.createForm.valid) {
-      let developer = new Developer(this.createForm);
+      
+      let developer = Developer.fromForm(this.createForm);
 
       if (this.isEdit) {
 
