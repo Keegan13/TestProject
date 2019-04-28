@@ -10,7 +10,8 @@
     <label for="name" class="col-form-label col-md-2">Project name</label>
     <div class="col-md-10">
       <input id="name" formControlName="name" type="text" placeholder="Test project" class="form-control"
-        [ngClass]="{'is-invalid': name.invalid&&(name.touched||name.dirty)}">
+        [ngClass]="{'is-invalid': name.invalid&&(name.touched||name.dirty)}"
+        [attr.maxLength]="constrains.name.maxLength">
       <div class="invalid-feedback" *ngIf="name.invalid &&(name.touched||name.dirty)">
         <span *ngFor="let error of validation_messages.name">
           <span *ngIf="name.hasError(error.type)">{{error.message}}</span>
@@ -27,7 +28,7 @@
     <label for="description" class="col-form-label col-md-2">Description</label>
     <div class="col-md-10">
       <textarea id="description" class="form-control" formControlName="description"
-        [ngClass]="{'is-invalid':description.invalid &&(description.touched||description.dirty)}"></textarea>
+        [ngClass]="{'is-invalid':description.invalid &&(description.touched||description.dirty)}" [attr.maxLength]="constrains.description.maxLength"></textarea>
       <div class="invalid-feedback" *ngIf="description.invalid &&(description.touched||description.dirty)">
         <span *ngFor="let error of validation_messages.description">
           <span *ngIf="description.hasError(error.type)">{{error.message}}</span>

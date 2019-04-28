@@ -12,16 +12,29 @@ import { HttpErrorResponse } from '@angular/common/http';
 })
 export class CreateDeveloperComponent implements OnInit {
 
+  constrains = {
+    'fullName': {
+      'maxLength': 150,
+      'minLength': 5
+    },
+    'nickname': {
+      'maxLength': 100,
+      'minLength': 4
+    }
+  }
+
   validation_messages = {
     'fullName': [
       { type: 'required', message: 'Full name is required' },
-      { type: 'maxlength', message: 'Full name should be less than 250 characters long' },
-      { type: 'minlength', message: 'Full name should have more than 2 characters' }
+      { type: 'maxlength', message: 'Full name must be less than ' + (this.constrains.fullName.minLength + 1) + ' characters long' },
+      { type: 'minlength', message: 'Full name must be at least ' + this.constrains.fullName.minLength + ' characters long' }
+      
     ],
     'nickname': [
       { type: 'required', message: 'Nickname is required' },
-      { type: 'maxlength', message: 'Nickname should be less than 150 character' },
-      { type: 'minlength', message: 'Nickname shoud have more than 5 character' }
+      { type: 'maxlength', message: 'Nickname must be less than ' + (this.constrains.nickname.maxLength + 1) + ' characters' },
+      { type: 'minlength', message: 'Nickname must be at least' + this.constrains.nickname.minLength + ' characters long' },
+      { type: "pattern",message: "Full name should not contain -"}
     ]
   };
 
@@ -61,15 +74,15 @@ export class CreateDeveloperComponent implements OnInit {
     this.createForm = this.fb.group({
       fullName: [fullNameInit, Validators.compose([
         Validators.required,
-        Validators.minLength(3),
-        Validators.maxLength(250)
+        Validators.minLength(this.constrains.fullName.minLength),
+        Validators.maxLength(this.constrains.fullName.maxLength)
       ])],
 
       nickname: [nickNameInit, Validators.compose([
         Validators.required,
-        Validators.minLength(5),
+        Validators.minLength(this.constrains.nickname.minLength),
         Validators.pattern('^([^-]+)$'), //any character excep dash
-        Validators.maxLength(150)
+        Validators.maxLength(this.constrains.nickname.maxLength)
       ])],
       //skills: ['']
     });

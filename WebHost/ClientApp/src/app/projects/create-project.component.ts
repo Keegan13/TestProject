@@ -28,20 +28,20 @@ export class CreateProjectComponent implements OnInit {
 
   validation_messages = {
     'name': [
-      { type: 'required', message: 'Name is required' },
-      { type: 'minlength', message: "Name should be at least " + this.constrains.name.minLength + " characters long" },
-      { type: 'maxlength', message: "Name should be less than " + this.constrains.name.maxLength + " characters long" },
+      { type: 'required', message: 'Project name is required' },
+      { type: 'minlength', message: "Project name must be at least " + this.constrains.name.minLength + " characters long" },
+      { type: 'maxlength', message: "Project name must be less than" + (this.constrains.name.maxLength + 1) + " characters" },
+      { type:'pattern',message: "Project name must not contain '-' (dash) characters"}
     ],
     'description': [
-      { type: 'maxlength', message: 'Description should be less ' + this.constrains.description.maxLength + 'characters' }
+      { type: 'maxlength', message: 'Description must be less than ' + (this.constrains.description.maxLength + 1) + ' characters' }
     ],
     'startDate': [
       { type: 'required', message: 'Start date is required' }
     ],
     'endDate': [
       { type: 'required', message: 'End date is required' }
-    ],
-
+    ]
   };
 
 
@@ -75,7 +75,7 @@ export class CreateProjectComponent implements OnInit {
     let description = "No description";
     let startDate = new Date(Date.now());
     let endDate = new Date(Date.now());
-    let status = 0;
+    let status = "0";
 
     if (this.isEdit && this.project) {
       name = this.project.name;
@@ -89,7 +89,10 @@ export class CreateProjectComponent implements OnInit {
       name: [name,
         Validators.compose([
           Validators.required,
-          Validators.maxLength(this.constrains.name.maxLength), Validators.minLength(this.constrains.name.minLength)])
+          Validators.maxLength(this.constrains.name.maxLength), 
+          Validators.pattern('^([^-]+)$'),
+          Validators.minLength(this.constrains.name.minLength)])
+
       ],
       description: [
         description,
