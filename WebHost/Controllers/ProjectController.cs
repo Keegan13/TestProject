@@ -32,7 +32,7 @@ namespace Host.Controllers
         {
             if (!ModelState.IsValid || !await ValidateProject(model))
             {
-                return BadRequest(ModelState);
+                return BadRequest(ModelState.GetValidationProblemDetails());
             }
 
             var project = model.GetInstance();
@@ -52,7 +52,7 @@ namespace Host.Controllers
             {
                 if (!ModelState.IsValid || !await ValidateProject(model, original))
                 {
-                    return BadRequest(ModelState);
+                    return BadRequest(ModelState.GetValidationProblemDetails());
                 }
 
                 original.Name = model.Name;

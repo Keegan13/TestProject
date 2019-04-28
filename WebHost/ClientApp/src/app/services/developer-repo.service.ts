@@ -42,6 +42,6 @@ export class DeveloperRepoService extends Repository<Developer> {
 
   public update(developer: Developer): Observable<Developer> 
   {
-    return this.http.put<Developer>("/api/developer"+developer.url,developer,this.httpOptions);
+    return this.http.put<Developer>("/api/developer/"+developer.url,developer,this.httpOptions);
   }
 }

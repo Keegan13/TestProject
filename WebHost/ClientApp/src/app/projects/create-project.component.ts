@@ -71,7 +71,7 @@ export class CreateProjectComponent implements OnInit {
   }
 
   public onSumbitError(error: any): void {
-    var errors = error.error;
+    var errors = error.error.errors;
     if (errors) {
       for (var field in errors) {
         this.addFieldErrors(field, errors[field]);

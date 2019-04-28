@@ -59,9 +59,9 @@ export class CreateDeveloperComponent implements OnInit {
 
   public onSumbitError(error: any): void {
 
-    if (error.error) {
-      for (var field in error.error) {
-        this.addFieldErrors(field, error.error[field]);
+    if (error.error.errors) {
+      for (var field in error.error.errors) {
+        this.addFieldErrors(field, error.error.errors[field]);
       }
     }
     switch (error.status) {
