@@ -33,6 +33,20 @@ namespace Infrastructure.Data.EntityFrameworkCore
             Assignments.Remove(assignment);
         }
 
+
+
+
+        public async Task Unassign(Project project, Developer developer)
+        {
+            if (project.Id > 0 && developer.Id > 0)
+                await Unassign(project.Id, developer.Id);
+            else
+            {
+                if (!string.IsNullOrEmpty(project.Name) && !string.IsNullOrEmpty(developer.Nickname))
+                    await Unassign(project.Name,developer.Nickname);
+            }
+        }
+
         public Task<bool> IsAssigned(string projName, string devNickname)
         {
             return Assignments.AnyAsync(x => x.Developer.Nickname == devNickname && x.Project.Name == projName);
@@ -61,15 +75,7 @@ namespace Infrastructure.Data.EntityFrameworkCore
             Assignments.Remove(assignment);
         }
 
-        public Task Assign(string projName, string devNickname)
-        {
-            throw new NotImplementedException();
-        }
 
-        public Task Unassign(Project project, Developer developer)
-        {
-            throw new NotImplementedException();
-        }
 
 
         #endregion

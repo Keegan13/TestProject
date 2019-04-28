@@ -5,7 +5,7 @@ namespace Infrastructure.Abstractions
 {
     public interface IProjectAssignments: IUnitOfWork
     {
-        Task Assign(string projName, string devNickname);
+        //Task Assign(string projName, string devNickname);
         Task Assign(Project project, Developer developer);
         Task Unassign(Project project, Developer developer);
         Task Unassign(string projName, string devNickname);
