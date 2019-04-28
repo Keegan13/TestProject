@@ -1,85 +1,88 @@
-  <div class="">
-    <form [formGroup]="createForm" class="form-horizontal" (ngSubmit)="onSubmit()">
-      <h3 *ngIf="isEdit"> Edit {{project.name}}</h3>
-      <h3 *ngIf="!isEdit">Create new project</h3>
+<form [formGroup]="createForm" class="form-horizontal" (ngSubmit)="onSubmit()">
+  <h3 *ngIf="isEdit"> Edit {{project.name}}</h3>
+  <h3 *ngIf="!isEdit">Create new project</h3>
 
-      <span class="has-error" *ngIf="createForm.errors?.serverError">
-        {{createForm.errors.serverError}}
-      </span>
+  <span class="invalid-feedback" *ngIf="createForm.errors?.serverError">
+    {{createForm.errors.serverError}}
+  </span>
 
-      <div class="form-group row" [ngClass]="{'has-error': name.invalid&&(name.touched||name.dirty)}">
-        <label for="name" class="col-form-label col-md-2">Project name</label>
-        <div class="col-md-10">
-          <input id="name" formControlName="name" type="text" class="form-control">
-          <span *ngIf="name.invalid&&(name.touched||name.dirty)">
-            <span *ngIf="name.errors?.required">
-              Name field is required
-            </span>
-            <span *ngIf="name.errors?.serverError">
-              {{name.errors.serverError}}
-            </span>
-          </span>
-        </div>
+  <div class="form-group row">
+    <label for="name" class="col-form-label col-md-2">Project name</label>
+    <div class="col-md-10">
+      <input id="name" formControlName="name" type="text" placeholder="Test project" class="form-control"
+        [ngClass]="{'is-invalid': name.invalid&&(name.touched||name.dirty)}">
+      <div class="invalid-feedback" *ngIf="name.invalid &&(name.touched||name.dirty)">
+        <span *ngFor="let error of validation_messages.name">
+          <span *ngIf="name.hasError(error.type)">{{error.message}}</span>
+        </span>
+        <span *ngIf="name.errors?.serverValidationError">
+          {{name.errors.serverValidationError}}
+        </span>
       </div>
-
-
-      <div class="form-group row"
-        [ngClass]="{'has-error':description.invalid &&(description.touched||description.dirty)}">
-        <label for="description" class="col-form-label col-md-2">Description</label>
-        <div class="col-md-10">
-          <textarea id="description" class="form-control" formControlName="description"></textarea>
-          <span *ngIf="description.invalid &&(description.touched||description.dirty)">
-            <span *ngIf="description.errors?.serverError">
-              {{description.errors.serverError}}
-            </span>
-          </span>
-        </div>
-      </div>
-
-      <div class="form-group row" [ngClass]="{'has-error': startDate.errors&&(startDate.touched||startDate.dirty)}">
-        <label for="startDate" class="col-form-label col-md-2">Project start Date</label>
-        <div class="col-md-4">
-          <input type="text" bsDatepicker [bsConfig]="dateConfig" id="startDate" formControlName="startDate" type="text"
-            class="form-control">
-          <span *ngIf="startDate.invalid&&(startDate.touched||startDate.dirty)">
-            <span *ngIf="startDate.errors.required">
-              Start date is required
-            </span>
-            <span *ngIf="startDate.errors?.serverError">
-              {{startDate.errors.serverError}}
-            </span>
-          </span>
-        </div>
-      </div>
-{{startDate.errors}}
-      <div class="form-group row" [ngClass]="{'has-error': endDate.errors&&(endDate.touched||endDate.dirty)}">
-        <label for="endDate" class="col-form-label col-md-2">Project end date</label>
-        <div class="col-md-4">
-          <input type="text" bsDatepicker [bsConfig]="dateConfig" id="endDate" formControlName="endDate" type="text"
-            class="form-control">
-          <span *ngIf="endDate.invalid&&(endDate.touched||endDate.dirty)">
-            <span *ngIf="endDate.errors.required">
-              Start date is required
-            </span>
-            <span *ngIf="endDate.errors?.serverError">
-              {{endDate.errors.serverError}}
-            </span>
-          </span>
-        </div>
-      </div>
-      {{endDate.errors}}
-
-      <div class="form-group row">
-        <label for="status" class="col-form-label col-md-2">Project status</label>
-        <div class="col-md-4">
-          <select name="status" formControlName="status" class="custom-select form-control ">
-            <option value="0">unstarted</option>
-            <option value="1">in progress</option>
-            <option value="2">completed</option>
-          </select>
-        </div>
-      </div>
-
-      <button class="btn btn-primary" type="submit">Save</button>
-    </form>
+    </div>
   </div>
+
+
+  <div class="form-group row">
+    <label for="description" class="col-form-label col-md-2">Description</label>
+    <div class="col-md-10">
+      <textarea id="description" class="form-control" formControlName="description"
+        [ngClass]="{'is-invalid':description.invalid &&(description.touched||description.dirty)}"></textarea>
+      <div class="invalid-feedback" *ngIf="description.invalid &&(description.touched||description.dirty)">
+        <span *ngFor="let error of validation_messages.description">
+          <span *ngIf="description.hasError(error.type)">{{error.message}}</span>
+        </span>
+        <span *ngIf="description.errors?.serverValidationError">
+          {{description.errors.serverValidationError}}
+        </span>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="form-group row">
+    <label for="startDate" class="col-form-label col-md-2">Project start Date</label>
+    <div class="col-md-6">
+      <input type="text" bsDatepicker [bsConfig]="dateConfig" id="startDate" formControlName="startDate" type="text"
+        class="form-control" [ngClass]="{'is-invalid': startDate.invalid&&(startDate.touched||startDate.dirty)}">
+      <div class="invalid-feedback" *ngIf="startDate.invalid&&(startDate.touched||startDate.dirty)">
+        <span *ngFor="let error of validation_messages.startDate">
+          <span *ngIf="startDate.hasError(error.type)">{{error.message}}</span>
+        </span>
+        <span *ngIf="startDate.errors?.serverValidationError">
+          {{startDate.errors.serverValidationError}}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label for="endDate" class="col-form-label col-md-2">Project end date</label>
+    <div class="col-md-6">
+      <input type="text" bsDatepicker [bsConfig]="dateConfig" id="endDate" formControlName="endDate" type="text"
+        class="form-control" [ngClass]="{'is-invalid': endDate.invalid&&(endDate.touched||endDate.dirty)}">
+      <div class="invalid-feedback" *ngIf="endDate.invalid&&(endDate.touched||endDate.dirty)">
+        <span *ngFor="let error of validation_messages.endDate">
+          <span *ngIf="endDate.hasError(error.type)">{{error.message}}</span>
+        </span>
+        <span *ngIf="endDate.errors?.serverValidationError">
+          {{endDate.errors.serverValidationError}}
+        </span>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label for="status" class="col-form-label col-md-2">Project status</label>
+    <div class="col-md-4">
+      <select name="status" formControlName="status" class="custom-select form-control ">
+        <option value="0">unstarted</option>
+        <option value="1">in progress</option>
+        <option value="2">completed</option>
+      </select>
+    </div>
+  </div>
+
+  <button class="btn btn-primary" type="submit">Save</button>
+</form>

@@ -9,7 +9,7 @@
   <div class="form-group row">
     <label for="fullName" class="col-form-label col-sm-2">Full name</label>
     <div class="col-sm-10">
-      <input id="fullName" placeholder="Jogn Doe" formControlName="fullName" type="text" class="form-control"
+      <input id="fullName" placeholder="John Doe" formControlName="fullName" type="text" class="form-control"
         [ngClass]="{'is-invalid':fullName.invalid &&(fullName.touched||fullName.dirty)}">
       <div class="invalid-feedback" *ngIf="fullName.invalid &&(fullName.touched||fullName.dirty)">
         <span *ngFor="let error of validation_messages.fullName">
@@ -26,7 +26,6 @@
   <div class="form-group row">
     <label for="nickname" class="col-form-label col-sm-2">Nickname</label>
     <div class="col-sm-10">
-
       <input id="nickname" placeholder="Developer unique nickname" type="text" formControlName="nickname"
         class="form-control" [ngClass]="{'is-invalid': nickname.errors&&(nickname.touched||nickname.dirty)}">
 

@@ -15,7 +15,7 @@ export class CreateDeveloperComponent implements OnInit {
   validation_messages = {
     'fullName': [
       { type: 'required', message: 'Full name is required' },
-      { type: 'maxlength', message: 'Full name should be less than 250 character long' },
+      { type: 'maxlength', message: 'Full name should be less than 250 characters long' },
       { type: 'minlength', message: 'Full name should have more than 2 characters' }
     ],
     'nickname': [
