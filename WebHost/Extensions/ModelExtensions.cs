@@ -1,6 +1,7 @@
 ﻿using Host.Models;
 using Infrastructure.Entities;
 using AutoMapper;
+using System.Linq;
 
 namespace Host.Extensions
 {
@@ -8,31 +9,25 @@ namespace Host.Extensions
     {
         public static Developer GetInstance(this EditDeveloperViewModel model)
         {
-            return Mapper.Map<Developer>(model);
-        }
+            var instance = Mapper.Map<Developer>(model);
 
-        public static void Update(this EditDeveloperViewModel model, Developer toUpdate)
-        {
-            toUpdate.FullName = model.FullName;
-            toUpdate.Nickname = model.Nickname;
-        }
+            instance.DeveloperTags = model.Tags.
+                Select(x => new DeveloperTag
+                {
+                    Developer = instance,
+                    Tag = new Tag { Name = x }
+                }).ToList();
 
-        public static void Update(this EditProjectViewModel model, Project toUpdate)
-        {
-            toUpdate.Name = model.Name;
-            toUpdate.Description = model.Description;
-            toUpdate.StartDate = model.StartDate.HasValue ? model.StartDate.Value : toUpdate.StartDate;
-            toUpdate.EndDate = model.EndDate.HasValue ? model.EndDate.Value : toUpdate.EndDate;
-            toUpdate.Status = model.Status.HasValue ? model.Status.Value : toUpdate.Status;
+            return instance;
         }
-
 
         public static EditDeveloperViewModel GetVM(this Developer developer, string url, string projectUrl = null)
         {
-            var result = Mapper.Map<EditDeveloperViewModel>(developer);
-            result.Url = url;
-            result.Project = projectUrl;
-            return result;
+            var model = Mapper.Map<EditDeveloperViewModel>(developer);
+            model.Url = url;
+            model.Project = projectUrl;
+            model.Tags = developer.DeveloperTags.Select(x => x.Tag.Name).ToArray();
+            return model;
         }
 
         public static Project GetInstance(this EditProjectViewModel model)
@@ -54,8 +49,8 @@ namespace Host.Extensions
             {
                 SortColumn = filter.Sort,
                 isAscendingOrder = filter.Order.HasValue ? filter.Order.Value == OrderDirection.Ascending : true,
-                Skip = filter.Skip.HasValue ? filter.Skip.Value : 0,
-                Take = filter.Take.HasValue ? filter.Take.Value : 0
+                Skip = filter.Skip ?? 0,
+                Take = filter.Take ?? 0
             };
         }
 

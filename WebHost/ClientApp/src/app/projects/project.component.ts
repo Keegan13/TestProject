@@ -1,15 +1,15 @@
 import { Component, OnInit, Input, EventEmitter } from '@angular/core';
 import { Project } from '../models/Project';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DeveloperRepoService } from '../developer-repo.service';
-import { ProjectRepoService } from '../project-repo.service';
+import { DeveloperRepoService } from '../services/developer-repo.service';
+import { ProjectRepoService } from '../services/project-repo.service';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { CreateProjectComponent } from './create-project.component';
 import { Developer } from '../models/Developer';
-import { CollectionResult } from '../collection-result';
+import { CollectionResult } from '../models/collection-result';
 import { FilterModel } from '../models/FilterModel';
 import { AssignModel } from '../models/AssignModel';
-import { AssignService } from '../assign.service';
+import { AssignService } from '../Services/assign.service';
 
 @Component({
   selector: 'app-project',
@@ -22,12 +22,7 @@ export class ProjectComponent implements OnInit {
   developers: CollectionResult<Developer>;
   keywords: string;
 
-  get start() {
-    return Project.formatDate(this.project.startDate);
-  }
-  get end() { return Project.formatDate(this.project.startDate); }
-
-  constructor(private modalService: BsModalService, private route: ActivatedRoute, private router: Router, private repo: ProjectRepoService, private devs: DeveloperRepoService, private assign: AssignService) {
+    constructor(private modalService: BsModalService, private route: ActivatedRoute, private router: Router, private repo: ProjectRepoService, private devs: DeveloperRepoService, private assign: AssignService) {
   }
 
   get id() {

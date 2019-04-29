@@ -1,7 +1,7 @@
 ﻿namespace Infrastructure.Entities
 {
     //bind entity for many to many
-     public class ProjectDeveloper
+     public class ProjectAssignment
     {
         public int ProjectId { get; set; }
         public Project Project { get; set; }

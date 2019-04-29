@@ -27,14 +27,14 @@ namespace Host.Data
             {
                 PopulateDevelopers(25);
             }
-            if (this._context.BindEntity.Count() == 0)
+            if (this._context.Assignments.Count() == 0)
             {
                 RandomlyAssign();
             }
         }
         private bool isAssigned(Project project, Developer developer)
         {
-            return this._context.Set<ProjectDeveloper>().Any(x => x.Developer == developer && x.Project == project);
+            return this._context.Set<ProjectAssignment>().Any(x => x.Developer == developer && x.Project == project);
         }
         protected virtual void PopulateProjects(int count)
         {
@@ -116,18 +116,18 @@ namespace Host.Data
         {
             Project[] projs = _context.Set<Project>().ToArray();
             Developer[] devs = _context.Set<Developer>().ToArray();
-            List<ProjectDeveloper> assigns = new List<ProjectDeveloper>();
+            List<ProjectAssignment> assigns = new List<ProjectAssignment>();
             for (int i = 0; i < projs.Length; i++)
             {
                 for (int j = 0; j < devs.Length; j++)
                 {
                     if (rng.Next(1,4)%3==1)
                     {
-                        assigns.Add(new ProjectDeveloper { ProjectId = projs[i].Id, DeveloperId = devs[j].Id });
+                        assigns.Add(new ProjectAssignment { ProjectId = projs[i].Id, DeveloperId = devs[j].Id });
                     }
                 }
             }
-            _context.BindEntity.AddRange(assigns);
+            _context.Assignments.AddRange(assigns);
             _context.SaveChanges();
             Console.WriteLine("Crated {0} connections betwen projects and developers");
         }

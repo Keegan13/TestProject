@@ -1,24 +1,24 @@
-import { AbstractControl } from '@angular/forms';
+import { AbstractControl, FormArray } from '@angular/forms';
 
 export class Developer {
 
-  public url:string;
+  public url: string;
   public fullName: string;
   public nickname: string;
-  //public skills: string[];
-  public project:string;
-  constructor(form: AbstractControl) {
-
-    this.fullName = form.get('fullName').value;
-    this.nickname = form.get('nickname').value;
-    //this.skills = Developer.parseSkills(form.get('skills').value);
-    this.url="";
-    this.project="";
-  }
-  private static parseSkills(skills: string): string[] {
-    var output: string[] = [];
-    skills.split(',').forEach(function (x) { var skill = x.trim(); if (x.length > 0) output.push(skill) });
-    return output;
+  public tags: string[];
+  public project: string;
+  constructor() {
   }
 
+  static fromForm(form: AbstractControl) {
+    let newDev = new Developer();
+    newDev.fullName = form.get('fullName').value;
+    newDev.nickname = form.get('nickname').value;
+    newDev.url = "";
+    newDev.project = "";
+    newDev.tags = (form.get('tags') as FormArray).controls.
+      map(x => x.value).
+      filter((val, index, self) => self.indexOf(val) === index);
+    return newDev;
+  }
 }

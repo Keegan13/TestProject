@@ -1,4 +1,5 @@
-﻿using Infrastructure.Data;
+﻿using Infrastructure.Abstractions;
+using Infrastructure.Data;
 using Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -9,23 +10,25 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Services
 {
-    public class ProjectManagerService
+    [Obsolete]
+    public class ProjectManagerService : IProjectRepository, IDeveloperRepository, IPaginationRepository, IProjectAssignments//,IDisposable 
     {
+        private readonly IProjectRepository Repo;
         protected readonly DbContext _context;
 
-        public ProjectManagerService(ApplicationContext context)
+        public int LastQueryTotalCount { get; protected set; }
+
+
+
+
+        public ProjectManagerService(IProjectRepository Repo, ApplicationContext context)
         {
+            this.Repo = Repo;
             this._context = context;
+            this.LastQueryTotalCount = 0;
         }
 
 
-        //public IQueryable<TEntity> Set<TEntity>() where TEntity : class => _context.Set<TEntity>();
-        //public Project GetProject(int id)
-        //{
-        //    return _context.Set<Project>().Find(id);
-        //}
-
-        public int LastQueryTotalCount = 0;
 
 
         #region READ
@@ -37,19 +40,34 @@ namespace Infrastructure.Services
             return _context.Set<Project>().SingleOrDefaultAsync(x => x.Name == name);
         }
 
-        public async Task<IEnumerable<Project>> GetAssignedProjects(string devNickname, OrderModel model = null)
+        public async Task<IEnumerable<Project>> GetProjectsAssignedToDeveloper(string devName, OrderModel model = null)
         {
-            if (await GetDeveloper(devNickname) is Developer dev)
-            {
-                int devId = dev.Id;
-                IEnumerable<int> projIds = this._context.Set<ProjectDeveloper>().Where(x => x.DeveloperId == devId).Select(x => x.ProjectId).ToArray();
+            var query = _context.Set<Project>().Where(proj => proj.ProjectAssignments.Any(x => x.Developer.Nickname == devName));
 
-                var query = _context.Set<Project>().Where(x => projIds.Contains(x.Id));
-                this.LastQueryTotalCount = await query.CountAsync();
-                query = query.ApplyOrderModel(model);
-                return await query.ToArrayAsync();
+
+            LastQueryTotalCount = await query.CountAsync();
+
+            if (model == null)
+            {
+                model = new OrderModel { SortColumn = "Name", isAscendingOrder = true };
             }
-            return Enumerable.Empty<Project>();
+
+            return await query.ApplyOrderModel(model).ToArrayAsync();
+
+
+            //return _context.Set<Developer>().Include(x => x.ProjectAssignments).FirstOrDefault(x => x.Nickname == devNickname).ProjectAssignments.Select(x => x.Project);
+
+            //if (await Single(devNickname) is Developer dev)
+            //{
+            //    int devId = dev.Id;
+            //    IEnumerable<int> projIds = this._context.Set<ProjectDeveloper>().Where(x => x.DeveloperId == devId).Select(x => x.ProjectId).ToArray();
+
+            //    var query = _context.Set<Project>().Where(x => projIds.Contains(x.Id));
+            //    this.LastQueryTotalCount = await query.CountAsync();
+            //    query = query.ApplyOrderModel(model);
+            //    return await query.ToArrayAsync();
+            //}
+            //return Enumerable.Empty<Project>();
         }
 
         public async Task<IEnumerable<Developer>> GetAssignedDevelopers(string projName, string keywords = null, OrderModel model = null)
@@ -57,7 +75,7 @@ namespace Infrastructure.Services
             if (await GetProject(projName) is Project proj)
             {
                 int projId = proj.Id;
-                IEnumerable<int> devIds = this._context.Set<ProjectDeveloper>().Where(x => x.ProjectId == projId).Select(x => x.DeveloperId).ToArray();
+                IEnumerable<int> devIds = this._context.Set<ProjectAssignment>().Where(x => x.ProjectId == projId).Select(x => x.DeveloperId).ToArray();
                 var query = _context.Set<Developer>().Where(x => devIds.Contains(x.Id));
                 if (!string.IsNullOrEmpty(keywords))
                 {
@@ -75,7 +93,7 @@ namespace Infrastructure.Services
             if (await GetProject(projName) is Project proj)
             {
                 int projId = proj.Id;
-                IEnumerable<int> devIds = this._context.Set<ProjectDeveloper>().Where(x => x.ProjectId == projId).Select(x => x.DeveloperId).ToArray();
+                IEnumerable<int> devIds = this._context.Set<ProjectAssignment>().Where(x => x.ProjectId == projId).Select(x => x.DeveloperId).ToArray();
                 var query = _context.Set<Developer>().Where(x => !devIds.Contains(x.Id));
 
                 if (!string.IsNullOrEmpty(keywords))
@@ -89,10 +107,10 @@ namespace Infrastructure.Services
 
         public async Task<IEnumerable<Project>> GetNotAssignedProjects(string nickname, string keywords = null, OrderModel model = null)
         {
-            if (await GetDeveloper(nickname) is Developer dev)
+            if (await Single(nickname) is Developer dev)
             {
                 int devId = dev.Id;
-                IEnumerable<int> projIds = this._context.Set<ProjectDeveloper>().Where(x => x.DeveloperId == devId).Select(x => x.ProjectId).ToArray();
+                IEnumerable<int> projIds = this._context.Set<ProjectAssignment>().Where(x => x.DeveloperId == devId).Select(x => x.ProjectId).ToArray();
 
                 var query = _context.Set<Project>().Where(x => !projIds.Contains(x.Id));
 
@@ -132,7 +150,7 @@ namespace Infrastructure.Services
         }
 
         //OK
-        public Task<Developer> GetDeveloper(string nickname)
+        public Task<Developer> Single(string nickname)
         {
             return _context.Set<Developer>().SingleOrDefaultAsync(x => x.Nickname == nickname);
         }
@@ -182,25 +200,15 @@ namespace Infrastructure.Services
 
 
 
-        ////public int CountDevelopers(string keywords = null)
-        ////{
-        ////    var query = _context.Set<Developer>().AsQueryable();
-        ////    if (!string.IsNullOrEmpty(keywords))
-        ////    {
-        ////        query = query.Where(x => x.FullName.Contains(keywords) | x.Nickname.Contains(keywords));
-        ////    }
-        ////    return query.Count();
-        ////}
-
 
         public async Task Assign(Project project, Developer developer)
         {
-            await _context.Set<ProjectDeveloper>().AddAsync(new ProjectDeveloper() { Project = project, Developer = developer });
+            await _context.Set<ProjectAssignment>().AddAsync(new ProjectAssignment() { Project = project, Developer = developer });
         }
         public async Task Unassign(Project project, Developer developer)
         {
-            if (await _context.Set<ProjectDeveloper>().SingleAsync(x => x.DeveloperId == developer.Id && x.ProjectId == project.Id) is ProjectDeveloper bind)
-                _context.Set<ProjectDeveloper>().Remove(bind);
+            if (await _context.Set<ProjectAssignment>().SingleAsync(x => x.DeveloperId == developer.Id && x.ProjectId == project.Id) is ProjectAssignment bind)
+                _context.Set<ProjectAssignment>().Remove(bind);
         }
         public async Task<bool> ProjectExists(Project project)
         {
@@ -237,22 +245,12 @@ namespace Infrastructure.Services
         public Task<bool> IsAssigned(int projectId, int developerId)
         {
             if (projectId <= 0 || developerId <= 0) throw new ArgumentOutOfRangeException();
-            return _context.Set<ProjectDeveloper>().AnyAsync(x => x.ProjectId == projectId && x.DeveloperId == developerId);
+            return _context.Set<ProjectAssignment>().AnyAsync(x => x.ProjectId == projectId && x.DeveloperId == developerId);
         }
         public Task<bool> IsAssigned(string projectName, string developerNickname)
         {
             if (String.IsNullOrEmpty(projectName) || String.IsNullOrEmpty(developerNickname)) throw new ArgumentOutOfRangeException();
-            return _context.Set<ProjectDeveloper>().AnyAsync(x => x.Developer.Nickname == developerNickname && x.Project.Name == projectName);
-        }
-        public async Task<bool[]> IsAssigned(Project project, IEnumerable<Developer> developers)
-        {
-            //int projId = project.Id;
-            //int[] devsId = developers.Select(x => x.Id);
-            //var ids = _context.Set<ProjectDeveloper>().Where(x => x.ProjectId == projId).Select(x => x.DeveloperId).ToArrayAsync();
-            //var result = new bool[developers.Count()];
-
-
-            return null;
+            return _context.Set<ProjectAssignment>().AnyAsync(x => x.Developer.Nickname == developerNickname && x.Project.Name == projectName);
         }
 
         public async Task<bool> IsAssigned(Project project, Developer developer)
@@ -263,8 +261,136 @@ namespace Infrastructure.Services
                 return await IsAssigned(project.Name, developer.Nickname);
             return false;
         }
+
+
+
+
+
+
+        #region IProjectRepotsitory implementations
+        Task<Project> IProjectRepository.Single(string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IProjectRepository.Delete(Project project)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IProjectRepository.Add(Project project) => this.Add(project);
+
+
+        Task<IEnumerable<Project>> IProjectRepository.Get(string keywords, OrderModel order)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<IEnumerable<Project>> IProjectRepository.GetByStatus(ProjectStatus status, string keywords, OrderModel order)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<IEnumerable<Project>> IProjectRepository.GetAssignedTo(string devName, ProjectStatus? status, string keywords, OrderModel order)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<IEnumerable<Project>> IProjectRepository.GetAssignableTo(string devName, ProjectStatus? status, string keywords, OrderModel order)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
+        #region IDeveloperRepository implementation
+        Task<Developer> IDeveloperRepository.Single(string nickname)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IDeveloperRepository.Delete(Developer developer)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task IDeveloperRepository.Add(Developer developer)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<IEnumerable<Developer>> IDeveloperRepository.Get(string keywords, OrderModel order)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<IEnumerable<Developer>> IDeveloperRepository.GetAssignedTo(string projName, string keywords, OrderModel order)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<IEnumerable<Developer>> IDeveloperRepository.GetAssignableTo(string projName, string keywords, OrderModel order)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task Assign(string projName, string devNickname)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task Unassign(string projName, string devNickname)
+        {
+            throw new NotImplementedException();
+        }
+
+
+
+        #endregion
+
+        #endregion
+
+
+        #region IUnitOfWork implementation
         public Task<int> SaveChanges() => _context.SaveChangesAsync();
 
+        Task<bool> IProjectRepository.Exist(string projName)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<bool> IProjectRepository.Exist(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<bool> IDeveloperRepository.Exist(string devNickname)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<bool> IDeveloperRepository.Exist(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> SaveChangesAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        int IUnitOfWork.SaveChanges()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Update(Project project)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task Update(Developer developer)
+        {
+            throw new NotImplementedException();
+        }
         #endregion
 
     }

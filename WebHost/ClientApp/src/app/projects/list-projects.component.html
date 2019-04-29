@@ -19,8 +19,8 @@
     <tbody *ngIf="hasItems">
       <tr *ngFor="let element of projects">
         <td class="align-middle" [routerLink]='["/project",element.url]'>{{element.name}}</td>
-        <td class="align-middle" [routerLink]='["/project",element.url]'>{{element.startDate | date}}</td>
-        <td class="align-middle" [routerLink]='["/project",element.url]'>{{element.endDate | date}}</td>
+        <td class="align-middle" [routerLink]='["/project",element.url]'>{{element.startDate | date:"dd/MM/yy"}}</td>
+        <td class="align-middle" [routerLink]='["/project",element.url]'>{{element.endDate | date:"dd/MM/yy"}}</td>
         <td class="align-middle" [routerLink]='["/project",element.url]'>
           <app-project-status [status]="element.status">
           </app-project-status>

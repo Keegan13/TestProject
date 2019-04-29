@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, EventEmitter } from '@angular/core';
 import { Developer } from '../models/Developer';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DeveloperRepoService } from '../developer-repo.service';
+import { DeveloperRepoService } from '../services/developer-repo.service';
 import { ModalModule, BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { CreateDeveloperComponent } from './create-developer.component';
 

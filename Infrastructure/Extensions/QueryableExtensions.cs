@@ -39,6 +39,7 @@ namespace System.Linq
 
         public static IQueryable<TEntity> Search<TEntity>(this IQueryable<TEntity> source, string keywords)
         {
+            if (string.IsNullOrEmpty(keywords)) return source;
 
             List<PropertyInfo> properties = new List<PropertyInfo>();
             foreach (var prop in typeof(TEntity).GetProperties())

@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { CollectionResult } from '../collection-result';
+import { CollectionResult } from '../models/collection-result';
 import { Project } from '../models/Project';
-import { ProjectRepoService } from '../project-repo.service';
+import { ProjectRepoService } from '../services/project-repo.service';
 import { ActivatedRoute } from '@angular/router';
 import { FilterModel } from '../models/FilterModel';
 

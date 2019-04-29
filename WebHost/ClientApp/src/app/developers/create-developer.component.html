@@ -1,49 +1,75 @@
-<div>
-  <form [formGroup]="createForm" class="form-horizontal" (ngSubmit)="onSubmit()">
-    <h3 *ngIf="isEdit"> Edit {{developer.fullName}}</h3>
-    <h3 *ngIf="!isEdit">Create new developer</h3>
+<form [formGroup]="createForm" class="form-horizontal" (ngSubmit)="onSubmit()">
+  <h3 *ngIf="isEdit"> Edit {{developer.fullName}}</h3>
+  <h3 *ngIf="!isEdit">Create new developer</h3>
 
-    <span class="has-error" *ngIf="createForm.errors?.serverError">
-      {{createForm.errors.serverError}}
-    </span>
+  <div class="invalid-feedback" *ngIf="createForm.errors?.serverError">
+    {{createForm.errors.serverError}}
+  </div>
 
-    <div class="form-group row" [ngClass]="{'has-error':fullName.invalid &&(fullName.touched||fullName.dirty)}">
-      <label for="fullName" class="col-form-label col-sm-2">Full name</label>
-      <div class="col-sm-10">
-        <input id="fullName" placeholder="Developer Full Name here" formControlName="fullName" type="text"
-          class="form-control">
-        <span *ngIf="fullName.invalid &&(fullName.touched||fullName.dirty)">
-          <span *ngIf="fullName.errors.required">Full name is required</span>
-          <span *ngIf="fullName.errors?.serverError">
-            {{fullName.errors.serverError}}
-          </span>
+  <div class="form-group row">
+    <label for="fullName" class="col-form-label col-sm-2">Full name</label>
+    <div class="col-sm-10">
+      <input id="fullName" placeholder="John Doe" formControlName="fullName" type="text" class="form-control"
+        [ngClass]="{'is-invalid':fullName.invalid &&(fullName.touched||fullName.dirty)}"
+        [attr.maxLength]="constrains.fullName.maxLength">
+      <div class="invalid-feedback" *ngIf="fullName.invalid &&(fullName.touched||fullName.dirty)">
+        <span *ngFor="let error of validation_messages.fullName">
+          <span *ngIf="fullName.hasError(error.type)">{{error.message}}</span>
+        </span>
+        <span *ngIf="fullName.errors?.serverValidationError">
+          {{fullName.errors.serverValidationError}}
         </span>
       </div>
     </div>
+  </div>
 
 
-    <div class="form-group row" [ngClass]="{'has-error': nickname.errors&&(nickname.touched||nickname.dirty)}">
-      <label for="nickname" class="col-form-label col-sm-2">Nickname</label>
-      <div class="col-sm-10">
-        <input id="nickname" placeholder="Developer unique nickname" type="text" formControlName="nickname"
-          class="form-control">
-        <span *ngIf="nickname.invalid&&(nickname.touched||nickname.dirty)">
-          <span *ngIf="nickname.errors.required">
-            Nickname is required
-          </span>
-          <span *ngIf="nickname.errors?.serverError">
-            {{nickname.errors.serverError}}
-          </span>
+  <div class="form-group row">
+    <label for="nickname" class="col-form-label col-sm-2">Nickname</label>
+    <div class="col-sm-10">
+      <input id="nickname" placeholder="Developer unique nickname" type="text" formControlName="nickname"
+        class="form-control" [ngClass]="{'is-invalid': nickname.errors&&(nickname.touched||nickname.dirty)}"
+        [attr.maxLength]="constrains.nickname.maxLength">
+
+      <div class="invalid-feedback" *ngIf="nickname.invalid &&(nickname.touched||nickname.dirty)">
+        <span *ngFor="let error of validation_messages.nickname">
+          <span *ngIf="nickname.hasError(error.type)">{{error.message}}</span>
+        </span>
+        <span *ngIf="nickname.errors?.serverValidationError">
+          {{nickname.errors.serverValidationError}}
         </span>
       </div>
     </div>
-<!-- 
-    <div class="form-group row">
-      <label for="skills" class="col-form-label col-sm-2">Skills</label>
-      <div class="col-sm-10">
-        <input id="skills" type="text" formControlName="skills" class="form-control">
+  </div>
+
+  <div class="row">
+    <div class="col-sm-2">
+      <span class="col-form-label">Tags</span>
+    </div>
+    <div class=" col-sm-10">
+      <div class="form-row" formArrayName="tags">
+        <div class="form-group col-sm-6" *ngFor="let tag of tags.controls; let i=index">
+          <div class="d-inline-block">
+            <div><input type="text" class="is-invalid form-control" [formControlName]="i"
+              [attr.maxLength]="constrains.tags.maxLength"
+              [ngClass]="{'is-invalid':tags.controls[i].invalid &&(tags.controls[i].touched||tags.controls[i].dirty)}">
+            </div>
+            <div class="invalid-feedback"
+              *ngIf="tags.controls[i].invalid &&(tags.controls[i].touched||tags.controls[i].dirty)">
+              <span *ngFor="let error of validation_messages.tags">
+                <span *ngIf="tags.controls[i].hasError(error.type)">{{error.message}}</span>
+              </span>
+
+            </div>
+          </div>
+ 
+            <button class="btn btn-remove" (click)="removeTag(i)" type="button" octicon="x" width="24"></button>
+        </div>
       </div>
-    </div> -->
+      <button (click)="addTag()" class="btn btn-primary">Add Tag</button>
+    </div>
+  </div>
+  <div>
     <button class="btn btn-primary" type="submit">Save</button>
-  </form>
-</div>
+  </div>
+</form>

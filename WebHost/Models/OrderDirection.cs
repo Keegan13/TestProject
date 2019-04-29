@@ -1,9 +1,7 @@
-﻿using System;
-
-namespace Host.Models
+﻿namespace Host.Models
 {
     public enum OrderDirection
     {
-        Ascending,Descending
+        Ascending, Descending
     }
 }

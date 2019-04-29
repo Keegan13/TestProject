@@ -10,6 +10,8 @@ using AutoMapper;
 using Host.Extensions;
 using Microsoft.AspNetCore.Http;
 using System.IO;
+using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.EntityFrameworkCore;
 
 namespace Host
 {
@@ -27,10 +29,14 @@ namespace Host
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            services.AddCustomDbContext();
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info { Title = "Host API", Version = "v1" });
+            });
 
-            services.AddProjectManager();
+            services.AddCustomDbContext(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")).EnableSensitiveDataLogging());
 
+            services.AddEFCoreRepositories();
 
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
@@ -64,7 +70,7 @@ namespace Host
                 app.UseHsts();
             }
 
-            
+
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
@@ -72,21 +78,38 @@ namespace Host
 
             app.UseDBSeed();
 
-            app.UseMvc(routes =>
+
+
+
+            //app.UseMvc(routes =>
+            //{
+            //    //routes.MapRoute(
+            //    //    name: "default",
+            //    //    template: "{Controller?}/{Action?}",
+            //    //    defaults: new { controller = "Home", Action = "Index" });
+            //    routes.MapRoute(
+            //        name: "main",
+            //        template: "api/{Controller}/{name}",
+            //        defaults: new { action = "Single" });
+            //    routes.MapRoute(
+            //        name: "manage",
+            //        template: "api/{controller}s/{action}/{name?}"
+            //       );
+            //});
+            app.UseMvcWithDefaultRoute();
+
+            app.Map("/swagger", (x) =>
             {
-                //routes.MapRoute(
-                //    name: "default",
-                //    template: "{Controller?}/{Action?}",
-                //    defaults: new { controller = "Home", Action = "Index" });
-                routes.MapRoute(
-                    name: "main",
-                    template: "api/{Controller}/{name}",
-                    defaults: new { action = "Single" });
-                routes.MapRoute(
-                    name: "manage",
-                    template: "api/{controller}s/{action}/{name?}"
-                   );
+                app.UseSwagger();
+
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                });
+
             });
+
+
 
             app.UseSpa(spa =>
             {

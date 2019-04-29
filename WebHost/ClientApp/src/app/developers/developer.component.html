@@ -10,6 +10,11 @@
             <span>Nickname</span>
             <p>{{developer?.nickname}}</p>
         </div>
+        <ul>
+            <li *ngFor="let item of developer.tags">
+                {{item}}
+            </li>
+        </ul>
     </div>
     <app-list-projects [developer]="developer.url" [pageSize]="5" set="associated"></app-list-projects>
 </div>

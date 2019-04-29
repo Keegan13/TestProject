@@ -1,11 +1,10 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+
 @Component({
   selector: 'app-active-projects',
-  templateUrl: './active-projects.component.html'
+  template: "<h3>Active projects</h3><app-list-projects [pageSize]=\"25\"set=\"active\"></app-list-projects>"
 })
-export class ActiveProjectsComponent implements OnInit {
-  constructor() { }
-  ngOnInit() {
 
-  }
+export class ActiveProjectsComponent {
+  constructor() { }
 }
