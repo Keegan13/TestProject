@@ -10,7 +10,8 @@
     <label for="fullName" class="col-form-label col-sm-2">Full name</label>
     <div class="col-sm-10">
       <input id="fullName" placeholder="John Doe" formControlName="fullName" type="text" class="form-control"
-        [ngClass]="{'is-invalid':fullName.invalid &&(fullName.touched||fullName.dirty)}" [attr.maxLength]="constrains.fullName.maxLength">
+        [ngClass]="{'is-invalid':fullName.invalid &&(fullName.touched||fullName.dirty)}"
+        [attr.maxLength]="constrains.fullName.maxLength">
       <div class="invalid-feedback" *ngIf="fullName.invalid &&(fullName.touched||fullName.dirty)">
         <span *ngFor="let error of validation_messages.fullName">
           <span *ngIf="fullName.hasError(error.type)">{{error.message}}</span>
@@ -27,19 +28,53 @@
     <label for="nickname" class="col-form-label col-sm-2">Nickname</label>
     <div class="col-sm-10">
       <input id="nickname" placeholder="Developer unique nickname" type="text" formControlName="nickname"
-        class="form-control" [ngClass]="{'is-invalid': nickname.errors&&(nickname.touched||nickname.dirty)}" 
-        [attr.maxLength]="constrains.nickname.maxLength"
-        >
+        class="form-control" [ngClass]="{'is-invalid': nickname.errors&&(nickname.touched||nickname.dirty)}"
+        [attr.maxLength]="constrains.nickname.maxLength">
 
-        <div class="invalid-feedback" *ngIf="nickname.invalid &&(nickname.touched||nickname.dirty)">
-            <span *ngFor="let error of validation_messages.nickname">
-              <span *ngIf="nickname.hasError(error.type)">{{error.message}}</span>
-            </span>
-            <span *ngIf="nickname.errors?.serverValidationError">
-              {{nickname.errors.serverValidationError}}
-            </span>
-          </div>
+      <div class="invalid-feedback" *ngIf="nickname.invalid &&(nickname.touched||nickname.dirty)">
+        <span *ngFor="let error of validation_messages.nickname">
+          <span *ngIf="nickname.hasError(error.type)">{{error.message}}</span>
+        </span>
+        <span *ngIf="nickname.errors?.serverValidationError">
+          {{nickname.errors.serverValidationError}}
+        </span>
+      </div>
     </div>
   </div>
-  <button class="btn btn-primary" type="submit">Save</button>
+
+  <div class="row">
+    <div class="col-sm-2">
+      <span class="col-form-label">Skills</span>
+    </div>
+    <div class=" col-sm-10">
+      <div class="form-row" formArrayName="skills">
+        <div class="form-group col-sm-6" *ngFor="let skill of skills.controls; let i=index">
+          <div class="d-inline-block">
+            <div><input type="text" class="is-invalid form-control" [formControlName]="i"
+              [attr.maxLength]="constrains.skills.maxLength"
+              [ngClass]="{'is-invalid':skills.controls[i].invalid &&(skills.controls[i].touched||skills.controls[i].dirty)}">
+            </div>
+            <div class="invalid-feedback"
+              *ngIf="skills.controls[i].invalid &&(skills.controls[i].touched||skills.controls[i].dirty)">
+              <span *ngFor="let error of validation_messages.skills">
+                <span *ngIf="skills.controls[i].hasError(error.type)">{{error.message}}</span>
+              </span>
+
+            </div>
+          </div>
+ 
+            <button class="btn btn-remove" (click)="removeSkill(i)" type="button" octicon="x" width="24"></button>
+        </div>
+      </div>
+      <button (click)="addSkillInput()" class="btn btn-primary">Add skill</button>
+    </div>
+  </div>
+  <div>
+    <button class="btn btn-primary" type="submit">Save</button>
+  </div>
 </form>
+
+<div>
+  {{createForm.value | json}}
+
+</div>

@@ -22,12 +22,7 @@ export class ProjectComponent implements OnInit {
   developers: CollectionResult<Developer>;
   keywords: string;
 
-  get start() {
-    return Project.formatDate(this.project.startDate);
-  }
-  get end() { return Project.formatDate(this.project.startDate); }
-
-  constructor(private modalService: BsModalService, private route: ActivatedRoute, private router: Router, private repo: ProjectRepoService, private devs: DeveloperRepoService, private assign: AssignService) {
+    constructor(private modalService: BsModalService, private route: ActivatedRoute, private router: Router, private repo: ProjectRepoService, private devs: DeveloperRepoService, private assign: AssignService) {
   }
 
   get id() {

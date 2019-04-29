@@ -1,11 +1,11 @@
-import { AbstractControl } from '@angular/forms';
+import { AbstractControl, FormArray } from '@angular/forms';
 
 export class Developer {
 
   public url: string;
   public fullName: string;
   public nickname: string;
-  //public skills: string[];
+  public skills: string[];
   public project: string;
   constructor() {
   }
@@ -17,13 +17,9 @@ export class Developer {
     //this.skills = Developer.parseSkills(form.get('skills').value);
     newDev.url = "";
     newDev.project = "";
+    newDev.skills = (form.get('skills') as FormArray).controls.
+      map(x => x.value).
+      filter((val, index, self) => self.indexOf(val) === index);
     return newDev;
   }
-
-  // private static parseSkills(skills: string): string[] {
-  //   var output: string[] = [];
-  //   skills.split(',').forEach(function (x) { var skill = x.trim(); if (x.length > 0) output.push(skill) });
-  //   return output;
-  // }
-
 }

@@ -1,5 +1,5 @@
 import { EventEmitter, Component, OnInit, Input } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
 import { DeveloperRepoService } from '../services/developer-repo.service';
 import { Developer } from './../models/Developer';
 import { Router } from '@angular/router';
@@ -20,6 +20,10 @@ export class CreateDeveloperComponent implements OnInit {
     'nickname': {
       'maxLength': 100,
       'minLength': 4
+    },
+    'skills':
+    {
+      'maxLength': 50
     }
   }
 
@@ -35,7 +39,9 @@ export class CreateDeveloperComponent implements OnInit {
       { type: 'maxlength', message: 'Nickname must be less than ' + (this.constrains.nickname.maxLength + 1) + ' characters' },
       { type: 'minlength', message: 'Nickname must be at least' + this.constrains.nickname.minLength + ' characters long' },
       { type: "pattern", message: "Full name should not contain -" }
-    ]
+    ],
+    'skills': [{ type: 'maxlength', message: "Skill name must be less than " + this.constrains.skills.maxLength + " character" },
+    { type: 'required', message: 'Skill name is required or remove' }]
   };
 
   createForm: FormGroup;
@@ -50,6 +56,8 @@ export class CreateDeveloperComponent implements OnInit {
 
   get fullName() { return this.createForm.get("fullName") }
 
+  get skills() { return this.createForm.get('skills') as FormArray }
+
   constructor(private router: Router, private fb: FormBuilder, private repo: DeveloperRepoService) { }
 
   ngOnInit() {
@@ -58,17 +66,19 @@ export class CreateDeveloperComponent implements OnInit {
 
     if (!this.isEdit) this.isEdit = false;
 
-    this.initForm();
+    this.initForm(this.developer);
   }
 
-  initForm() {
+  initForm(developer: Developer = null) {
 
     let fullNameInit = '';
     let nickNameInit = '';
+    let skillsInit = [];
 
-    if (this.isEdit && this.developer) {
-      fullNameInit = this.developer.fullName;
-      nickNameInit = this.developer.nickname;
+    if (developer) {
+      fullNameInit = developer.fullName;
+      nickNameInit = developer.nickname;
+      skillsInit = developer.skills;
     }
 
     this.createForm = this.fb.group({
@@ -84,43 +94,62 @@ export class CreateDeveloperComponent implements OnInit {
         Validators.pattern('^([^-]+)$'), //any character excep dash
         Validators.maxLength(this.constrains.nickname.maxLength)
       ])],
-      //skills: ['']
+
+      skills: this.fb.array([...skillsInit.map(x => this.fb.control(x,
+        Validators.compose([Validators.maxLength(this.constrains.skills.maxLength), Validators.required]))
+      )])
     });
 
   }
 
   onSubmit() {
+
+    if (this.createForm.untouched)
+      this.markFormGroupTouched(this.createForm);
+
     if (this.createForm.valid) {
-      
+
       let developer = Developer.fromForm(this.createForm);
+
+      console.log("Sending developer: "+JSON.stringify(developer));
 
       if (this.isEdit) {
 
         developer.url = this.developer.url;
+
         this.repo.update(developer).subscribe(this.onSubmitResult.bind(this
         ), this.onSubmitError.bind(this
         ));
       }
       else {
+
         this.repo.create(developer).subscribe(this.onSubmitResult.bind(this
         ), this.onSubmitError.bind(this
         ));
-
       }
     }
-    this.markFormGroupTouched(this.createForm);
   }
 
-  onSubmitResult(developer: Developer) {
-    this.developer = developer;
-    if (this.developer) {
-      this.fullName.setValue(this.developer.fullName);
-      this.nickname.setValue(this.developer.nickname);
+  addSkillInput(skill?: string) {
+    if (this.skills.valid) {
+      this.skills.push(this.fb.control(skill ? skill : '',
+        Validators.compose([Validators.maxLength(this.constrains.skills.maxLength), Validators.required])));
     }
-    if (this.update.observers.length > 0)
-      this.update.emit(this.developer);
-    else
-      this.router.navigate(['developer', this.developer.url]);
+  }
+  removeSkill(index: number) {
+    this.skills.removeAt(index);
+  }
+  onSubmitResult(developer: Developer) {
+    if (developer) {
+      this.initForm(developer);
+      if (this.update.observers.length > 0)
+        this.update.emit(this.developer);
+      else
+        this.router.navigate(['developer', this.developer.url]);
+    }
+    else {
+      console.log("TODO create-developer-component.ts");
+    }
   }
 
   onSubmitError(error: HttpErrorResponse): void {
