@@ -11,7 +11,7 @@ namespace Host.Extensions
         {
             var instance = Mapper.Map<Developer>(model);
 
-            instance.DeveloperTags = model.Skills.
+            instance.DeveloperTags = model.Tags.
                 Select(x => new DeveloperTag
                 {
                     Developer = instance,
@@ -26,7 +26,7 @@ namespace Host.Extensions
             var model = Mapper.Map<EditDeveloperViewModel>(developer);
             model.Url = url;
             model.Project = projectUrl;
-            model.Skills = developer.DeveloperTags.Select(x => x.Tag.Name).ToArray();
+            model.Tags = developer.DeveloperTags.Select(x => x.Tag.Name).ToArray();
             return model;
         }
 

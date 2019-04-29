@@ -21,7 +21,7 @@ export class CreateDeveloperComponent implements OnInit {
       'maxLength': 100,
       'minLength': 4
     },
-    'skills':
+    'tags':
     {
       'maxLength': 50
     }
@@ -40,8 +40,8 @@ export class CreateDeveloperComponent implements OnInit {
       { type: 'minlength', message: 'Nickname must be at least' + this.constrains.nickname.minLength + ' characters long' },
       { type: "pattern", message: "Full name should not contain -" }
     ],
-    'skills': [{ type: 'maxlength', message: "Skill name must be less than " + this.constrains.skills.maxLength + " character" },
-    { type: 'required', message: 'Skill name is required or remove' }]
+    'tags': [{ type: 'maxlength', message: "Tag name must be less than " + this.constrains.tags.maxLength + " character" },
+    { type: 'required', message: 'Tag name is required or remove' }]
   };
 
   createForm: FormGroup;
@@ -56,7 +56,7 @@ export class CreateDeveloperComponent implements OnInit {
 
   get fullName() { return this.createForm.get("fullName") as FormControl; }
 
-  get skills() { return this.createForm.get('skills') as FormArray; }
+  get tags() { return this.createForm.get('tags') as FormArray; }
 
   constructor(private router: Router, private fb: FormBuilder, private repo: DeveloperRepoService) { }
 
@@ -73,12 +73,12 @@ export class CreateDeveloperComponent implements OnInit {
 
     let fullNameInit = '';
     let nickNameInit = '';
-    let skillsInit = [];
+    let tagsInit = [];
 
     if (developer) {
       fullNameInit = developer.fullName;
       nickNameInit = developer.nickname;
-      skillsInit = developer.skills;
+      tagsInit = developer.tags;
     }
 
     this.createForm = this.fb.group({
@@ -95,8 +95,8 @@ export class CreateDeveloperComponent implements OnInit {
         Validators.maxLength(this.constrains.nickname.maxLength)
       ])],
 
-      skills: this.fb.array([...skillsInit.map(x => this.fb.control(x,
-        Validators.compose([Validators.maxLength(this.constrains.skills.maxLength), Validators.required]))
+      tags: this.fb.array([...tagsInit.map(x => this.fb.control(x,
+        Validators.compose([Validators.maxLength(this.constrains.tags.maxLength), Validators.required]))
       )])
     });
 
@@ -130,15 +130,16 @@ export class CreateDeveloperComponent implements OnInit {
     }
   }
 
-  addSkillInput(skill?: string) {
-    if (this.skills.valid) {
-      this.skills.push(this.fb.control(skill ? skill : '',
-        Validators.compose([Validators.maxLength(this.constrains.skills.maxLength), Validators.required])));
+  addTag(tag?: string) {
+    if (this.tags.valid) {
+      this.tags.push(this.fb.control(tag ? tag : '',
+        Validators.compose([Validators.maxLength(this.constrains.tags.maxLength), Validators.required])));
     }
   }
-  removeSkill(index: number) {
-    this.skills.removeAt(index);
+  removeTag(index: number) {
+    this.tags.removeAt(index);
   }
+
   onSubmitResult(developer: Developer) {
     if (developer) {
       this.initForm(developer);

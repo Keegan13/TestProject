@@ -9,7 +9,7 @@ namespace Host.Models
         [Required]
         public string Nickname { get; set; }
 
-        public string[] Skills { get; set; }
+        public string[] Tags { get; set; }
 
         #region For Client side interactions
 

@@ -89,7 +89,7 @@ namespace Host.Controllers
                 }
                 //updates fields of orginal enitty
 
-                model.Skills = model.Skills.Distinct().ToArray();
+                model.Tags = model.Tags.Distinct().ToArray();
 
                 original.FullName = model.FullName;
 
@@ -98,13 +98,13 @@ namespace Host.Controllers
                 //remove 
                 foreach (var devTag in original.DeveloperTags.ToArray())
                 {
-                    if (!model.Skills.Contains(devTag.Tag.Name))
+                    if (!model.Tags.Contains(devTag.Tag.Name))
                     {
                         original.DeveloperTags.Remove(devTag);
                     }
                 }
                 //add new tags
-                foreach (var tagName in model.Skills)
+                foreach (var tagName in model.Tags)
                 {
                     if (original.DeveloperTags.All(x => x.Tag.Name != tagName))
                     {

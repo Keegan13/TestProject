@@ -1,8 +1,9 @@
+import { FormGroup } from '@angular/forms';
 
 
 
 
 export class DateIntervalValidator
 {
-    static validDateInterval=()=>{};
+    static validDateInterval=(form:FormGroup)=>{};
 }

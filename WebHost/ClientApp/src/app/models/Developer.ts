@@ -5,7 +5,7 @@ export class Developer {
   public url: string;
   public fullName: string;
   public nickname: string;
-  public skills: string[];
+  public tags: string[];
   public project: string;
   constructor() {
   }
@@ -14,10 +14,9 @@ export class Developer {
     let newDev = new Developer();
     newDev.fullName = form.get('fullName').value;
     newDev.nickname = form.get('nickname').value;
-    //this.skills = Developer.parseSkills(form.get('skills').value);
     newDev.url = "";
     newDev.project = "";
-    newDev.skills = (form.get('skills') as FormArray).controls.
+    newDev.tags = (form.get('tags') as FormArray).controls.
       map(x => x.value).
       filter((val, index, self) => self.indexOf(val) === index);
     return newDev;
