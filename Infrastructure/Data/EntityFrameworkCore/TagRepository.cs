@@ -20,34 +20,30 @@ namespace Infrastructure.Data.EntityFrameworkCore
             this._context = context;
         }
 
-        public void AddOrLoad(Tag tag)
+        public void Add(Tag tag)
         {
-
-            //  
-            //
-            //
-            //
-            //
+            _context.Add(tag);
         }
 
-        public Task AddOrLoadRange(IEnumerable<Tag> tags)
+        public void AddRange(IEnumerable<Tag> tags)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task AddRange(IEnumerable<Tag> tags)
-        {
-            return this.Tags.AddRangeAsync(tags);
+            this.Tags.AddRange(tags);
         }
 
         public void Delete(Tag tag)
         {
-            throw new NotImplementedException();
+            var entry = _context.Entry(tag);
+            entry.State = EntityState.Deleted;
         }
 
         public async Task<IEnumerable<Tag>> Get(IEnumerable<string> tagNames)
         {
             return await Tags.Where(x => tagNames.Contains(x.Name)).ToArrayAsync();
+        }
+
+        public Task<Tag> Get(string name)
+        {
+            return Tags.SingleOrDefaultAsync(x => x.Name == name);
         }
 
         public int SaveChanges()

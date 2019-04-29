@@ -83,16 +83,19 @@ namespace Host.Controllers
         {
             if (await Repo.Single(Decode(name)) is Developer original)
             {
-                if (!ModelState.IsValid || !await ValidateModel(model, original))
+                if (!await ValidateModel(model, original))
                 {
                     return BadRequest(ModelState.GetValidationProblemDetails());
                 }
                 //updates fields of orginal enitty
 
+                model.Skills = model.Skills.Distinct().ToArray();
+
                 original.FullName = model.FullName;
+
                 original.Nickname = model.Nickname;
 
-                //remove removed
+                //remove 
                 foreach (var devTag in original.DeveloperTags.ToArray())
                 {
                     if (!model.Skills.Contains(devTag.Tag.Name))
@@ -100,22 +103,25 @@ namespace Host.Controllers
                         original.DeveloperTags.Remove(devTag);
                     }
                 }
-
                 //add new tags
                 foreach (var tagName in model.Skills)
                 {
                     if (original.DeveloperTags.All(x => x.Tag.Name != tagName))
                     {
-                        original.DeveloperTags.Add(new DeveloperTag { Developer = original, Tag = new Tag { Name = tagName } });
+                        original.DeveloperTags.Add(
+                            new DeveloperTag
+                            {
+                                Developer = original,
+                                Tag = new Tag { Name = tagName }
+                            });
                     }
                 }
 
-
-                //sets EntityState to Modifed
                 await Repo.Update(original);
                 // ...
                 await Repo.SaveChangesAsync();
                 // returns updated entity
+
                 return Ok(original.GetVM(Encode(original.Nickname)));
             }
 
@@ -203,11 +209,13 @@ namespace Host.Controllers
                 ModelState.AddModelError(nameof(filter.Context), "Project name not provided in \"Context\" field of request object");
             }
 
+
             // not sure where it goes
             //else if (!await _mng.ProjectExists(Decode(filter.Context)))  
             //{
             //    ModelState.AddModelError(nameof(filter.Context), string.Format("Project with name {0} was not found", Decode(filter.Context)));
             //}
+
             return Task.FromResult<bool>(ModelState.IsValid);
         }
     }

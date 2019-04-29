@@ -8,11 +8,10 @@ namespace Infrastructure.Abstractions
 {
     public interface ITagRepository : IUnitOfWork
     {
+        void Add(Tag tag);
         Task<IEnumerable<Tag>> Get(IEnumerable<string> names);
-
-        void AddOrLoad(Tag tag);
-        Task AddRange(IEnumerable<Tag> tags);
-        Task AddOrLoadRange(IEnumerable<Tag> tags);
+        Task<Tag> Get(string name);
+        void AddRange(IEnumerable<Tag> tags);
         void Delete(Tag tag);
     }
 }

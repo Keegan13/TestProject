@@ -136,32 +136,21 @@ namespace Infrastructure.Data.EntityFrameworkCore
 
         protected virtual async Task UpdateTags(Developer developer)
         {
-            //map tags that exist in Db
+            //ToDo Remove distinct
 
+            //map tags that exist in Db
             var tagsFromDb = await _tags.Get(
                 developer.DeveloperTags.
                 Select(x => x.Tag.Name));
 
-            //tags that not yet in Db
-            List<Tag> newTags = new List<Tag>();
-            //    Where(dt => !dbTags.Select(t => t.Name).Contains(dt.Tag.Name)).
-            //  Select(x => x.Tag).ToList();
-
-            foreach (var dt in developer.DeveloperTags.ToArray())
+            foreach (var dt in developer.DeveloperTags)
             {
                 if (tagsFromDb.FirstOrDefault(x => x.Name == dt.Tag.Name) is Tag dbTag)
                 {
-                    dt.Tag = dbTag;
+                    dt.Tag = dbTag;// replacing all existing tags with tags loaded from Db (which is tracked by DbContext)
                 }
-                else
-                {
-                    newTags.Add(dt.Tag);
-                }
-
-                dt.Developer = developer;
+                dt.Developer = developer; // DeveloperTag should be pointing to developer and Tag
             }
-
-           // await this._tags.AddRange(newTags);
         }
 
         public Task<int> SaveChangesAsync()
