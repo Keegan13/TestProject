@@ -312,12 +312,7 @@ namespace Infrastructure.Services
             throw new NotImplementedException();
         }
 
-        void IDeveloperRepository.Add(Developer developer)
-        {
-            throw new NotImplementedException();
-        }
-
-        void IDeveloperRepository.Update(Developer developer)
+        Task IDeveloperRepository.Add(Developer developer)
         {
             throw new NotImplementedException();
         }
@@ -388,6 +383,11 @@ namespace Infrastructure.Services
         }
 
         public void Update(Project project)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task Update(Developer developer)
         {
             throw new NotImplementedException();
         }

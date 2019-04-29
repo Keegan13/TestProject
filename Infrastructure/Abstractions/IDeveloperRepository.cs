@@ -10,9 +10,9 @@ namespace Infrastructure.Abstractions
 
         void Delete(Developer developer);
 
-        void Add(Developer developer);
+        Task Add(Developer developer);
 
-        void Update(Developer developer);
+        Task Update(Developer developer);
 
         Task<bool> Exist(string devNickname);
 

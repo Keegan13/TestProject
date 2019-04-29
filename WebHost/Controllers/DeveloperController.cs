@@ -70,7 +70,7 @@ namespace Host.Controllers
 
             var developer = model.GetInstance();
 
-            Repo.Add(developer);
+            await Repo.Add(developer);
 
             await Repo.SaveChangesAsync();
 
@@ -92,8 +92,27 @@ namespace Host.Controllers
                 original.FullName = model.FullName;
                 original.Nickname = model.Nickname;
 
+                //remove removed
+                foreach (var devTag in original.DeveloperTags.ToArray())
+                {
+                    if (!model.Skills.Contains(devTag.Tag.Name))
+                    {
+                        original.DeveloperTags.Remove(devTag);
+                    }
+                }
+
+                //add new tags
+                foreach (var tagName in model.Skills)
+                {
+                    if (original.DeveloperTags.All(x => x.Tag.Name != tagName))
+                    {
+                        original.DeveloperTags.Add(new DeveloperTag { Developer = original, Tag = new Tag { Name = tagName } });
+                    }
+                }
+
+
                 //sets EntityState to Modifed
-                Repo.Update(original);
+                await Repo.Update(original);
                 // ...
                 await Repo.SaveChangesAsync();
                 // returns updated entity

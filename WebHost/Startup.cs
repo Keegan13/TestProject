@@ -11,6 +11,7 @@ using Host.Extensions;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.EntityFrameworkCore;
 
 namespace Host
 {
@@ -33,7 +34,7 @@ namespace Host
                 c.SwaggerDoc("v1", new Info { Title = "Host API", Version = "v1" });
             });
 
-            services.AddCustomDbContext();
+            services.AddCustomDbContext(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")).EnableSensitiveDataLogging());
 
             services.AddEFCoreRepositories();
 
@@ -73,7 +74,7 @@ namespace Host
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-           app.UseSpaStaticFiles();
+            app.UseSpaStaticFiles();
 
             app.UseDBSeed();
 

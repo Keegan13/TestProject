@@ -11,12 +11,9 @@ namespace Infrastructure.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static void AddCustomDbContext(this IServiceCollection services)
+        public static void AddCustomDbContext(this IServiceCollection services, Action<DbContextOptionsBuilder> options)
         {
-            var provider = services.BuildServiceProvider();
-            var config = provider.GetRequiredService<IConfiguration>();
-
-            services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(config.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<ApplicationContext>(options);
         }
 
         [Obsolete]
@@ -30,6 +27,7 @@ namespace Infrastructure.Extensions
             services.AddScoped<IDeveloperRepository, DeveloperRepository>();
             services.AddScoped<IProjectRepository, ProjectRepository>();
             services.AddScoped<IProjectAssignments, ProjectAssignments>();
+            services.AddScoped<ITagRepository, TagRepository>();
         }
     }
 }

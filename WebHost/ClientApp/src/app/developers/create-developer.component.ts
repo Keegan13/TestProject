@@ -142,6 +142,7 @@ export class CreateDeveloperComponent implements OnInit {
   onSubmitResult(developer: Developer) {
     if (developer) {
       this.initForm(developer);
+      this.developer=developer;
       if (this.update.observers.length > 0)
         this.update.emit(this.developer);
       else

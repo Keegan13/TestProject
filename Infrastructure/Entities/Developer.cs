@@ -17,7 +17,7 @@
 
         public ICollection<ProjectAssignment> ProjectAssignments { get; set; }
 
-        public ICollection<DeveloperTag> DeveloperTags { get; set; }
+        public virtual ICollection<DeveloperTag> DeveloperTags { get; set; }
 
     }
 }
