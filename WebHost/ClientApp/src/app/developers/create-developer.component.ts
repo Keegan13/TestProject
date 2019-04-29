@@ -1,5 +1,5 @@
 import { EventEmitter, Component, OnInit, Input } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, FormArray, FormControl } from '@angular/forms';
 import { DeveloperRepoService } from '../services/developer-repo.service';
 import { Developer } from './../models/Developer';
 import { Router } from '@angular/router';
@@ -52,11 +52,11 @@ export class CreateDeveloperComponent implements OnInit {
 
   @Input() update: EventEmitter<Developer> = new EventEmitter<Developer>();
 
-  get nickname() { return this.createForm.get("nickname") }
+  get nickname() { return this.createForm.get("nickname") as FormControl; }
 
-  get fullName() { return this.createForm.get("fullName") }
+  get fullName() { return this.createForm.get("fullName") as FormControl; }
 
-  get skills() { return this.createForm.get('skills') as FormArray }
+  get skills() { return this.createForm.get('skills') as FormArray; }
 
   constructor(private router: Router, private fb: FormBuilder, private repo: DeveloperRepoService) { }
 
@@ -111,7 +111,7 @@ export class CreateDeveloperComponent implements OnInit {
 
       let developer = Developer.fromForm(this.createForm);
 
-      console.log("Sending developer: "+JSON.stringify(developer));
+      console.log("Sending developer: " + JSON.stringify(developer));
 
       if (this.isEdit) {
 

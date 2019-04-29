@@ -16,5 +16,8 @@
         public string Nickname { get; set; }
 
         public ICollection<ProjectAssignment> ProjectAssignments { get; set; }
+
+        public ICollection<DeveloperTag> DeveloperTags { get; set; }
+
     }
 }

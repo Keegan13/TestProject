@@ -27,7 +27,7 @@ namespace Host.Data
             {
                 PopulateDevelopers(25);
             }
-            if (this._context.BindEntity.Count() == 0)
+            if (this._context.Assignments.Count() == 0)
             {
                 RandomlyAssign();
             }
@@ -127,7 +127,7 @@ namespace Host.Data
                     }
                 }
             }
-            _context.BindEntity.AddRange(assigns);
+            _context.Assignments.AddRange(assigns);
             _context.SaveChanges();
             Console.WriteLine("Crated {0} connections betwen projects and developers");
         }

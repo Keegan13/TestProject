@@ -13,7 +13,9 @@ namespace Host.Models
         public string FullName { get; set; }
         [Required]
         public string Nickname { get; set; }
-        public IEnumerable<string> Skills { get; set; }
+
+        public string[] Skills { get; set; }
+
         public string Project { get; set; }
     }
 }

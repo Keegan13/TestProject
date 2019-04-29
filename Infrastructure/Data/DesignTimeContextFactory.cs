@@ -8,7 +8,7 @@
     {
         public ApplicationContext CreateDbContext(string[] args)
         {
-            return new ApplicationContext((new DbContextOptionsBuilder()).UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=TestProjectDB;Trusted_Connection=True;").Options);
+            return new ApplicationContext((new DbContextOptionsBuilder()).UseSqlServer(@"Server=.;Database=TestProjectDB;Trusted_Connection=True;").Options);
         }
     }
 }
