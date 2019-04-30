@@ -46,21 +46,6 @@ namespace Host.Extensions
             return result;
         }
 
-        [Obsolete]
-        public static OrderModel GetOrderModel(this FilterModel filter)
-        {
-            if (filter == null)
-                return null;
-
-            return new OrderModel
-            {
-                SortColumn = filter.Sort,
-                isAscendingOrder = filter.Order.HasValue ? filter.Order.Value == OrderDirection.Ascending : true,
-                Skip = filter.Skip ?? 0,
-                Take = filter.Take ?? 0
-            };
-        }
-
         public static OrderModel GetOrderModel(this ProjectFilterModel filter)
         {
             return new OrderModel
