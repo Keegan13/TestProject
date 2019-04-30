@@ -38,13 +38,13 @@
 
       <div class="col-sm-6">
         <h2 class="text-center info">Assigned</h2>
-        <app-list-developers [projectContextUrl]="project.url" [pageSize]="5" set="associated" [noPanel]="false" [isModal]="false">
+        <app-list-developers [projectContextUrl]="projectUrl" [pageSize]="5" set="associated" [noPanel]="false">
         </app-list-developers>
       </div>
       <div class="col-sm-6">
         <h2 class="text-center info">Not assigned</h2>
-        <app-list-developers [projectContextUrl]="project.url" [pageSize]="5" set="nonassociated"
-          [isModal]="false">
+        <app-list-developers [projectContextUrl]="projectUrl" [pageSize]="5" set="nonassociated"
+          >
         </app-list-developers>
       </div>
     </div>

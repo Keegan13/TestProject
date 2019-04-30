@@ -25,12 +25,12 @@ export class ProjectComponent implements OnInit {
     constructor(private modalService: BsModalService, private route: ActivatedRoute, private router: Router, private repo: ProjectRepoService, private devs: DeveloperRepoService, private assign: AssignService) {
   }
 
-  get id() {
+  get projectUrl() {
     return this.route.snapshot.params['id'];
   }
   ngOnInit() {
 
-    this.repo.single(this.id).subscribe((x => { this.project = x; }
+    this.repo.single(this.projectUrl).subscribe((x => { this.project = x; }
     ).bind(this), this.onGetError.bind(this), this.onSuccess.bind(this));
     this.loadProject();
     this.developers = new CollectionResult<Developer>();

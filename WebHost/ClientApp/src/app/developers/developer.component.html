@@ -11,10 +11,10 @@
             <p>{{developer?.nickname}}</p>
         </div>
         <ul>
-            <li *ngFor="let item of developer.tags">
+            <li *ngFor="let item of developer?.tags">
                 {{item}}
             </li>
         </ul>
     </div>
-    <app-list-projects [developerContextUrl]="developer.url" [pageSize]="5" set="associated"></app-list-projects>
+    <app-list-projects [developerContextUrl]="developerUrl" [pageSize]="5" set="associated"></app-list-projects>
 </div>

@@ -1,40 +1,30 @@
-  <div class="list-group" *ngIf="isModal">
-    <div *ngFor="let element of developers">
-      <a class="list-group-item list-group-item-action" [routerLink]='["/developer",element.url]'>{{element.nickname}}
-      </a>
-    </div>
-  </div>
-  <div *ngIf="!isModal">
-    <app-list-controls *ngIf="!noPanel" [collectionSize]="collectionSize" [page]="page" [pageSize]="pageSize"
-      (pageChange)="onPageChange($event)" [filter]="filter"></app-list-controls>
-    <table class="table table-sm table-hover">
-      <thead>
-        <tr>
-          <th style="width:60%">Full name</th>
-          <th style="width:30%">Nickname</th>
-          <th style="width:10%"></th>
-        </tr>
-      </thead>
-      <tbody *ngIf="hasItems">
-        <tr *ngFor="let element of developers">
-          <td class="align-middle" [routerLink]='["/developer",element.url]'>{{element.fullName}}</td>
-          <td class="align-middle" [routerLink]='["/developer",element.url]'>{{element.nickname}}</td>
-          <!-- <td   >{{element.skills|json}}</td> -->
-          <td>
-            <app-assign-button class="col-sm-12" [developerUrl]="element.url" [projectUrl]="projectContextUrl"
-              [isAssigned]="element.projectContextUrl==projectContextUrl">
-            </app-assign-button>
-          </td>
-        </tr>
-      </tbody>
-      <tbody *ngIf="!hasItems">
-          <tr>
-            <td colspan="3">
-                No developers
-            </td>
-          </tr>
-
-      </tbody>
-    </table>
-
-  </div>
+<app-list-controls *ngIf="!noPanel" [collectionSize]="collectionSize" [page]="page" [pageSize]="pageSize"
+  (pageChange)="onPageChange($event)" [filter]="filter"></app-list-controls>
+<table class="table table-sm table-hover">
+  <thead>
+    <tr>
+      <th style="width:50%">Full name</th>
+      <th style="width:40%">Nickname</th>
+      <th style="width:10%"></th>
+    </tr>
+  </thead>
+  <tbody *ngIf="hasItems">
+    <tr *ngFor="let element of developers">
+      <td class="align-middle" [routerLink]='["/developer",element.url]'>{{element.fullName}}</td>
+      <td class="align-middle" [routerLink]='["/developer",element.url]'>{{element.nickname}}</td>
+      <!-- <td   >{{element.skills|json}}</td> -->
+      <td>
+        <app-assign-button class="col-sm-12" [developerUrl]="element.url" [projectUrl]="projectContextUrl"
+          [isAssigned]="element.projectContextUrl==projectContextUrl">
+        </app-assign-button>
+      </td>
+    </tr>
+  </tbody>
+  <tbody *ngIf="!hasItems">
+    <tr>
+      <td colspan="3">
+        No developers
+      </td>
+    </tr>
+  </tbody>
+</table>

@@ -17,23 +17,20 @@ export class ListDevelopersComponent implements OnInit {
 
   constructor(
     private repo: DeveloperRepoService,
-    private router: ActivatedRoute,
     private assign: AssignService) {
     assign.anotherField.subscribe(this.onAssignChanged.bind(this));
   }
 
   ngOnInit() {
     //init filter
-    if (!this.filter) {
-      this.filter = new FilterModel();
-      this.filter.sort = "fullName";//sort should handle
-      this.filter.order = "ascending"; // sort
-      this.filter.set = this.set; // parent
-      this.filter.take = this.pageSize; // list-panel
-      this.filter.skip = 0; //list-panel
-      this.filter.keywords = ""; //list-panel
-    }
+    this.filter.sort = "fullName";//sort should handle
+    this.filter.order = "ascending"; // sort
+    this.filter.set = this.set; // parent
+    this.filter.take = this.pageSize; // list-panel
+    this.filter.skip = 0; //list-panel
+    this.filter.keywords = ""; //list-panel
     if (this.hasContext) this.filter.context = this.projectContextUrl;
+    
     this.loadData();
   }
   //required 
@@ -41,19 +38,29 @@ export class ListDevelopersComponent implements OnInit {
 
   //optional
 
-  @Input() filter: FilterModel;
+  _projectContextUrl = "";
+
+  @Input() set projectContextUrl(val: string) {
+    this._projectContextUrl = val;
+    this.filter.context = val;
+    this.loadData();
+  }
+
+  get projectContextUrl(): string {
+    return this._projectContextUrl;
+  }
 
   @Input() pageSize: number = 25;
 
-  @Input() isModal: boolean = false;
 
-  @Input() projectContextUrl: string = null;
 
   @Input() set: string = "all";
 
   @Input() noPanel: boolean = false;
 
   //internal
+  filter: FilterModel = new FilterModel();
+
   private _pageDelta: number = 0;
 
   private developers: Developer[];
@@ -79,7 +86,6 @@ export class ListDevelopersComponent implements OnInit {
   }
 
   //event Handlers
-
   onPageChange($page: number) {
     //current page is updated only if request was successful
     if ($page > this.page) {
@@ -91,14 +97,14 @@ export class ListDevelopersComponent implements OnInit {
     this.loadData();
   }
 
-
   onAssignChanged(model: AssignModel) {
+    //temporary
     if (this.hasContext) {
       this.loadData();
     }
   }
 
-  onLoad(result: CollectionResult<Developer>): void {
+  onDataLoaded(result: CollectionResult<Developer>): void {
     if (result.values.length == 0) {
       let lastPage = result.totalCount / this.pageSize;
       this.page = Number.isInteger(lastPage) ? lastPage : Math.ceil(lastPage);//1
@@ -117,6 +123,6 @@ export class ListDevelopersComponent implements OnInit {
   //methods 
 
   loadData() {
-    this.repo.get(this.filter).subscribe(this.onLoad.bind(this));
+    this.repo.get(this.filter).subscribe(this.onDataLoaded.bind(this));
   }
 }
