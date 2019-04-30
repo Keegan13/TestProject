@@ -136,6 +136,7 @@ export class CreateDeveloperComponent implements OnInit {
         Validators.compose([Validators.maxLength(this.constrains.tags.maxLength), Validators.required])));
     }
   }
+  
   removeTag(index: number) {
     this.tags.removeAt(index);
   }

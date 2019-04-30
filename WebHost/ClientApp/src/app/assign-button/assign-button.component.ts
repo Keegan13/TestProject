@@ -25,7 +25,7 @@ export class AssignButtonComponent implements OnInit {
   size: number = 26;
 
   //internal
-  disabled: boolean;
+  disabled: boolean=true;
 
   constructor(
     private assignService: AssignService,
@@ -58,6 +58,7 @@ export class AssignButtonComponent implements OnInit {
 
   ngOnInit() {
     if (this.projectUrl && this.developerUrl) {
+      this.disabled=false;
       this.color=this.isAssigned ? "#007bff" : "grey"
       this.update();
     }
@@ -67,7 +68,9 @@ export class AssignButtonComponent implements OnInit {
   }
 
   swap() {
+    console.log("entered swap");
     if (!this.disabled) {
+      console.log("entered assign");
       this.assignService
         .requestAssign(new AssignModel(
           this.projectUrl,

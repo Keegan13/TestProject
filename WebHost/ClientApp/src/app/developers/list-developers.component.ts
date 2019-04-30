@@ -6,56 +6,23 @@ import { FilterModel } from '../models/FilterModel';
 import { CollectionResult } from '../models/collection-result';
 import { AssignModel } from '../models/AssignModel';
 import { AssignService } from '../Services/assign.service';
-import { hasAlignedHourOffset } from 'ngx-bootstrap/chronos/units/offset';
-import { fillProperties } from '@angular/core/src/util/property';
 
 @Component({
   selector: 'app-list-developers',
   templateUrl: './list-developers.component.html',
   styleUrls: ['./list-developers.component.css']
 })
+
 export class ListDevelopersComponent implements OnInit {
-  //do not refresh page until it loads
-  private _pageDelta: number = 0;
 
-  @Input() pageSize: number = 25;
-  @Input() isModal: boolean = false;
-
-  //@Input() data: CollectionResult<Developer>;
-  @Input() projectContextUrl: string = null;//this is context
-  @Input() set: string = "all";
-  @Input() noPanel: boolean = false;
-  @Input() filter: FilterModel;
-  developers: Developer[];
-  page: number = 1;
-  collectionSize: number = 0;
-
-
-  onPageChange($page: number) {
-    if ($page > this.page) {
-      this._pageDelta = 1;
-    }
-    if ($page < this.page) {
-      this._pageDelta = -1;
-    }
-    this.loadData();
-  }
-
-
-  constructor(private repo: DeveloperRepoService, private router: ActivatedRoute, private assign: AssignService) {
+  constructor(
+    private repo: DeveloperRepoService,
+    private router: ActivatedRoute,
+    private assign: AssignService) {
     assign.anotherField.subscribe(this.onAssignChanged.bind(this));
   }
-  get hasContext(): boolean {
-    if (!this.projectContextUrl) return false;
-    return true;
-  }
-  
-  get hasItems(): boolean { return this.developers && this.developers.length > 0 }
+
   ngOnInit() {
-    //default
-    if (!this.pageSize) this.pageSize = 25;
-    if (!this.set) this.set = "all";
-    this.page = 1;
     //init filter
     if (!this.filter) {
       this.filter = new FilterModel();
@@ -69,6 +36,61 @@ export class ListDevelopersComponent implements OnInit {
     if (this.hasContext) this.filter.context = this.projectContextUrl;
     this.loadData();
   }
+  //required 
+
+
+  //optional
+
+  @Input() filter: FilterModel;
+
+  @Input() pageSize: number = 25;
+
+  @Input() isModal: boolean = false;
+
+  @Input() projectContextUrl: string = null;
+
+  @Input() set: string = "all";
+
+  @Input() noPanel: boolean = false;
+
+  //internal
+  private _pageDelta: number = 0;
+
+  private developers: Developer[];
+
+  private page: number = 1;
+
+  private collectionSize: number = 0;
+
+  //properties
+
+  get hasContext(): boolean {
+    if (this.projectContextUrl) {
+
+      return true;
+    }
+
+    return false;
+  }
+
+  get hasItems(): boolean {
+
+    return this.developers && this.developers.length > 0
+  }
+
+  //event Handlers
+
+  onPageChange($page: number) {
+    //current page is updated only if request was successful
+    if ($page > this.page) {
+      this._pageDelta = 1;
+    }
+    if ($page < this.page) {
+      this._pageDelta = -1;
+    }
+    this.loadData();
+  }
+
 
   onAssignChanged(model: AssignModel) {
     if (this.hasContext) {
@@ -76,46 +98,25 @@ export class ListDevelopersComponent implements OnInit {
     }
   }
 
-  public update(): void {
-    this.loadData();
-  }
-
-  private onLoad(result: CollectionResult<Developer>): void {
-    this.developers = result.values;
-    if (result) {
-      //if data received
-      this.collectionSize = result.totalCount;
-
-      // do nothigs
-      if (this.collectionSize == 0) {
-        this._pageDelta = 0;
-        this.page = 1;
-        //this.loadData();
-        return;
-      }
-
-      if (result.values.length == 0) {
-        let lastPage = result.totalCount / this.pageSize;
-
-        this.page = Number.isInteger(lastPage) ? lastPage : Math.ceil(lastPage);
-
+  onLoad(result: CollectionResult<Developer>): void {
+    if (result.values.length == 0) {
+      let lastPage = result.totalCount / this.pageSize;
+      this.page = Number.isInteger(lastPage) ? lastPage : Math.ceil(lastPage);//1
+      if (result.totalCount > 0) {
         this.filter.skip = (this.page - 1) * this.pageSize;
-        this._pageDelta = 0;
         this.loadData();
       }
+    }
 
-      this.page += this._pageDelta;
-      this._pageDelta = 0;
-      this.developers = result.values;
-    }
-    else {
-      //if no data
-      console.log("handle this later TODO");
-    }
+    this.developers = result.values;
+    this.collectionSize = result.totalCount;
+    this.page += this._pageDelta;
     this._pageDelta = 0;
   }
 
-  private loadData() {
+  //methods 
+
+  loadData() {
     this.repo.get(this.filter).subscribe(this.onLoad.bind(this));
   }
 }
