@@ -3,15 +3,15 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Project } from '../models/Project';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { FilterModel } from '../models/FilterModel';
 import { Repository } from './repository';
 import { CollectionResult } from './../models/collection-result';
+import { ProjectFilterModel } from '../models/ProjectFilterModel';
 
 @Injectable({
   providedIn: 'root'
 })
 
-export class ProjectRepoService extends Repository<Project>{
+export class ProjectRepoService {
 
   httpOptions = {
     headers: new HttpHeaders({
@@ -20,9 +20,7 @@ export class ProjectRepoService extends Repository<Project>{
   };
 
 
-  constructor(private http: HttpClient) {
-    super();
-  }
+  constructor(private http: HttpClient) { }
 
   update(project: Project): Observable<Project> {
     return this.http.put<Project>('api/project/' + project.url, project, this.httpOptions).pipe(map(item => {
@@ -53,16 +51,19 @@ export class ProjectRepoService extends Repository<Project>{
     }));
   }
 
-  get(filter: FilterModel): Observable<CollectionResult<Project>> {
+  get(filter: ProjectFilterModel): Observable<CollectionResult<Project>> {
 
-    return this.http.get<CollectionResult<Project>>("api/project?" + this.getQueryStringFromObject(filter)).pipe(map(result => {
-      result.values = result.values.map(item => {
-        item.startDate = new Date(item.startDate);
-        item.endDate = new Date(item.endDate);
-        return Object.assign(new Project(), item);
-      });
-      return result;
-    }));
+    return this.http.get<CollectionResult<Project>>("api/project?" + Repository.getQueryStringFromObject(filter))
+      .pipe(
+        map(result => {
+          result.values = result.values.map(item => {
+            item.startDate = new Date(item.startDate);
+            item.endDate = new Date(item.endDate);
+            return Object.assign(new Project(), item);
+          });
+
+          return result;
+        }));
   }
 }
 

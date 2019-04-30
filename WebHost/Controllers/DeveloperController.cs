@@ -13,7 +13,7 @@ namespace Host.Controllers
 {
     public class DeveloperController : BaseConroller
     {
-        private readonly IDeveloperRepository Repo;
+        private readonly IDeveloperRepository _developerRepo;
 
         protected string[] Sets = new[] { "all", "associated", "nonassociated" };
 
@@ -21,7 +21,7 @@ namespace Host.Controllers
 
         public DeveloperController(IDeveloperRepository devRepo)
         {
-            this.Repo = devRepo;
+            this._developerRepo = devRepo;
         }
 
         #region API
@@ -30,20 +30,21 @@ namespace Host.Controllers
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery] FilterModel filter)
         {
-            if (!await ValidateFilterOrDefault(filter))
+            SetFilterDefaults(filter);
+
+            if (!await ValidateFilter(filter))
             {
-                return BadRequest(ModelState);
+                return BadRequest(ModelState.GetValidationProblemDetails());
             }
 
             var developers = await GetSetOrAll(filter);
 
             string projName = filter.Set.ToLower() == "associated" ? filter.Context : "";
 
-
-            return Ok(new CollectionResult<EditDeveloperViewModel>()
+            return Ok(new PaginationCollection<EditDeveloperViewModel>()
             {
                 Values = developers.Select(x => x.GetVM(Encode(x.Nickname), projName)).ToArray(),
-                TotalCount = Repo.LastQueryTotalCount
+                TotalCount = _developerRepo.LastQueryTotalCount
             });
         }
 
@@ -51,7 +52,7 @@ namespace Host.Controllers
         [HttpGet("{name}")]
         public async Task<IActionResult> Get([FromRoute] string name)
         {
-            if (await Repo.Single(Decode(name)) is Developer developer)
+            if (await _developerRepo.Single(Decode(name)) is Developer developer)
             {
                 return Ok(developer.GetVM(name, null));
             }
@@ -70,41 +71,41 @@ namespace Host.Controllers
 
             var developer = model.GetInstance();
 
-            await Repo.Add(developer);
+            await _developerRepo.Add(developer);
 
-            await Repo.SaveChangesAsync();
+            await _developerRepo.SaveChangesAsync();
 
             return new JsonResult(developer.GetVM(Encode(developer.Nickname)));
         }
 
         //PUT api/developer/frekyyy-doctor
         [HttpPut("{name}")]
-        public async Task<IActionResult> Put([FromRoute] string name, [FromBody] EditDeveloperViewModel model)
+        public async Task<IActionResult> Put([FromRoute] string name, [FromBody] EditDeveloperViewModel updateModel)
         {
-            if (await Repo.Single(Decode(name)) is Developer original)
+            if (await _developerRepo.Single(Decode(name)) is Developer original)
             {
-                if (!await ValidateModel(model, original))
+                if (!await ValidateModel(updateModel, original))
                 {
                     return BadRequest(ModelState.GetValidationProblemDetails());
                 }
                 //updates fields of orginal enitty
 
-                model.Tags = model.Tags.Distinct().ToArray();
+                updateModel.Tags = updateModel.Tags.Distinct().ToArray();
 
-                original.FullName = model.FullName;
+                original.FullName = updateModel.FullName;
 
-                original.Nickname = model.Nickname;
+                original.Nickname = updateModel.Nickname;
 
                 //remove 
                 foreach (var devTag in original.DeveloperTags.ToArray())
                 {
-                    if (!model.Tags.Contains(devTag.Tag.Name))
+                    if (!updateModel.Tags.Contains(devTag.Tag.Name))
                     {
                         original.DeveloperTags.Remove(devTag);
                     }
                 }
                 //add new tags
-                foreach (var tagName in model.Tags)
+                foreach (var tagName in updateModel.Tags)
                 {
                     if (original.DeveloperTags.All(x => x.Tag.Name != tagName))
                     {
@@ -117,9 +118,9 @@ namespace Host.Controllers
                     }
                 }
 
-                await Repo.Update(original);
+                await _developerRepo.Update(original);
                 // ...
-                await Repo.SaveChangesAsync();
+                await _developerRepo.SaveChangesAsync();
                 // returns updated entity
 
                 return Ok(original.GetVM(Encode(original.Nickname)));
@@ -132,11 +133,11 @@ namespace Host.Controllers
         [HttpDelete("name")]
         public async Task<IActionResult> Delete([FromRoute] string name)
         {
-            if (await Repo.Single(Decode(name)) is Developer developer)
+            if (await _developerRepo.Single(Decode(name)) is Developer developer)
             {
-                Repo.Delete(developer);
+                _developerRepo.Delete(developer);
 
-                await Repo.SaveChangesAsync();
+                await _developerRepo.SaveChangesAsync();
 
                 return Ok();
             }
@@ -148,7 +149,7 @@ namespace Host.Controllers
 
         protected virtual async Task<bool> ValidateModel(EditDeveloperViewModel model, Developer original = null)
         {
-            if ((original == null || model.Nickname != original.Nickname) && await Repo.Exist(model.Nickname))
+            if ((original == null || model.Nickname != original.Nickname) && await _developerRepo.Exist(model.Nickname))
             {
                 ModelState.AddModelError(nameof(model.Nickname), String.Format("Developer with nickname {0} already exists", model.Nickname));
             }
@@ -165,7 +166,7 @@ namespace Host.Controllers
         {
             if (filter.Set.ToLower() == "associated")
             {
-                return Repo.GetAssignedTo(
+                return _developerRepo.GetAssignedTo(
                     projName: Decode(filter.Context),
                     keywords: filter.Keywords,
                     order: filter.GetOrderModel());
@@ -173,16 +174,16 @@ namespace Host.Controllers
 
             if (filter.Set.ToLower() == "nonassociated")
             {
-                return Repo.GetAssignableTo(
+                return _developerRepo.GetAssignableTo(
                     projName: Decode(filter.Context),
                     keywords: filter.Keywords,
                     order: filter.GetOrderModel());
             }
 
-            return Repo.Get(filter.Keywords, filter.GetOrderModel());
+            return _developerRepo.Get(filter.Keywords, filter.GetOrderModel());
         }
 
-        protected virtual Task<bool> ValidateFilterOrDefault(FilterModel filter)
+        protected virtual void SetFilterDefaults(FilterModel filter)
         {
             //seting defaults
             if (string.IsNullOrEmpty(filter.Set)) filter.Set = "all";
@@ -190,9 +191,10 @@ namespace Host.Controllers
             if (!filter.Order.HasValue) filter.Order = OrderDirection.Ascending;
 
             if (string.IsNullOrEmpty(filter.Sort)) filter.Sort = "fullname";
+        }
 
-            //adding errors for bad fields
-
+        protected virtual Task<bool> ValidateFilter(FilterModel filter)
+        {
             if (!this.Sets.Contains(filter.Set.ToLower()))
             {
                 ModelState.AddModelError(nameof(filter.Set), String.Format("Unrecognizable set was requested \"{0}\"", filter.Set));

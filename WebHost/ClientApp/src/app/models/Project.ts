@@ -8,6 +8,7 @@ export class Project {
   public startDate: Date;
   public endDate: Date;
   public status: string;
+  public developerContextUrl:string;
 
   constructor() {
 

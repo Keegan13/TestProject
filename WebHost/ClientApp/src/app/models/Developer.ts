@@ -6,7 +6,7 @@ export class Developer {
   public fullName: string;
   public nickname: string;
   public tags: string[];
-  public project: string;
+  public projectContextUrl: string;
   constructor() {
   }
 
@@ -15,7 +15,7 @@ export class Developer {
     newDev.fullName = form.get('fullName').value;
     newDev.nickname = form.get('nickname').value;
     newDev.url = "";
-    newDev.project = "";
+    newDev.projectContextUrl = "";
     newDev.tags = (form.get('tags') as FormArray).controls.
       map(x => x.value).
       filter((val, index, self) => self.indexOf(val) === index);

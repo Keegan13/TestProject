@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 
 namespace Host.Models
 {
-    public class CollectionResult<T>
+    //TODO rename: PageResult, Page  etc
+    public class PaginationCollection<T>
     {
         public T[] Values { get; set; }
         public int TotalCount { get; set; }

@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using System.IO;
 using Swashbuckle.AspNetCore.Swagger;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Host
 {
@@ -54,7 +55,8 @@ namespace Host
             {
                 return async (context) =>
                 {
-
+                    var fact= context.RequestServices.GetService<ILoggerFactory>();
+                    
                     await _next.Invoke(context);
                 };
 
@@ -62,6 +64,8 @@ namespace Host
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                //Uncomment this to turn on seed (Note! works only on emtpy db)
+                //app.UseDBSeed();
             }
             else
             {
@@ -73,14 +77,14 @@ namespace Host
 
 
             app.UseHttpsRedirection();
+
             app.UseStaticFiles();
+
+            
             app.UseSpaStaticFiles();
 
-            app.UseDBSeed();
-
-
-
-
+           
+            //app.UseMiddleware<StackifyMiddleware.RequestTracerMiddleware>();
             //app.UseMvc(routes =>
             //{
             //    //routes.MapRoute(
@@ -96,8 +100,12 @@ namespace Host
             //        template: "api/{controller}s/{action}/{name?}"
             //       );
             //});
+
+
             app.UseMvcWithDefaultRoute();
 
+
+            // fork pipeline with swagger middleware if path startd with swagger
             app.Map("/swagger", (x) =>
             {
                 app.UseSwagger();
@@ -110,7 +118,7 @@ namespace Host
             });
 
 
-
+            // ng serve
             app.UseSpa(spa =>
             {
                 // To learn more about options for serving an Angular SPA from ASP.NET Core,
@@ -123,6 +131,8 @@ namespace Host
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });
+
+            // return compiled SPA  index page
 
             app.Run(async (context) =>
             {

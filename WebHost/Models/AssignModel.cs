@@ -10,8 +10,10 @@ namespace Host.Models
     {
         [Required]
         public bool isAssigned { get; set; }
+
         [Required]
         public string Project { get; set; }
+
         [Required]
         public string Developer { get; set; }
     }

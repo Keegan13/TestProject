@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Host.Extensions;
 using AutoMapper.Configuration;
-using Infrastructure.Services;
 using System.Linq;
 using Infrastructure.Entities;
 using System;
@@ -16,6 +15,8 @@ namespace Host.Controllers
 {
     public class ProjectController : BaseConroller
     {
+        protected const int DefaultTake = 25;
+
         private readonly IProjectRepository Repo;
 
         public ProjectController(IProjectRepository repo)
@@ -101,18 +102,22 @@ namespace Host.Controllers
 
         // GET api/project
         [HttpGet]
-        public async Task<IActionResult> Get([FromQuery] FilterModel filter)
+        public async Task<IActionResult> Get([FromQuery] ProjectFilterModel filter)
         {
-            if (!await ValidateFilterOrDefault(filter))
+            SetFilterDefaults(filter);
+
+            if (!await ValidateFilter(filter))
             {
-                return BadRequest(filter);
+                return BadRequest(ModelState.GetValidationProblemDetails());
             }
 
             var projects = await GetSetOrAll(filter);
 
-            return new JsonResult(new CollectionResult<EditProjectViewModel>()
+            return new JsonResult(new PaginationCollection<EditProjectViewModel>()
             {
-                Values = projects.Select(x => x.GetVM(Encode(x.Name), filter.Context)).ToArray(),
+                Values = projects
+                .Select(x => x.GetVM(Encode(x.Name), filter.DeveloperContextUrl))
+                .ToArray(),
                 TotalCount = Repo.LastQueryTotalCount
             });
         }
@@ -121,35 +126,37 @@ namespace Host.Controllers
 
 
         //retrive predefined sets of Projects
-        protected virtual Task<IEnumerable<Project>> GetSetOrAll(FilterModel filter)
+        protected virtual Task<IEnumerable<Project>> GetSetOrAll(ProjectFilterModel filter)
         {
-            if (filter.Set.ToLower() == "associated")
+            //ToDo switch statements should be omitted using polymorphism
+
+            if (filter.Set.Value == ProjectSet.Associated)
                 return Repo.GetAssignedTo(
-                    devName: filter.Context,
+                    devName: filter.DeveloperContextUrl,
                     status: null,
                     keywords: filter.Keywords,
                     order: filter.GetOrderModel());
 
-            if (filter.Set.ToLower() == "nonassociated")
+            if (filter.Set.Value == ProjectSet.NonAssociated)
                 return Repo.GetAssignableTo(
-                    devName: filter.Context,
+                    devName: filter.DeveloperContextUrl,
                     status: null,
                     keywords: filter.Keywords,
                     order: filter.GetOrderModel());
 
-            if (filter.Set.ToLower() == "completed")
+            if (filter.Set.Value == ProjectSet.Completed)
                 return Repo.GetByStatus(
                     status: ProjectStatus.Completed,
                     keywords: filter.Keywords,
                     order: filter.GetOrderModel());
 
-            if (filter.Set.ToLower() == "unstarted")
+            if (filter.Set.Value == ProjectSet.UnStarted)
                 return Repo.GetByStatus(
                     status: ProjectStatus.UnStarted,
                     keywords: filter.Keywords,
                     order: filter.GetOrderModel());
 
-            if (filter.Set.ToLower() == "active")
+            if (filter.Set.Value == ProjectSet.Active)
                 return Repo.GetByStatus(
                     status: ProjectStatus.InProgress,
                     keywords: filter.Keywords,
@@ -179,22 +186,55 @@ namespace Host.Controllers
             return ModelState.IsValid;
         }
 
-        private async Task<bool> ValidateFilterOrDefault(FilterModel filter)
+        protected virtual void SetFilterDefaults(ProjectFilterModel filter)
         {
-            if (!filter.Order.HasValue) filter.Order = OrderDirection.Ascending;
-            if (string.IsNullOrEmpty(filter.Set)) filter.Set = "all";
-            //if no sort Column  given use fullName
-            if (string.IsNullOrEmpty(filter.Sort)) filter.Sort = "name";
+            if (!filter.Set.HasValue)
+            {
+                filter.Set = ProjectSet.All;
+            }
+
+            if (!filter.Sort.HasValue)
+            {
+                filter.Sort = ProjectSort.Name;
+            }
+
+            if (!filter.Order.HasValue)
+            {
+                filter.Order = OrderDirection.Ascending;
+            }
+
+            if (!filter.Skip.HasValue || filter.Skip.Value < 0)
+            {
+                filter.Skip = 0;
+            }
+
+            if (!filter.Take.HasValue || filter.Take.Value < 0)
+            {
+                filter.Take = DefaultTake;
+            }
+
+            if (filter.Set.Value != ProjectSet.Associated && filter.Set.Value != ProjectSet.NonAssociated)
+            {
+                filter.DeveloperContextUrl = "";
+            }
+        }
+
+        //ToDO
+        private async Task<bool> ValidateFilter(ProjectFilterModel filter)
+        {
             //if retriving associated data (devs of project) and context not given or project does't exist
-            if (filter.Set.ToLower() == "associated")
-                if (string.IsNullOrEmpty(filter.Context))
+            if (filter.Set.Value == ProjectSet.Associated || filter.Set.Value == ProjectSet.NonAssociated)
+            {
+                if (string.IsNullOrEmpty(filter.DeveloperContextUrl))
                 {
-                    ModelState.AddModelError(nameof(filter.Context), "Developer url not provided in \"Context\" field");
+                    ModelState.AddModelError(nameof(filter.DeveloperContextUrl), "Developer url not provided in \"Context\" field");
                 }
-            //else if (!await _mng.DeveloperExists(Decode(filter.Context)))
-            //{
-            //    ModelState.AddModelError(nameof(filter.Context), string.Format("Developer with nickname {0} was not found", Decode(filter.Context)));
-            //}
+                //else if (!await _mng.DeveloperExists(Decode(filter.Context)))
+                //{
+                //    ModelState.AddModelError(nameof(filter.Context), string.Format("Developer with nickname {0} was not found", Decode(filter.Context)));
+                //}
+            }
+
             return ModelState.IsValid;
         }
     }

@@ -55,7 +55,8 @@ namespace Infrastructure.Data.EntityFrameworkCore
 
         public async Task<IEnumerable<Project>> Get(string keywords = null, OrderModel order = null)
         {
-            var query = Projects.Search(keywords);
+            var query = Projects
+                .Search(keywords);
 
             this.LastQueryTotalCount = await query.CountAsync();
 
@@ -64,7 +65,8 @@ namespace Infrastructure.Data.EntityFrameworkCore
                 order = DefaultOrderModel;
             }
 
-            return await query.ApplyOrderModel(order).ToArrayAsync();
+            return await query.ApplyOrderModel(order)
+                .ToArrayAsync();
         }
 
         public async Task<IEnumerable<Project>> GetByStatus(ProjectStatus status, string keywords = null, OrderModel order = null)
@@ -83,7 +85,9 @@ namespace Infrastructure.Data.EntityFrameworkCore
 
         public async Task<IEnumerable<Project>> GetAssignedTo(string devName, ProjectStatus? status = null, string keywords = null, OrderModel order = null)
         {
-            var query = Projects.Where(proj => proj.ProjectAssignments.Any(x => x.Developer.Nickname == devName)).Search(keywords);
+            var query = Projects
+                .Where(proj => proj.ProjectAssignments.Any(x => x.Developer.Nickname == devName))
+                .Search(keywords);
 
             if (status.HasValue)
             {

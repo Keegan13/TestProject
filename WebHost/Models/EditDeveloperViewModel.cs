@@ -13,7 +13,7 @@ namespace Host.Models
 
         #region For Client side interactions
 
-        public string Project { get; set; }
+        public string ProjectContextUrl { get; set; }
 
         public string Url { get; set; }
 

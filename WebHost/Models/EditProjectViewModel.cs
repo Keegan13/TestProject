@@ -20,7 +20,7 @@ namespace Host.Models
         [Required]
         public ProjectStatus Status { get; set; }
 
-        public string Developer { get; set; }
+        public string DeveloperContextUrl { get; set; }
 
         public string Url { get; set; }
     }

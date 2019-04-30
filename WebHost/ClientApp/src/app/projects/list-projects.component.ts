@@ -4,6 +4,7 @@ import { Project } from '../models/Project';
 import { ProjectRepoService } from '../services/project-repo.service';
 import { ActivatedRoute } from '@angular/router';
 import { FilterModel } from '../models/FilterModel';
+import { ProjectFilterModel } from '../models/ProjectFilterModel';
 
 @Component({
   selector: 'app-list-projects',
@@ -20,7 +21,7 @@ export class ListProjectsComponent implements OnInit {
   @Input() set: string = "all";
   @Input() noPanel: boolean = false;
 
-  @Input() filter: FilterModel;// = new FilterModel();
+  @Input() filter: ProjectFilterModel;// = new FilterModel();
   projects: Project[];
   page: number = 1;
   collectionSize: number = 0;
@@ -61,7 +62,7 @@ export class ListProjectsComponent implements OnInit {
 
 
     if (!this.filter) {
-      this.filter = new FilterModel();
+      this.filter = new ProjectFilterModel();
       this.filter.sort = "name";//sort should handle
       this.filter.order = "ascending"; // sort
       this.filter.set = this.set; // parent
@@ -71,7 +72,7 @@ export class ListProjectsComponent implements OnInit {
      
     }
 
-    if (this.hasContext) this.filter.context = this.developer;
+    if (this.hasContext) this.filter.developerContextUrl = this.developer;
     this.loadData();
   }
 

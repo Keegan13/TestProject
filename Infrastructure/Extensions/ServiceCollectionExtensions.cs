@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Infrastructure.Services;
+
 using Infrastructure.Data.EntityFrameworkCore;
 using Infrastructure.Abstractions;
 using System;
@@ -14,12 +14,6 @@ namespace Infrastructure.Extensions
         public static void AddCustomDbContext(this IServiceCollection services, Action<DbContextOptionsBuilder> options)
         {
             services.AddDbContext<ApplicationContext>(options);
-        }
-
-        [Obsolete]
-        public static void AddProjectManager(this IServiceCollection services)
-        {
-            services.AddScoped<ProjectManagerService>();
         }
 
         public static void AddEFCoreRepositories(this IServiceCollection services)
