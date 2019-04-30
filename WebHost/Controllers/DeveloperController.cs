@@ -15,9 +15,7 @@ namespace Host.Controllers
     {
         private readonly IDeveloperRepository _developerRepo;
 
-        protected string[] Sets = new[] { "all", "associated", "nonassociated" };
-
-        protected string[] Sorts = new[] { "fullname", "nickname" };
+        private const int DefaultTake = 20;
 
         public DeveloperController(IDeveloperRepository devRepo)
         {
@@ -28,7 +26,7 @@ namespace Host.Controllers
 
         //GET api/developer
         [HttpGet]
-        public async Task<IActionResult> Get([FromQuery] FilterModel filter)
+        public async Task<IActionResult> Get([FromQuery] DeveloperFilterModel filter)
         {
             SetFilterDefaults(filter);
 
@@ -39,11 +37,11 @@ namespace Host.Controllers
 
             var developers = await GetSetOrAll(filter);
 
-            string projName = filter.Set.ToLower() == "associated" ? filter.Context : "";
+            string projectUrl = filter.Set.Value == DeveloperSet.Associated ? filter.ProjectContextUrl : "";
 
             return Ok(new PaginationCollection<EditDeveloperViewModel>()
             {
-                Values = developers.Select(x => x.GetVM(Encode(x.Nickname), projName)).ToArray(),
+                Values = developers.Select(x => x.GetVM(Encode(x.Nickname), projectUrl)).ToArray(),
                 TotalCount = _developerRepo.LastQueryTotalCount
             });
         }
@@ -162,20 +160,20 @@ namespace Host.Controllers
             return ModelState.IsValid;
         }
 
-        protected virtual Task<IEnumerable<Developer>> GetSetOrAll(FilterModel filter)
+        protected virtual Task<IEnumerable<Developer>> GetSetOrAll(DeveloperFilterModel filter)
         {
-            if (filter.Set.ToLower() == "associated")
+            if (filter.Set.Value == DeveloperSet.Associated)
             {
                 return _developerRepo.GetAssignedTo(
-                    projName: Decode(filter.Context),
+                    projName: Decode(filter.ProjectContextUrl),
                     keywords: filter.Keywords,
                     order: filter.GetOrderModel());
             }
 
-            if (filter.Set.ToLower() == "nonassociated")
+            if (filter.Set.Value == DeveloperSet.NonAssociated)
             {
                 return _developerRepo.GetAssignableTo(
-                    projName: Decode(filter.Context),
+                    projName: Decode(filter.ProjectContextUrl),
                     keywords: filter.Keywords,
                     order: filter.GetOrderModel());
             }
@@ -183,32 +181,56 @@ namespace Host.Controllers
             return _developerRepo.Get(filter.Keywords, filter.GetOrderModel());
         }
 
-        protected virtual void SetFilterDefaults(FilterModel filter)
+        protected virtual void SetFilterDefaults(DeveloperFilterModel filter)
         {
-            //seting defaults
-            if (string.IsNullOrEmpty(filter.Set)) filter.Set = "all";
+            if (!filter.Set.HasValue)
+            {
+                filter.Set = DeveloperSet.All;
+            }
 
-            if (!filter.Order.HasValue) filter.Order = OrderDirection.Ascending;
+            if (!filter.Sort.HasValue)
+            {
+                filter.Sort = DeveloperSort.FullName;
+            }
 
-            if (string.IsNullOrEmpty(filter.Sort)) filter.Sort = "fullname";
+            if (!filter.Order.HasValue)
+            {
+                filter.Order = OrderDirection.Ascending;
+            }
+
+            if (!filter.Skip.HasValue || filter.Skip.Value < 0)
+            {
+                filter.Skip = 0;
+            }
+
+            if (!filter.Take.HasValue || filter.Take.Value < 0)
+            {
+                filter.Take = DefaultTake;
+            }
+
+            if (filter.Set.Value != DeveloperSet.Associated && filter.Set.Value != DeveloperSet.NonAssociated)
+            {
+                filter.ProjectContextUrl = "";
+            }
         }
 
-        protected virtual Task<bool> ValidateFilter(FilterModel filter)
+        protected virtual Task<bool> ValidateFilter(DeveloperFilterModel filter)
         {
-            if (!this.Sets.Contains(filter.Set.ToLower()))
-            {
-                ModelState.AddModelError(nameof(filter.Set), String.Format("Unrecognizable set was requested \"{0}\"", filter.Set));
-            }
+            //if (!filter.Set.HasValue)
+            //{
+            //    ModelState.AddModelError(nameof(filter.Set), String.Format("Unrecognizable set was requested \"{0}\"", filter.Set));
+            //}
 
-            if (!this.Sorts.Contains(filter.Sort.ToLower()))
-            {
-                ModelState.AddModelError(nameof(filter.Set), String.Format("Unrecognizable sort column was requested \"{0}\"", filter.Sort));
-            }
+            //if (!filter.Sort.HasValue)
+            //{
+            //    ModelState.AddModelError(nameof(filter.Set), String.Format("Unrecognizable sort column was requested \"{0}\"", filter.Sort));
+            //}
 
             //if retriving associated data (devs of project) and context not given or project does't exist
-            if (filter.Set.ToLower() == "associated" && string.IsNullOrEmpty(filter.Context))
+
+            if ((filter.Set.Value == DeveloperSet.Associated || filter.Set.Value == DeveloperSet.NonAssociated) && string.IsNullOrEmpty(filter.ProjectContextUrl))
             {
-                ModelState.AddModelError(nameof(filter.Context), "Project name not provided in \"Context\" field of request object");
+                ModelState.AddModelError(nameof(filter.ProjectContextUrl), string.Format("Project url not provided in \"{0}\" field of request object", nameof(filter.ProjectContextUrl)));
             }
 
 

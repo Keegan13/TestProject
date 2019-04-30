@@ -38,10 +38,9 @@ export class DeveloperComponent implements OnInit {
     this.router.navigate(['/developer/' + this.developer.url]);
   }
 
-  edit() {
+  showEdit() {
     var initialState = Object.assign({}, {
       developer: this.developer,
-      isEdit: true
     });
 
     this.bsModalRef = this.modalService.show(CreateDeveloperComponent, { initialState });

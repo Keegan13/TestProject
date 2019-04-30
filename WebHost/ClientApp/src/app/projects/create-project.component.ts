@@ -45,13 +45,19 @@ export class CreateProjectComponent implements OnInit {
   };
 
 
+
+  //internal 
+
   private dateConfig = {
     dateInputFormat: 'DD/MM/YYYY'
   };
 
   public createForm: FormGroup;
 
-  @Input() isEdit: boolean;
+  get isEdit(){ 
+    if(this.project) return true;
+    return false;
+  }
 
   @Input() project: Project;
 
@@ -67,8 +73,6 @@ export class CreateProjectComponent implements OnInit {
 
 
   ngOnInit() {
-    if (this.project) this.isEdit = true;
-    if (!this.isEdit) this.isEdit = false;
     this.initForm();
   }
 

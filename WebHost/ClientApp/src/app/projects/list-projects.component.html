@@ -1,40 +1,32 @@
-<div class="list-group" *ngIf="isModal">
-  <div *ngFor="let element of projects">
-    <a class="list-group-item list-group-item-action" [routerLink]='["/project",element.url]'>{{element.name}}
-    </a></div>
-</div>
-<div *ngIf="!isModal">
-  <app-list-controls *ngIf="!noPanel" [collectionSize]="collectionSize" [pageSize]="pageSize" [page]="page"
-    (pageChange)="onPageChange($event)" [filter]="filter">
-  </app-list-controls>
-  <table class="table table-sm table-hover">
-    <thead>
-      <tr>
-        <th style="width: 50%">Project name</th>
-        <th style="width: 20%">Start</th>
-        <th style="width: 20%">Finish</th>
-        <th style="width:10%">Status</th>
-      </tr>
-    </thead>
-    <tbody *ngIf="hasItems">
-      <tr *ngFor="let element of projects">
-        <td class="align-middle" [routerLink]='["/project",element.url]'>{{element.name}}</td>
-        <td class="align-middle" [routerLink]='["/project",element.url]'>{{element.startDate | date:"dd/MM/yy"}}</td>
-        <td class="align-middle" [routerLink]='["/project",element.url]'>{{element.endDate | date:"dd/MM/yy"}}</td>
-        <td class="align-middle" [routerLink]='["/project",element.url]'>
-          <app-project-status [status]="element.status">
-          </app-project-status>
-        </td>
-      </tr>
-    </tbody>
-    <tbody *ngIf="!hasItems">
-      <tr>
-        <td colspan="4">
-          No projects
-        </td>
-      </tr>
+<app-list-controls *ngIf="!noPanel" [collectionSize]="collectionSize" [pageSize]="pageSize" [page]="page"
+  (pageChange)="onPageChange($event)" (keywordsChange)="onKeywordsChange($event)">
+</app-list-controls>
+<table class="table table-sm table-hover">
+  <thead>
+    <tr>
+      <th style="width: 50%">Project name</th>
+      <th style="width: 20%">Start</th>
+      <th style="width: 20%">Finish</th>
+      <th style="width:10%">Status</th>
+    </tr>
+  </thead>
+  <tbody *ngIf="hasItems">
+    <tr *ngFor="let element of projects">
+      <td class="align-middle" [routerLink]='["/project",element.url]'>{{element.name}}</td>
+      <td class="align-middle" [routerLink]='["/project",element.url]'>{{element.startDate | date:"dd/MM/yy"}}</td>
+      <td class="align-middle" [routerLink]='["/project",element.url]'>{{element.endDate | date:"dd/MM/yy"}}</td>
+      <td class="align-middle" [routerLink]='["/project",element.url]'>
+        <app-project-status [status]="element.status">
+        </app-project-status>
+      </td>
+    </tr>
+  </tbody>
+  <tbody *ngIf="!hasItems">
+    <tr>
+      <td colspan="4">
+        No projects
+      </td>
+    </tr>
 
-    </tbody>
-  </table>
-
-</div>
+  </tbody>
+</table>

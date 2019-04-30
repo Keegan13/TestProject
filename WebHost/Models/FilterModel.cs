@@ -1,5 +1,8 @@
-﻿namespace Host.Models
+﻿using System;
+
+namespace Host.Models
 {
+    [Obsolete]
     public class FilterModel
     {
         public string Type { get; set; }

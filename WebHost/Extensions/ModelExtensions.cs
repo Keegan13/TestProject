@@ -2,6 +2,7 @@
 using Infrastructure.Entities;
 using AutoMapper;
 using System.Linq;
+using System;
 
 namespace Host.Extensions
 {
@@ -45,6 +46,7 @@ namespace Host.Extensions
             return result;
         }
 
+        [Obsolete]
         public static OrderModel GetOrderModel(this FilterModel filter)
         {
             if (filter == null)
@@ -60,6 +62,17 @@ namespace Host.Extensions
         }
 
         public static OrderModel GetOrderModel(this ProjectFilterModel filter)
+        {
+            return new OrderModel
+            {
+                SortColumn = filter.Sort.Value.ToString(),
+                isAscendingOrder = filter.Order.Value == OrderDirection.Ascending,
+                Skip = filter.Skip.Value,
+                Take = filter.Take.Value
+            };
+        }
+
+        public static OrderModel GetOrderModel(this DeveloperFilterModel filter)
         {
             return new OrderModel
             {

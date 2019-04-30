@@ -3,8 +3,8 @@ import { CollectionResult } from '../models/collection-result';
 import { Project } from '../models/Project';
 import { ProjectRepoService } from '../services/project-repo.service';
 import { ActivatedRoute } from '@angular/router';
-import { FilterModel } from '../models/FilterModel';
 import { ProjectFilterModel } from '../models/ProjectFilterModel';
+import { timingSafeEqual } from 'crypto';
 
 @Component({
   selector: 'app-list-projects',
@@ -12,33 +12,52 @@ import { ProjectFilterModel } from '../models/ProjectFilterModel';
   styleUrls: ['./list-projects.component.css']
 })
 export class ListProjectsComponent implements OnInit {
-  private _pageDelta: number = 0;
+  constructor(private repo: ProjectRepoService) {
+  }
 
-  @Input() pageSize: number = 25;
-  @Input() isModal: boolean = false;
+  ngOnInit() {
+    this.filter = new ProjectFilterModel();
+    this.filter.sort = "name";//sort should handle
+    this.filter.order = "ascending"; // sort
+    this.filter.set = this.set; // parent
+    this.filter.take = this.pageSize; // list-panel
+    this.filter.skip = 0; //list-panel
+    this.filter.keywords = ""; //list-panel}
 
-  @Input() developerContextUrl: string = null;
-  @Input() set: string = "all";
-  @Input() noPanel: boolean = false;
+    if (this.hasContext) this.filter.developerContextUrl = this.developerContextUrl;
 
-  @Input() filter: ProjectFilterModel;// = new FilterModel();
-  projects: Project[];
-  page: number = 1;
-  collectionSize: number = 0;
+    this._initialized=true;
 
-
-  onPageChange($page: number) {
-    if ($page > this.page) {
-      this._pageDelta = 1;
-    }
-    if ($page < this.page) {
-      this._pageDelta = -1;
-    }
     this.loadData();
   }
 
+  @Input() pageSize: number = 25;
 
-  constructor(private repo: ProjectRepoService) {
+  @Input() set: string = "all";
+
+  @Input() noPanel: boolean = false;
+
+  @Input() developerContextUrl: string = null;
+
+  @Input() filter: ProjectFilterModel;// = new FilterModel();
+
+  private _pageDelta: number = 0;
+  projects: Project[];
+  page: number = 1;
+  collectionSize: number = 0;
+  private _initialized = false;
+
+  onPageChange($page: number) {
+    this._pageDelta=$page-this.page;
+
+    this.filter.skip=($page-1)*this.pageSize;
+
+    this.loadData();
+  }
+
+  onKeywordsChange($keywords: string) {
+    this.filter.keywords = $keywords;
+    this.loadData();
   }
 
   get hasContext(): boolean {
@@ -46,72 +65,31 @@ export class ListProjectsComponent implements OnInit {
     return true;
   }
 
-  get hasItems() {
-    if (!this.projects) return false;
-    if (this.projects.length == 0) return false;
-    return true;
+  get hasItems(): boolean {
+    return this.projects && this.projects.length > 0;
   }
 
 
-  ngOnInit() {
-    if (!this.isModal) this.isModal = false;
-    if (!this.pageSize) this.pageSize = 25;
-    if (!this.set) this.set = "all";
-    this.page = 1;
-    //init filter
 
+  private onDataLoad(result: CollectionResult<Project>): void {
 
-    if (!this.filter) {
-      this.filter = new ProjectFilterModel();
-      this.filter.sort = "name";//sort should handle
-      this.filter.order = "ascending"; // sort
-      this.filter.set = this.set; // parent
-      this.filter.take = this.pageSize; // list-panel
-      this.filter.skip = 0; //list-panel
-      this.filter.keywords = ""; //list-panel}
-     
-    }
-
-    if (this.hasContext) this.filter.developerContextUrl = this.developerContextUrl;
-    this.loadData();
-  }
-
-  private onLoad(result: CollectionResult<Project>): void {
-    this.projects = result.values;
-    if (result) {
-
-      this.collectionSize = result.totalCount;
-
-      if (this.collectionSize == 0) {
-        this._pageDelta = 0;
-        this.page = 1;
-        return;
-      }
-      if (result.values.length == 0) {
-        let lastPage = result.totalCount / this.pageSize;
-
-        this.page = Number.isInteger(lastPage) ? lastPage : Math.ceil(lastPage);
-
+    if (result.values.length == 0) {
+      let lastPage = result.totalCount / this.pageSize;
+      this.page = Number.isInteger(lastPage) ? lastPage : Math.ceil(lastPage);//1
+      if (result.totalCount > 0) {
         this.filter.skip = (this.page - 1) * this.pageSize;
-        this._pageDelta = 0;
         this.loadData();
       }
-      this.page += this._pageDelta;
-      this._pageDelta = 0;
-      this.projects = result.values;
+    }
 
-    }
-    else {
-      //if no data
-      console.log("handle this later TODO");
-    }
+    this.projects = result.values;
+    this.collectionSize = result.totalCount;
+    this.page += this._pageDelta;
     this._pageDelta = 0;
   }
 
-  public update(): void {
-    this.loadData();
-  }
   private loadData() {
-    this.repo.get(this.filter).subscribe(this.onLoad.bind(this));
+    console.log("loading projects with filter:" + JSON.stringify(this.filter));
+    this.repo.get(this.filter).subscribe(this.onDataLoad.bind(this));
   }
 }

@@ -113,10 +113,12 @@ namespace Host.Controllers
 
             var projects = await GetSetOrAll(filter);
 
+            string developerUrl = filter.Set.Value == ProjectSet.Associated ? filter.DeveloperContextUrl : "";
+
             return new JsonResult(new PaginationCollection<EditProjectViewModel>()
             {
                 Values = projects
-                .Select(x => x.GetVM(Encode(x.Name), filter.DeveloperContextUrl))
+                .Select(x => x.GetVM(Encode(x.Name), developerUrl))
                 .ToArray(),
                 TotalCount = Repo.LastQueryTotalCount
             });
@@ -227,7 +229,7 @@ namespace Host.Controllers
             {
                 if (string.IsNullOrEmpty(filter.DeveloperContextUrl))
                 {
-                    ModelState.AddModelError(nameof(filter.DeveloperContextUrl), "Developer url not provided in \"Context\" field");
+                    ModelState.AddModelError(nameof(filter.DeveloperContextUrl), string.Format("Developer url not provided in \"Context\" field", nameof(filter.DeveloperContextUrl)));
                 }
                 //else if (!await _mng.DeveloperExists(Decode(filter.Context)))
                 //{

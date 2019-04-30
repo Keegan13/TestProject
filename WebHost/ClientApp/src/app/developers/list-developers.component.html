@@ -1,5 +1,5 @@
 <app-list-controls *ngIf="!noPanel" [collectionSize]="collectionSize" [page]="page" [pageSize]="pageSize"
-  (pageChange)="onPageChange($event)" [filter]="filter"></app-list-controls>
+  (pageChange)="onPageChange($event)" (keywordsChange)="onKeywordsChange($event)"></app-list-controls>
 <table class="table table-sm table-hover">
   <thead>
     <tr>

@@ -1,5 +1,4 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
-import { FilterModel } from '../models/FilterModel';
 
 @Component({
   selector: 'app-list-controls',
@@ -9,62 +8,66 @@ import { FilterModel } from '../models/FilterModel';
 
 export class ListControlsComponent implements OnInit {
 
-  //
+  constructor() { }
+
+  ngOnInit() {
+  }
+
+  //required
+
   @Input() collectionSize: number;
+
   @Input() page: number;
+
   @Input() pageSize: number;
+
+  //events
+
   @Output() pageChange: EventEmitter<number> = new EventEmitter();
-  @Input() filter: FilterModel;//ref
-  //@Output() filterChange: EventEmitter<FilterModel> = new EventEmitter();
+
+  @Output() keywordsChange: EventEmitter<string> = new EventEmitter();
+
+  
+  //internal 
 
   get pageCount(): number {
     let count = this.collectionSize / this.pageSize;
     return Number.isInteger(count) ? count : Math.ceil(count);
   }
+
   get hasNext(): boolean {
     return this.page < this.pageCount;
   }
+
   get hasPrevious(): boolean {
     return this.page > 1;
   }
-  get from() {
+
+  get from():number {
     return (this.page - 1) * this.pageSize + 1;
   }
-  get to() {
+
+  get to():number {
     if (this.pageCount == this.page) {
       return this.collectionSize;
     }
     return this.page * this.pageSize;
   }
 
-  constructor() { }
-
-  ngOnInit() {
-    if (!this.filter) {
-      this.filter = new FilterModel();
-    }
-
-  }
-
+  //event handlers
   onSearch(keywords: string) {
-    this.filter.keywords = keywords;
-    this.pageChange.emit(this.page);
-
+    this.keywordsChange.emit(keywords);
   }
-  nextPage() {
+
+  onNextPage() {
     if (this.hasNext) {
-      this.filter.skip = this.page * this.pageSize;
-      this.filter.take = this.pageSize;
       this.pageChange.emit(this.page + 1);
-      console.log(JSON.stringify(this.filter))
     }
   }
-  previousPage() {
+
+  onPreviousPage() {
     if (this.hasPrevious) {
-      this.filter.skip = (this.page - 2) * this.page;
-      this.filter.take = this.pageSize;
       this.pageChange.emit(this.page - 1);
-      console.log(JSON.stringify(this.filter))
     }
   }
 }

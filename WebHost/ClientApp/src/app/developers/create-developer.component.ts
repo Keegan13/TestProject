@@ -1,4 +1,4 @@
-import { EventEmitter, Component, OnInit, Input } from '@angular/core';
+import { EventEmitter, Component, OnInit, Input, Output } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormArray, FormControl } from '@angular/forms';
 import { DeveloperRepoService } from '../services/developer-repo.service';
 import { Developer } from './../models/Developer';
@@ -10,8 +10,19 @@ import { HttpErrorResponse } from '@angular/common/http';
   templateUrl: './create-developer.component.html',
   styleUrls: ['./create-developer.component.css']
 })
+
 export class CreateDeveloperComponent implements OnInit {
 
+  constructor(
+    private router: Router,
+    private fb: FormBuilder,
+    private repo: DeveloperRepoService) { }
+
+  ngOnInit() {
+    this.initForm(this.developer);
+  }
+
+  //constants
   constrains = {
     'fullName': {
       'maxLength': 150,
@@ -44,13 +55,20 @@ export class CreateDeveloperComponent implements OnInit {
     { type: 'required', message: 'Tag name is required or remove' }]
   };
 
+  //internal
+
   createForm: FormGroup;
 
-  @Input() isEdit: boolean = false;
+  get isEdit(): boolean {
+    if (this.developer) return true;
+    return false;
+  }
+
+  //optional inputs
 
   @Input() developer: Developer = null;
 
-  @Input() update: EventEmitter<Developer> = new EventEmitter<Developer>();
+  //properties
 
   get nickname() { return this.createForm.get("nickname") as FormControl; }
 
@@ -58,49 +76,11 @@ export class CreateDeveloperComponent implements OnInit {
 
   get tags() { return this.createForm.get('tags') as FormArray; }
 
-  constructor(private router: Router, private fb: FormBuilder, private repo: DeveloperRepoService) { }
+  //events
 
-  ngOnInit() {
+  @Output() update: EventEmitter<Developer> = new EventEmitter<Developer>();
 
-    if (this.developer) this.isEdit = true;
-
-    if (!this.isEdit) this.isEdit = false;
-
-    this.initForm(this.developer);
-  }
-
-  initForm(developer: Developer = null) {
-
-    let fullNameInit = '';
-    let nickNameInit = '';
-    let tagsInit = [];
-
-    if (developer) {
-      fullNameInit = developer.fullName;
-      nickNameInit = developer.nickname;
-      tagsInit = developer.tags;
-    }
-
-    this.createForm = this.fb.group({
-      fullName: [fullNameInit, Validators.compose([
-        Validators.required,
-        Validators.minLength(this.constrains.fullName.minLength),
-        Validators.maxLength(this.constrains.fullName.maxLength)
-      ])],
-
-      nickname: [nickNameInit, Validators.compose([
-        Validators.required,
-        Validators.minLength(this.constrains.nickname.minLength),
-        Validators.pattern('^([^-]+)$'), //any character excep dash
-        Validators.maxLength(this.constrains.nickname.maxLength)
-      ])],
-
-      tags: this.fb.array([...tagsInit.map(x => this.fb.control(x,
-        Validators.compose([Validators.maxLength(this.constrains.tags.maxLength), Validators.required]))
-      )])
-    });
-
-  }
+  //event handlers
 
   onSubmit() {
 
@@ -136,7 +116,7 @@ export class CreateDeveloperComponent implements OnInit {
         Validators.compose([Validators.maxLength(this.constrains.tags.maxLength), Validators.required])));
     }
   }
-  
+
   removeTag(index: number) {
     this.tags.removeAt(index);
   }
@@ -144,7 +124,7 @@ export class CreateDeveloperComponent implements OnInit {
   onSubmitResult(developer: Developer) {
     if (developer) {
       this.initForm(developer);
-      this.developer=developer;
+      this.developer = developer;
       if (this.update.observers.length > 0)
         this.update.emit(this.developer);
       else
@@ -180,6 +160,42 @@ export class CreateDeveloperComponent implements OnInit {
       }
     }
   }
+
+  //methods
+
+  initForm(developer: Developer = null) {
+
+    let fullNameInit = '';
+    let nickNameInit = '';
+    let tagsInit = [];
+
+    if (developer) {
+      fullNameInit = developer.fullName;
+      nickNameInit = developer.nickname;
+      tagsInit = developer.tags;
+    }
+
+    this.createForm = this.fb.group({
+      fullName: [fullNameInit, Validators.compose([
+        Validators.required,
+        Validators.minLength(this.constrains.fullName.minLength),
+        Validators.maxLength(this.constrains.fullName.maxLength)
+      ])],
+
+      nickname: [nickNameInit, Validators.compose([
+        Validators.required,
+        Validators.minLength(this.constrains.nickname.minLength),
+        Validators.pattern('^([^-]+)$'), //any character excep dash
+        Validators.maxLength(this.constrains.nickname.maxLength)
+      ])],
+
+      tags: this.fb.array([...tagsInit.map(x => this.fb.control(x,
+        Validators.compose([Validators.maxLength(this.constrains.tags.maxLength), Validators.required]))
+      )])
+    });
+
+  }
+
   /**
  * Marks all controls in a form group as touched
  * @param formGroup - The form group to touch
