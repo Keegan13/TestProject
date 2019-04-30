@@ -1,8 +1,4 @@
-﻿using Host.Models;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Web;
 
 namespace Host.Controllers
@@ -15,6 +11,7 @@ namespace Host.Controllers
         {
 
         }
+
         public static string Encode(string input)
         {
             if (!string.IsNullOrEmpty(input))

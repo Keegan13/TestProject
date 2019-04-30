@@ -63,6 +63,9 @@ import { ListControlsComponent } from './list-controls/list-controls.component';
     ProgressbarModule,
 
   ],
+  exports:[
+    CreateDeveloperComponent
+  ],
   providers: [{ provide: APP_BASE_HREF, useValue: '/' }],
   bootstrap: [AppComponent]
 })

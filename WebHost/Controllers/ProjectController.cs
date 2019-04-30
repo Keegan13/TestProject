@@ -1,12 +1,10 @@
 ﻿using Host.Models;
 using Microsoft.AspNetCore.Mvc;
 using Host.Extensions;
-using AutoMapper.Configuration;
 using System.Linq;
 using Infrastructure.Entities;
 using System;
 using System.Threading.Tasks;
-using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Infrastructure.Abstractions;
@@ -23,7 +21,6 @@ namespace Host.Controllers
         {
             this.Repo = repo;
         }
-
 
         // api/project
         #region API
@@ -126,7 +123,6 @@ namespace Host.Controllers
 
         #endregion
 
-
         //retrive predefined sets of Projects
         protected virtual Task<IEnumerable<Project>> GetSetOrAll(ProjectFilterModel filter)
         {
@@ -166,7 +162,6 @@ namespace Host.Controllers
 
             return Repo.Get(filter.Keywords, filter.GetOrderModel());
         }
-
 
         protected virtual async Task<bool> ValidateProject(EditProjectViewModel model, Project original = null)
         {
@@ -220,7 +215,6 @@ namespace Host.Controllers
                 filter.DeveloperContextUrl = "";
             }
         }
-
         //ToDO
         private async Task<bool> ValidateFilter(ProjectFilterModel filter)
         {

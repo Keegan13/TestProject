@@ -1,6 +1,10 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CreateDeveloperComponent } from './create-developer.component';
+import { ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AppRoutingModule } from '../app-routing.module';
+import { AppModule } from '../app.module';
 
 describe('CreateDeveloperComponent', () => {
   let component: CreateDeveloperComponent;
@@ -8,7 +12,12 @@ describe('CreateDeveloperComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CreateDeveloperComponent ]
+      imports:[
+        ReactiveFormsModule,
+        AppRoutingModule,
+        AppModule
+      ],
+      declarations: [  ]
     })
     .compileComponents();
   }));
