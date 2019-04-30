@@ -17,7 +17,7 @@ export class ListProjectsComponent implements OnInit {
   @Input() pageSize: number = 25;
   @Input() isModal: boolean = false;
 
-  @Input() developer: string = null;
+  @Input() developerContextUrl: string = null;
   @Input() set: string = "all";
   @Input() noPanel: boolean = false;
 
@@ -42,7 +42,7 @@ export class ListProjectsComponent implements OnInit {
   }
 
   get hasContext(): boolean {
-    if (!this.developer) return false;
+    if (!this.developerContextUrl) return false;
     return true;
   }
 
@@ -72,7 +72,7 @@ export class ListProjectsComponent implements OnInit {
      
     }
 
-    if (this.hasContext) this.filter.developerContextUrl = this.developer;
+    if (this.hasContext) this.filter.developerContextUrl = this.developerContextUrl;
     this.loadData();
   }
 

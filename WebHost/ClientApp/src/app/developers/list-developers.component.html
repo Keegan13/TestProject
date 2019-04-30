@@ -21,8 +21,8 @@
           <td class="align-middle" [routerLink]='["/developer",element.url]'>{{element.nickname}}</td>
           <!-- <td   >{{element.skills|json}}</td> -->
           <td>
-            <app-assign-button class="col-sm-12" [developer]="element.url" [project]="project"
-              [isAssigned]="element.projectContextUrl==project">
+            <app-assign-button class="col-sm-12" [developerUrl]="element.url" [projectUrl]="projectContextUrl"
+              [isAssigned]="element.projectContextUrl==projectContextUrl">
             </app-assign-button>
           </td>
         </tr>

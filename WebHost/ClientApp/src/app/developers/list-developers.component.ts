@@ -22,7 +22,7 @@ export class ListDevelopersComponent implements OnInit {
   @Input() isModal: boolean = false;
 
   //@Input() data: CollectionResult<Developer>;
-  @Input() project: string = null;//this is context
+  @Input() projectContextUrl: string = null;//this is context
   @Input() set: string = "all";
   @Input() noPanel: boolean = false;
   @Input() filter: FilterModel;
@@ -38,7 +38,6 @@ export class ListDevelopersComponent implements OnInit {
     if ($page < this.page) {
       this._pageDelta = -1;
     }
-
     this.loadData();
   }
 
@@ -47,9 +46,10 @@ export class ListDevelopersComponent implements OnInit {
     assign.anotherField.subscribe(this.onAssignChanged.bind(this));
   }
   get hasContext(): boolean {
-    if (!this.project) return false;
+    if (!this.projectContextUrl) return false;
     return true;
   }
+  
   get hasItems(): boolean { return this.developers && this.developers.length > 0 }
   ngOnInit() {
     //default
@@ -66,7 +66,7 @@ export class ListDevelopersComponent implements OnInit {
       this.filter.skip = 0; //list-panel
       this.filter.keywords = ""; //list-panel
     }
-    if (this.hasContext) this.filter.context = this.project;
+    if (this.hasContext) this.filter.context = this.projectContextUrl;
     this.loadData();
   }
 

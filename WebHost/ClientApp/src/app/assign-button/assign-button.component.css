@@ -1,9 +1,9 @@
-
 button:focus
 {
     outline:none;
     border: 0px;
 }
+
 :host
 {
     padding:5px;
